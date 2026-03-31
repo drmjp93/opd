@@ -19,7 +19,7 @@
         }
     </script>
     <style>
-        body { background-color: #f8fafc; overflow-y: hidden; }
+        body { background-color: #f8fafc; overflow-y: auto; overflow-x: hidden; }
         .glass-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226,232,240,0.8); border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03); }
         .premium-input { width: 100%; background: #f1f5f9; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; font-weight: 500; color: #1e293b; transition: all 0.2s ease; }
         .premium-input:focus { background: #fff; border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
@@ -41,7 +41,6 @@
         .inline-search-input:focus { border-color: #4f46e5; border-style: solid; outline: none; box-shadow: 0 4px 20px -2px rgba(79,70,229,0.15); }
         .inline-search-icon { position: absolute; left: 14px; top: 14px; color: #94a3b8; }
 
-```
     /* ── DRUG CARD ── */
     .rx-card {
         background: #fff;
@@ -110,7 +109,6 @@
     }
     @media screen { #print-layout { display: none; } }
 </style>
-```
 
 </head>
 <body class="antialiased">
@@ -127,56 +125,56 @@
 <div id="print-layout"></div>
 
 <div id="screen-layout" class="p-4 lg:p-6 min-h-screen" style="display:none;">
-    <header class="max-w-[1600px] mx-auto mb-5 flex justify-between items-center">
-        <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-lg">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold tracking-tight text-slate-900">OPD ENGINE</h1>
-                <p class="text-[10px] font-bold text-brand-600 uppercase tracking-widest">Developed by Dr. Mit Panchani</p>
-            </div>
-        </div>
-        <div class="flex items-center gap-3">
-            <button onclick="clearWorkspace()" class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-white rounded-lg transition-all border border-slate-200">Clear Data</button>
-            <button onclick="prepareAndPrint()" class="px-5 py-2 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-lg shadow-md transition-all flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                Print
-            </button>
-        </div>
-    </header>
+    
 
-```
-<!-- SMART COMMAND LINE -->
-<div class="max-w-[1600px] mx-auto mb-4 w-full">
-    <div class="glass-card p-4 border-l-4 border-l-indigo-500 shadow-sm transition-all" id="quickEntryCard">
-        <div class="flex items-center justify-between mb-3">
-            <h2 class="font-bold text-slate-800 flex items-center gap-2 text-sm uppercase tracking-wider">
-                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                Smart Command Line
-            </h2>
-            <span id="quickEntryStatus" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest hidden">✅ Data Loaded Successfully</span>
-        </div>
-        <div class="relative flex gap-2 items-center">
-            <div class="relative flex-1">
-                <input type="text" id="quickEntryInput" class="inline-search-input !py-3 !pl-10 !pr-4 !text-base !font-semibold !border-solid !border-2 !border-slate-300 focus:!border-indigo-500 w-full" placeholder="e.g. Ramila 45 f 130/80 88 rs-n cvs-n t-n kco-dm,htn c/o-fever and cough" autocomplete="off">
-                <span class="absolute left-4 top-3.5 text-indigo-500 font-bold">⌨️</span>
+
+            <header class="max-w-[1600px] mx-auto flex justify-between items-center sticky top-0 z-50 bg-[#f8fafc] py-2 px-4 border-b border-slate-200 mb-3 shadow-sm">
+            <div class="flex items-center gap-4">
+                <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white shadow-md">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-none">OPD ENGINE</h1>
+                </div>
             </div>
-            <button id="quickEntryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl text-sm font-bold shadow-md transition-colors shrink-0">Execute</button>
+            <div class="flex items-center gap-3">
+
+                <button onclick="clearWorkspace()" class="px-3 py-1.5 text-xs font-bold text-rose-500 hover:text-white hover:bg-rose-500 rounded-md transition-all border border-rose-200">Clear Data</button>
+                
+                   <button onclick="prepareAndPrint()" class="px-5 py-2 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-lg shadow-md transition-all flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>Print</button>
+            </div>
+        </header>
+
+
+<!-- SMART COMMAND LINE -->
+ 
+<div class="max-w-[1600px] mx-auto mb-3 w-full">
+    <div class="glass-card px-4 py-2 border-l-4 border-l-indigo-500 shadow-sm transition-all flex flex-col justify-center" id="quickEntryCard">
+        <div class="relative flex gap-2 items-center">
+            
+            <div class="relative flex-1">
+                <input type="text" id="quickEntryInput" class="inline-search-input !py-2 !pl-9 !pr-4 !text-sm !font-semibold !border-solid !border-2 !border-slate-300 focus:!border-indigo-500 w-full shadow-sm" placeholder="e.g. Ramila 45 f 130/80 88 rs-n cvs-n t-n kco-dm,htn c/o-fever and cough" autocomplete="off">
+                <span class="absolute left-3 top-2.5 text-indigo-500 font-bold text-sm">⌨️</span>
+            </div>
+            
+            <span id="quickEntryStatus" class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest hidden mr-1">✅ Loaded</span>
+            
+            <button id="quickEntryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md transition-colors shrink-0">Execute</button>
         </div>
-        <div id="quickEntryChips" class="flex flex-wrap gap-2 mt-4 min-h-[24px]"></div>
+        
+        <div id="quickEntryChips" class="flex flex-wrap gap-1.5 mt-2 empty:hidden"></div>
     </div>
 </div>
 
 <main class="max-w-[1600px] mx-auto w-full flex flex-col gap-4">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
 
-        <details class="glass-card group bg-white/90 shadow-sm z-50">
+        <details class="glass-card group bg-white/90 shadow-sm z-50 hidden">
             <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
                 <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-brand-500"></span> 1. Demographics & Vitals</span>
                 <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </summary>
-            <div class="p-4 pt-0 space-y-3 border-t border-slate-100 mt-2">
+            <div class="p-4 pt-0 space-y-3 border-t border-slate-100 mt-2 ">
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="input-label">Date</label><input type="date" id="date" class="premium-input !px-2"></div>
                     <div><label class="input-label">Sex</label><select id="ptSex" class="premium-input !px-2"><option>M</option><option>F</option></select></div>
@@ -200,7 +198,7 @@
             </div>
         </details>
 
-        <details class="glass-card group bg-white/90 shadow-sm z-50" id="kcoSection">
+        <details class="glass-card group bg-white/90 shadow-sm z-50 hidden" id="kcoSection">
             <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
                 <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-rose-500"></span> 2. KCO</span>
                 <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -224,7 +222,7 @@
             </div>
         </details>
 
-        <details class="glass-card group bg-white/90 shadow-sm z-50">
+        <details class="glass-card group bg-white/90 shadow-sm z-50 hidden">
             <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
                 <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-amber-500"></span> 3. Clinical Note</span>
                 <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -347,7 +345,6 @@
         </div>
     </div>
 </main>
-```
 
 </div>
 
