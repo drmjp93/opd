@@ -1175,7 +1175,7 @@ function prepareAndPrint() {
             ${rxItems.map((item,i) => {
                 const f = item.freqArr || ["0","0","0"];
                 const getCell = val => {
-                    if (!val||val==='0') return '<span style="color:#cbd5e1;font-size:12px;">✕</span>';
+                    if (!val||val==='0') return '<span style="color:#000000;font-size:12px;">✕</span>';
                     if (val==='1') return '<span style="color:#000;font-weight:900;font-size:14px;">1</span>';
                     return `<span style="color:#000;font-weight:900;font-size:13px;">${val}</span>`;
                 };
