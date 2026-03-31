@@ -468,7 +468,19 @@ function renderResults(list) {
             srchInput.value = "";
             rd.classList.add("hidden");
             srchInput.focus();
-            setTimeout(() => document.querySelector('.inline-search-container').scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+
+
+            
+            setTimeout(() => {
+    const lastItem = rxItems[rxItems.length - 1];
+    const sigEl = document.getElementById(`sig-${lastItem.id}`);
+    if (sigEl) {
+        sigEl.focus();
+        sigEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}, 50);
+
+            
         };
         rd.appendChild(item);
     });
@@ -671,6 +683,15 @@ function renderRx() {
             parseSmartSig(item.id, this.value);
             updateCardDisplay(item.id);
         });
+sigEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        srchInput.focus();
+        srchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
+
+        
     });
 }
 
