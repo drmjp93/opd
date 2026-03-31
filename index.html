@@ -1204,15 +1204,15 @@ function prepareAndPrint() {
                 <tr style="border-bottom:${subRowText?'0px':'1px solid #e2e8f0'};">
                     <td ${rs} style="padding:12px 5px;font-size:12px;color:#475569;vertical-align:middle;">${i+1}</td>
                     <td ${rs} style="padding:12px 5px;vertical-align:middle;">
-                        <div style="font-size:14px;font-weight:900;color:#000;line-height:1.2;">${item.brand}</div>
-                        <div style="font-size:10px;color:#64748b;font-style:italic;margin-top:4px;">(${item.molecule})</div>
+                        <div style="font-size:12px;font-weight:900;color:#000;line-height:1.2;">${item.brand}</div>
+                        <div style="font-size:9px;color:#64748b;font-style:italic;margin-top:4px;">(${item.molecule})</div>
                     </td>
                     ${gridRow}
                     <td ${rs} style="padding:12px 5px;text-align:center;vertical-align:middle;">
                         <span style="display:inline-block;border:1px solid #cbd5e1;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:900;color:#000;">${daysDisplay}</span>
                     </td>
                 </tr>
-                ${subRowText?`<tr style="border-bottom:1px solid #e2e8f0;"><td colspan="3" style="padding:0 5px 12px 5px;text-align:center;vertical-align:top;"><div style="display:inline-block;padding:3px 12px;border-radius:4px;font-size:11px;color:#000;font-weight:800;border:1px dashed #cbd5e1;">↳ ${subRowText}</div></td></tr>`:''}`;
+                ${subRowText?`<tr style="border-bottom:1px solid #e2e8f0;"><td colspan="3" style="padding:0 5px 12px 5px;text-align:center;vertical-align:top;"><div style="display:inline-block;padding:3px 12px;border-radius:4px;font-size:9px;color:#000;font-weight:800;border:1px dashed #cbd5e1;">↳ ${subRowText}</div></td></tr>`:''}`;
             }).join('')}
             </tbody>
         </table>`;
