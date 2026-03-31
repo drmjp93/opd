@@ -246,53 +246,10 @@
                     <button onclick="applyTemplate('viral_urti_pregnancy')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">URTI (Preg)</button>
                 </div>
             </div>
-            <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shrink-0">
-                <label class="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Days</label>
-                <input type="number" id="masterDays" value="5" class="bg-white border border-slate-300 rounded-lg w-16 text-center text-sm font-bold py-1 outline-none focus:border-brand-500" onchange="setGlobalDays(this.value)">
-                <span id="rxCount" class="px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px] font-black uppercase tracking-wider ml-1">0 Meds</span>
-            </div>
+          
         </div>
 
-        <div id="rxListWrapper" class="flex-1 overflow-y-auto scroll-pane p-4 bg-slate-50/40 relative pb-40">
-            <div id="rxList" class="space-y-2"></div>
-
-            <!-- Drug Search -->
-            <div class="inline-search-container mt-4 no-print">
-                <input id="drugSearch" autocomplete="off" type="text" class="inline-search-input" placeholder="Type drug name to add... (Use ↑/↓ to select, Enter to add)">
-                <svg class="w-5 h-5 inline-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <div id="results" class="absolute w-full mt-2 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-slate-100 max-h-[300px] overflow-y-auto hidden divide-y divide-slate-50 scroll-pane z-50"></div>
-            </div>
-
-            <!-- Tapering Engine -->
-            <div class="mt-6 no-print bg-white border border-rose-200 rounded-xl shadow-sm overflow-hidden">
-                <div onclick="document.getElementById('taperBody').classList.toggle('hidden')" class="bg-rose-50 hover:bg-rose-100 cursor-pointer px-4 py-3 flex justify-between items-center transition-colors">
-                    <h3 class="text-xs font-bold text-rose-600 uppercase tracking-wider m-0 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                        Tapering Engine
-                    </h3>
-                    <span class="text-rose-500 text-[10px] font-bold uppercase tracking-widest bg-white px-2 py-0.5 rounded border border-rose-200">Expand / Hide</span>
-                </div>
-                <div id="taperBody" class="hidden p-4 border-t border-rose-100">
-                    <div id="activeTapers" class="space-y-2 mb-3"></div>
-                    <div class="bg-rose-50 border border-rose-100 rounded-lg p-3">
-                        <input type="text" id="tDrug" class="premium-input !py-1.5 !text-xs font-bold text-slate-800 w-full mb-2" placeholder="Drug Name (e.g. Tab Wysolone)">
-                        <div id="taperPreview" class="flex flex-wrap items-center gap-1.5 mb-3 min-h-[24px]">
-                            <span class="text-[10px] text-slate-400 italic font-medium">Add steps below to build taper...</span>
-                        </div>
-                        <div class="flex gap-2 items-center">
-                            <input type="text" id="tDose" class="premium-input !py-1.5 !text-xs w-24" placeholder="Dose (1 Tab)">
-                            <input type="text" id="tFreq" class="premium-input !py-1.5 !text-xs w-24" placeholder="Freq (1-0-0)" value="1-0-0">
-                            <input type="number" id="tDays" class="premium-input !py-1.5 !text-xs w-20 text-center" placeholder="Days">
-                            <button type="button" onclick="addTaperStep()" class="bg-white border border-rose-300 text-rose-600 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-rose-600 hover:text-white transition whitespace-nowrap">+ Add Step</button>
-                            <div class="flex-1 text-right border-l border-rose-200 pl-3 ml-2">
-                                <button type="button" onclick="saveTaperProtocol()" class="bg-slate-900 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold shadow-sm hover:bg-black transition whitespace-nowrap">Save Protocol</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Advice -->
+        <!-- Advice -->
             <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-4 mt-6">
                 <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
                     <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -326,6 +283,57 @@
                 <textarea id="generalAdvice" class="premium-input w-full h-16 resize-none" placeholder="Type general advice here..."></textarea>
             </div>
 
+
+
+
+
+        <div id="rxListWrapper" class="flex-1 overflow-y-auto scroll-pane p-4 bg-slate-50/40 relative pb-40">
+            <div id="rxList" class="space-y-2"></div>
+
+            <!-- Drug Search -->
+            <div class="inline-search-container mt-4 no-print">
+                <input id="drugSearch" autocomplete="off" type="text" class="inline-search-input" placeholder="Type drug name to add... (Use ↑/↓ to select, Enter to add)">
+                <svg class="w-5 h-5 inline-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <div id="results" class="absolute w-full mt-2 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-slate-100 max-h-[300px] overflow-y-auto hidden divide-y divide-slate-50 scroll-pane z-50"></div>
+            </div>
+
+              <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shrink-0">
+                <label class="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Days</label>
+                <input type="number" id="masterDays" value="5" class="bg-white border border-slate-300 rounded-lg w-16 text-center text-sm font-bold py-1 outline-none focus:border-brand-500" onchange="setGlobalDays(this.value)">
+                <span id="rxCount" class="px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px] font-black uppercase tracking-wider ml-1">0 Meds</span>
+            </div>
+
+
+            <!-- Tapering Engine -->
+            <div class="mt-6 no-print bg-white border border-rose-200 rounded-xl shadow-sm overflow-hidden">
+                <div onclick="document.getElementById('taperBody').classList.toggle('hidden')" class="bg-rose-50 hover:bg-rose-100 cursor-pointer px-4 py-3 flex justify-between items-center transition-colors">
+                    <h3 class="text-xs font-bold text-rose-600 uppercase tracking-wider m-0 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                        Tapering Engine
+                    </h3>
+                    <span class="text-rose-500 text-[10px] font-bold uppercase tracking-widest bg-white px-2 py-0.5 rounded border border-rose-200">Expand / Hide</span>
+                </div>
+                <div id="taperBody" class="hidden p-4 border-t border-rose-100">
+                    <div id="activeTapers" class="space-y-2 mb-3"></div>
+                    <div class="bg-rose-50 border border-rose-100 rounded-lg p-3">
+                        <input type="text" id="tDrug" class="premium-input !py-1.5 !text-xs font-bold text-slate-800 w-full mb-2" placeholder="Drug Name (e.g. Tab Wysolone)">
+                        <div id="taperPreview" class="flex flex-wrap items-center gap-1.5 mb-3 min-h-[24px]">
+                            <span class="text-[10px] text-slate-400 italic font-medium">Add steps below to build taper...</span>
+                        </div>
+                        <div class="flex gap-2 items-center">
+                            <input type="text" id="tDose" class="premium-input !py-1.5 !text-xs w-24" placeholder="Dose (1 Tab)">
+                            <input type="text" id="tFreq" class="premium-input !py-1.5 !text-xs w-24" placeholder="Freq (1-0-0)" value="1-0-0">
+                            <input type="number" id="tDays" class="premium-input !py-1.5 !text-xs w-20 text-center" placeholder="Days">
+                            <button type="button" onclick="addTaperStep()" class="bg-white border border-rose-300 text-rose-600 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-rose-600 hover:text-white transition whitespace-nowrap">+ Add Step</button>
+                            <div class="flex-1 text-right border-l border-rose-200 pl-3 ml-2">
+                                <button type="button" onclick="saveTaperProtocol()" class="bg-slate-900 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold shadow-sm hover:bg-black transition whitespace-nowrap">Save Protocol</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
             <!-- Follow-up -->
             <div class="mt-4 bg-white border border-purple-200 rounded-xl p-4 shadow-sm no-print" id="invSection">
                 <div class="flex items-center gap-3">
@@ -618,8 +626,8 @@ function renderRx() {
                 }, 0);
                 const daily = parseFloat((parsedDaily * s).toFixed(2));
                 const overdose = daily > m;
-                if (overdose) safeHTML = `<span class="safety-badge safety-over">⚠ OD<br>${daily}/${m}mg</span>`;
-                else safeHTML = `<span class="safety-badge safety-ok">✓ Safe<br>${daily}/${m}mg</span>`;
+                if (overdose) safeHTML = `<span class="safety-badge safety-over">⚠ OD: ${daily}/${m}mg</span>`;
+                else safeHTML = `<span class="safety-badge safety-ok">✓ Safe: ${daily}/${m}mg</span>`;
             }
         }
 
@@ -648,13 +656,13 @@ function renderRx() {
                     </div>
                     <div style="display:flex;gap:8px;align-items:center;">
                         ${safeHTML ? `<div style="align-self:center;">${safeHTML}</div>` : ''}
-                        <div class="rx-maxdose">Max<br>${item.maxRaw}</div>
+                        <div class="rx-maxdose">Max: ${item.maxRaw}</div>
                     </div>
                 </div>
 
-                <div style="padding:10px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;gap:15px;align-items:center;">
-                    <div style="flex:1;">
-                        <label style="font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Smart Sig</label>
+                <div style="padding:8px 10px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;gap:12px;align-items:center;">
+                    
+                    <div style="flex: 0 0 45%;"> 
                         <input type="text"
                                id="sig-${item.id}"
                                placeholder="e.g. 1bbf 1/2bd 30d cc-Avoid Curd"
@@ -663,13 +671,17 @@ function renderRx() {
                                value="${item.rawSig || ''}"
                                autocomplete="off">
                     </div>
-                    <div style="min-width:120px;text-align:right;border-left:2px solid #e2e8f0;padding-left:15px;">
+                    
+                    <div id="advice-display-${item.id}" 
+                         style="flex:1; font-size:11px; color:#475569; font-style:italic; padding:0 10px; border-left:1px dashed #cbd5e1; line-height:1.2; ${adviceTxt ? '' : 'display:none;'}">
+                        ↳ ${adviceTxt}
+                    </div>
+
+                    <div style="min-width:110px;text-align:right;border-left:2px solid #e2e8f0;padding-left:12px;">
                         <div id="freq-display-${item.id}" style="font-size:14px;font-weight:900;color:#0f172a;letter-spacing:1px;">${displayFreq}</div>
                         <div id="days-display-${item.id}" style="font-size:11px;font-weight:600;color:#64748b;margin-top:2px;">${item.days || ''}</div>
                     </div>
                 </div>
-
-                <div id="advice-display-${item.id}" style="padding:6px 10px;background:#fff;font-size:11px;color:#475569;border-top:1px dashed #cbd5e1;font-style:italic;${adviceTxt ? '' : 'display:none;'}">↳ ${adviceTxt}</div>
             </div>`;
 
         // Attach input listener AFTER appending (no oninput in innerHTML — avoids reflow)
