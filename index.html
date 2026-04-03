@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OPD ENGINE</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="black"/><text x="50" y="70" font-size="80" fill="white" font-family="Arial, sans-serif" font-weight="bold" text-anchor="middle">O</text></svg>'>
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="black"/><text x="50" y="70" font-size="80" fill="white" font-family="Arial, sans-serif" font-weight="bold" text-anchor="middle">P</text></svg>'>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -14,153 +14,114 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: { brand: { 50: '#eef2ff', 100: '#e0e7ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' } },
+                    boxShadow: { 'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.04)' }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #f8fafc; overflow-y: auto; overflow-x: hidden; }
-        .glass-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226,232,240,0.8); border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03); }
-        .premium-input { width: 100%; background: #f1f5f9; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; font-weight: 500; color: #1e293b; transition: all 0.2s ease; }
-        .premium-input:focus { background: #fff; border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
-        .premium-input::placeholder { color: #94a3b8; font-weight: 400; }
-        .input-label { display: block; font-size: 0.65rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; margin-left: 2px; }
-        .check-pill input { display: none; }
-        .check-pill span { display: inline-block; padding: 3px 10px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 0.7rem; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.2s; user-select: none; }
-        .check-pill input:checked + span { background: #e0e7ff; border-color: #6366f1; color: #4f46e5; }
-        .advice-pill { padding: 4px 12px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.2s; }
-        .advice-pill:hover { background: #ccfbf1; border-color: #14b8a6; color: #0f766e; }
-        .scroll-pane::-webkit-scrollbar { width: 5px; }
-        .scroll-pane::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .scroll-pane::-webkit-scrollbar-track { background: transparent; }
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        .search-item-active { background-color: #e0e7ff !important; border-left: 4px solid #4f46e5; }
-        .inline-search-container { position: relative; margin-top: 10px; }
-        .inline-search-input { width: 100%; background: white; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 12px 16px 12px 40px; font-size: 1rem; font-weight: 600; color: #1e293b; transition: all 0.2s ease; }
-        .inline-search-input:focus { border-color: #4f46e5; border-style: solid; outline: none; box-shadow: 0 4px 20px -2px rgba(79,70,229,0.15); }
-        .inline-search-icon { position: absolute; left: 14px; top: 14px; color: #94a3b8; }
+        body { background-color: #f8fafc; overflow-y: hidden; }
 
-    /* ── DRUG CARD ── */
-    .rx-card {
-        background: #fff;
-        border-radius: 10px;
-        border: 1px solid #e4e9f2;
-        box-shadow: 0 1px 4px rgba(15,23,42,0.04);
+    .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03); }
+    
+    .premium-input { width: 100%; background: #f1f5f9; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; font-weight: 500; color: #1e293b; transition: all 0.2s ease; }
+    .premium-input:focus { background: #ffffff; border-color: #6366f1; outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .premium-input::placeholder { color: #94a3b8; font-weight: 400; }
+    
+    .input-label { display: block; font-size: 0.65rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; margin-left: 2px; }
+    
+    .check-pill input { display: none; }
+    .check-pill span { display: inline-block; padding: 3px 10px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 0.7rem; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.2s; user-select: none;}
+    .check-pill input:checked + span { background: #e0e7ff; border-color: #6366f1; color: #4f46e5; }
+
+
+    /* Auto-hiding for Advice and KCO cards */
+    .hover-reveal-card {
+        max-height: 52px; /* Shows only the header */
         overflow: hidden;
-        display: flex;
-        contain: layout style;
-    }
-    .rx-card:hover { box-shadow: 0 4px 16px rgba(79,70,229,0.1); border-color: #c7d2fe; }
-    .rx-card.is-overdose { border-color: #fca5a5 !important; }
-
-    .rx-sidebar {
-        flex-shrink: 0; width: 28px; background: #f8fafc;
-        border-right: 1px solid #eef0f6; display: flex;
-        align-items: center; justify-content: center;
-        cursor: pointer; transition: background 0.12s;
-    }
-    .rx-sidebar:hover { background: #fee2e2; }
-    .rx-sidebar:hover .rx-sidebar-icon { color: #ef4444; }
-    .rx-sidebar-icon { color: #d1d5db; transition: color 0.12s; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-    .rx-sidebar-icon span { display: block; width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
-
-    .rx-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-
-    .rx-header {
-        display: flex; align-items: flex-start; gap: 8px;
-        padding: 9px 12px 8px 10px;
-        background: linear-gradient(to right, #fafaff, #fff);
-        border-bottom: 1px solid #f0f3fa;
-    }
-    .rx-num {
-        flex-shrink: 0; min-width: 22px; height: 22px; padding: 0 4px;
-        border-radius: 5px; background: #4f46e5; color: #fff;
-        font-size: 10px; font-weight: 900;
-        display: flex; align-items: center; justify-content: center; margin-top: 1px;
-    }
-    .rx-card.is-overdose .rx-num { background: #ef4444; }
-    .rx-names { flex: 1; min-width: 0; }
-    .rx-brand { font-size: 13px; font-weight: 800; color: #0f172a; line-height: 1.25; word-break: break-word; }
-    .rx-generic { font-size: 10.5px; font-weight: 500; color: #64748b; font-style: italic; line-height: 1.4; margin-top: 1px; word-break: break-word; }
-    .rx-maxdose {
-        flex-shrink: 0; font-size: 8.5px; font-weight: 700; color: #94a3b8;
-        background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 5px;
-        padding: 2px 6px; white-space: nowrap; align-self: flex-start;
-        margin-top: 2px; text-align: right; line-height: 1.5;
-    }
-    .safety-badge { font-size: 8.5px; font-weight: 800; padding: 3px 6px; border-radius: 5px; letter-spacing: 0.03em; white-space: nowrap; }
-    .safety-ok   { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
-    .safety-over { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
-
-
-
-    /* Auto-hiding Advice Card */
-    #advice-card {
-      max-height: 55px; /* Adjust this so ONLY the title shows */
-      overflow: hidden;
-      transition: max-height 0.4s ease-in-out;
-      cursor: pointer;
-    }
-
-    /* Expands on hover, AND stays open if you are typing inside it */
-    #advice-card:hover,
-    #advice-card:focus-within {
-      max-height: 1000px; /* Large enough to fit all content */
-      cursor: default;
+        transition: max-height 0.4s ease-in-out;
+        cursor: pointer;
     }
     
-    /* Optional: Add a visual hint that it expands */
-    #advice-card h3::after {
-      content: ' (Hover to expand)';
-      font-size: 0.75rem;
-      color: #94a3b8;
-      font-weight: normal;
+    .hover-reveal-card:hover,
+    .hover-reveal-card:focus-within {
+        max-height: 1000px; /* Expands to fit content */
+        cursor: default;
     }
-    #advice-card:hover h3::after,
-    #advice-card:focus-within h3::after {
-      content: ''; /* Hides hint when open */
+    
+    .hover-reveal-card h3::after {
+        content: ' (Hover to expand)';
+        font-size: 0.7rem;
+        color: #94a3b8;
+        font-weight: normal;
+        margin-left: auto; /* Pushes it to the right */
+    }
+    
+    .hover-reveal-card:hover h3::after,
+    .hover-reveal-card:focus-within h3::after {
+        content: '';
     }
 
 
 
 
+    /* KCO pills in rose theme */
+    .kco-pill input { display: none; }
+    .kco-pill span { display: inline-block; padding: 3px 10px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 0.7rem; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.2s; user-select: none;}
+    .kco-pill input:checked + span { background: #ffe4e6; border-color: #f43f5e; color: #be123c; }
 
-    /* ── PRINT ── */
-    @media print {
-        @page { size: A4; margin: 5mm; }
+    .advice-pill { padding: 4px 12px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 20px; font-size: 0.75rem; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.2s; }
+    .advice-pill:hover { background: #ccfbf1; border-color: #14b8a6; color: #0f766e; }
+
+    .scroll-pane::-webkit-scrollbar { width: 5px; }
+    .scroll-pane::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .scroll-pane::-webkit-scrollbar-track { background: transparent; }
+
+    /* Invisible Horizontal Scroll for Templates */
+    .hide-scroll::-webkit-scrollbar { display: none; }
+    .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .search-item-active { background-color: #e0e7ff !important; border-left: 4px solid #4f46e5; }
+
+    .inline-search-container { position: relative; margin-top: 10px; }
+    .inline-search-input { width: 100%; background: white; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 12px 16px 12px 40px; font-size: 1rem; font-weight: 600; color: #1e293b; transition: all 0.2s ease; }
+    .inline-search-input:focus { border-color: #4f46e5; border-style: solid; outline: none; box-shadow: 0 4px 20px -2px rgba(79, 70, 229, 0.15); }
+    .inline-search-icon { position: absolute; left: 14px; top: 14px; color: #94a3b8; }
+    .inline-search-input:focus + .inline-search-icon { color: #4f46e5; }
+
+
+/* =========================================
+ULTRA-RELIABLE PRINT ENGINE (MULTI-PAGE SAFE)
+========================================= */
+@media screen {
+#print-layout { display: none; }
+}
+@media print {
+@page { size: A4; margin: 5mm; } /* Gives the browser a tiny baseline margin */
+
+
         body { background: white; overflow-y: visible; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         #screen-layout { display: none !important; }
-        #lock-screen   { display: none !important; }
-        #print-layout  {
-            display: block !important; width: 100%; color: black;
-            font-family: 'Inter', sans-serif;
-            padding-top: 35mm !important;
+        #lock-screen { display: none !important; }
+        
+        #print-layout { 
+            display: block !important; 
+            width: 100%; 
+            color: black; 
+            font-family: 'Inter', sans-serif; 
+            padding-top: 35mm !important; /* FORCES YOUR LETTERHEAD GAP */
             padding-left: 12mm !important;
             padding-right: 10mm !important;
-        }
-        /* Software Credit Footer */
-
-
-      .print-software-credit { 
-
-        margin-top: 50px; 
-        text-align: center; 
-        font-size: 8pt;
-        color: #94a3b8; 
-        font-family: Arial, sans-serif;
-      }
-
+        }        
     }
-    @media screen { #print-layout { display: none; } }
 </style>
+
 
 </head>
 <body class="antialiased">
 
-<!-- LOCK SCREEN -->
 
-<div id="lock-screen" class="fixed inset-0 z-[9999] bg-[#0f172a] flex items-center justify-center transition-all duration-700">
+<div id="lock-screen" class="fixed inset-0 z-[9999] bg-[#0f172a] flex items-center justify-center transition-all duration-700" style="display: flex;">
     <div class="text-slate-600 flex flex-col items-center select-none pointer-events-none">
         <svg class="w-16 h-16 mb-6 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
         <p class="text-[10px] font-bold tracking-[0.3em] uppercase opacity-20">Console Locked</p>
@@ -169,1174 +130,1104 @@
 
 <div id="print-layout"></div>
 
-<div id="screen-layout" class="p-4 lg:p-6 min-h-screen" style="display:none;">
-    
-
-
-            <header class="max-w-[1600px] mx-auto flex justify-between items-center sticky top-0 z-50 bg-[#f8fafc] py-2 px-4 border-b border-slate-200 mb-3 shadow-sm">
-            <div class="flex items-center gap-4">
-                <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white shadow-md">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-none">OPD ENGINE</h1>
-                </div>
+<div id="screen-layout" class="p-4 lg:p-6 min-h-screen" style="display: none;">
+    <header class="max-w-[1600px] mx-auto mb-5 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white shadow-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
             </div>
-            <div class="flex items-center gap-3">
-
-                <button onclick="clearWorkspace()" class="px-3 py-1.5 text-xs font-bold text-rose-500 hover:text-white hover:bg-rose-500 rounded-md transition-all border border-rose-200">Clear Data</button>
-                
-                   <button onclick="prepareAndPrint()" class="px-5 py-2 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-lg shadow-md transition-all flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>Print</button>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-slate-900">OPD ENGINE</h1>
+                <p class="text-[10px] font-bold text-brand-600 uppercase tracking-widest">Developed by Dr. Mit Panchani</p>
             </div>
-        </header>
-
-
-<!-- SMART COMMAND LINE -->
- 
-<div class="max-w-[1600px] mx-auto mb-3 w-full">
-    <div class="glass-card px-4 py-2 border-l-4 border-l-indigo-500 shadow-sm transition-all flex flex-col justify-center" id="quickEntryCard">
-        <div class="relative flex gap-2 items-center">
-            
-            <div class="relative flex-1">
-                <input type="text" id="quickEntryInput" class="inline-search-input !py-2 !pl-9 !pr-4 !text-sm !font-semibold !border-solid !border-2 !border-slate-300 focus:!border-indigo-500 w-full shadow-sm" placeholder="e.g. Ramila 45 f 130/80 88 rs-n cvs-n t-n kco-dm,htn c/o-fever and cough" autocomplete="off">
-                <span class="absolute left-3 top-2.5 text-indigo-500 font-bold text-sm">⌨️</span>
-            </div>
-            
-            <span id="quickEntryStatus" class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest hidden mr-1">✅ Loaded</span>
-            
-            <button id="quickEntryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md transition-colors shrink-0">Execute</button>
         </div>
+        <div class="flex items-center gap-3">
+            <button onclick="clearWorkspace()" class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800 hover:bg-white rounded-lg transition-all border border-slate-200">Clear Data</button>
+            <button onclick="prepareAndPrint()" class="px-5 py-2 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-lg shadow-md transition-all flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                Print
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         
-        <div id="quickEntryChips" class="flex flex-wrap gap-1.5 mt-2 empty:hidden"></div>
-    </div>
-</div>
+        <!-- LEFT COLUMN: Demographics, Vitals, Clinical Note only -->
+        <div class="lg:col-span-3 space-y-4 h-[calc(100vh-100px)] overflow-y-auto scroll-pane pr-2 pb-10">
+            
+            <div class="glass-card p-4">
+                <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-brand-500"></span> 1. Demographics & Vitals</h2>
+                <div class="space-y-3">
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="input-label">Date</label>
+                            <input type="date" id="date" class="premium-input !px-2">
+                        </div>
+                        <div>
+                            <label class="input-label">Sex</label>
+                            <select id="ptSex" class="premium-input !px-2">
+                                <option>M</option><option>F</option>
+                            </select>
+                        </div>
+                    </div>
 
-<main class="max-w-[1600px] mx-auto w-full flex flex-col gap-4">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
+                    <div class="grid grid-cols-[1fr_80px] gap-2">
+                        <div>
+                            <label class="input-label">Patient Name</label>
+                            <input type="text" id="ptName" placeholder="Full Name" class="premium-input font-bold" oninput="this.value = this.value.toUpperCase()">
+                        </div>
+                        <div>
+                            <label class="input-label">Age</label>
+                            <input type="number" id="ptAge" placeholder="Yrs" class="premium-input text-center">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-4 gap-2">
+                        <div>
+                            <label class="input-label">BP (mmHg)</label>
+                            <input type="text" id="bpInput" placeholder="120/80" class="premium-input !px-1 text-center">
+                        </div>
+                        <div>
+                            <label class="input-label">HR (bpm)</label>
+                            <input type="number" id="ptPulse" placeholder="72" class="premium-input !px-1 text-center">
+                        </div>
+                        <div>
+                            <label class="input-label">Temp</label>
+                            <input type="text" id="ptTemp" placeholder="98.6 F" class="premium-input !px-1 text-center">
+                        </div>
+                        <div>
+                            <label class="input-label">SpO2 (%)</label>
+                            <input type="text" id="ptSpo2" value="98% with RA" class="premium-input !px-1 text-center">
+                        </div>
+                    </div>
 
-        <details class="glass-card group bg-white/90 shadow-sm z-50 hidden">
-            <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
-                <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-brand-500"></span> 1. Demographics & Vitals</span>
-                <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </summary>
-            <div class="p-4 pt-0 space-y-3 border-t border-slate-100 mt-2 ">
-                <div class="grid grid-cols-2 gap-2">
-                    <div><label class="input-label">Date</label><input type="date" id="date" class="premium-input !px-2"></div>
-                    <div><label class="input-label">Sex</label><select id="ptSex" class="premium-input !px-2"><option>M</option><option>F</option></select></div>
-                </div>
-                <div class="grid grid-cols-[1fr_80px] gap-2">
-                    <div><label class="input-label">Patient Name</label><input type="text" id="ptName" placeholder="Full Name" class="premium-input font-bold" oninput="this.value=this.value.toUpperCase()"></div>
-                    <div><label class="input-label">Age</label><input type="number" id="ptAge" placeholder="Yrs" class="premium-input text-center"></div>
-                </div>
-                <div class="grid grid-cols-4 gap-2">
-                    <div><label class="input-label">BP</label><input type="text" id="bpInput" placeholder="120/80" class="premium-input !px-1 text-center"></div>
-                    <div><label class="input-label">HR</label><input type="number" id="ptPulse" placeholder="72" class="premium-input !px-1 text-center"></div>
-                    <div><label class="input-label">Temp</label><input type="text" id="ptTemp" placeholder="98.6 F" class="premium-input !px-1 text-center"></div>
-                    <div><label class="input-label">SpO2</label><input type="text" id="ptSpo2" value="98% with RA" class="premium-input !px-1 text-center"></div>
-                </div>
-                <div class="grid grid-cols-4 gap-2">
-                    <div><label class="input-label">R/S</label><input type="text" id="ptRS" class="premium-input !px-1 text-center"></div>
-                    <div><label class="input-label">CVS</label><input type="text" id="ptCVS" class="premium-input !px-1 text-center"></div>
-                    <div><label class="input-label">P/A</label><input type="text" id="ptPA" placeholder="Blank" class="premium-input !px-1 text-center"></div>
-                    <div><label class="input-label">CNS</label><input type="text" id="ptCNS" placeholder="Blank" class="premium-input !px-1 text-center"></div>
-                </div>
-            </div>
-        </details>
+                    <div class="grid grid-cols-4 gap-2">
+                        <div>
+                            <label class="input-label">R/S</label>
+                            <input type="text" id="ptRS" class="premium-input !px-1 text-center">
+                        </div>
+                        <div>
+                            <label class="input-label">CVS</label>
+                            <input type="text" id="ptCVS" class="premium-input !px-1 text-center">
+                        </div>
+                        <div>
+                            <label class="input-label">P/A</label>
+                            <input type="text" id="ptPA" placeholder="Blank" class="premium-input !px-1 text-center">
+                        </div>
+                        <div>
+                            <label class="input-label">CNS</label>
+                            <input type="text" id="ptCNS" placeholder="Blank" class="premium-input !px-1 text-center">
+                        </div>
+                    </div>
 
-        <details class="glass-card group bg-white/90 shadow-sm z-50 hidden" id="kcoSection">
-            <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
-                <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-rose-500"></span> 2. KCO</span>
-                <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </summary>
-            <div class="p-4 pt-0 border-t border-slate-100 mt-2 flex flex-wrap gap-2">
-                <label class="check-pill"><input type="checkbox"><span>DM</span></label>
-                <label class="check-pill"><input type="checkbox"><span>HTN</span></label>
-                <label class="check-pill"><input type="checkbox"><span>IHD</span></label>
-                <label class="check-pill"><input type="checkbox"><span>S/P CABG</span></label>
-                <label class="check-pill"><input type="checkbox"><span>S/P PTCA</span></label>
-                <label class="check-pill"><input type="checkbox"><span>Asthma</span></label>
-                <label class="check-pill"><input type="checkbox"><span>COPD</span></label>
-                <label class="check-pill"><input type="checkbox"><span>CKD</span></label>
-                <label class="check-pill"><input type="checkbox"><span>Epilepsy</span></label>
-                <label class="check-pill"><input type="checkbox"><span>Psychiatric Disorder</span></label>
-                <label class="check-pill"><input type="checkbox"><span>RA</span></label>
-                <label class="check-pill"><input type="checkbox"><span>PIH</span></label>
-                <label class="check-pill"><input type="checkbox"><span>GDM</span></label>
-                <label class="check-pill"><input type="checkbox"><span>Hyperthyroid</span></label>
-                <label class="check-pill"><input type="checkbox"><span>Hypothyroid</span></label>
-            </div>
-        </details>
-
-        <details class="glass-card group bg-white/90 shadow-sm z-50 hidden">
-            <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
-                <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-amber-500"></span> 3. Clinical Note</span>
-                <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </summary>
-            <div class="p-4 pt-0 border-t border-slate-100 mt-2">
-                <textarea id="complaints" class="premium-input w-full h-32 resize-none" placeholder="Patient complaints..."></textarea>
-            </div>
-        </details>
-    </div>
-
-    <!-- RX PANEL -->
-    <div class="glass-card flex flex-col overflow-hidden relative h-[calc(100vh-230px)] shadow-sm">
-        <div class="px-5 py-3 border-b border-slate-100 bg-white flex justify-between items-center z-10 gap-4">
-            <div class="flex items-center gap-3 flex-1 min-w-0">
-                <span class="text-xl font-serif font-bold text-slate-800 pr-3 border-r-2 border-brand-200">Rx</span>
-                <div class="flex flex-1 overflow-x-auto hide-scroll gap-2 items-center py-1">
-                    <button onclick="applyTemplate('viral_fever')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">Viral Fever</button>
-                    <button onclick="applyTemplate('viral_urti')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">Viral URTI</button>
-                    <button onclick="applyTemplate('acute_gastroenteritis')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">Gastroenteritis</button>
-                    <button onclick="applyTemplate('uti')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">UTI Protocol</button>
-                    <button onclick="applyTemplate('viral_urti_pregnancy')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">URTI (Preg)</button>
                 </div>
             </div>
-          
+
+            <div class="glass-card p-4">
+                <h2 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-amber-500"></span> 2. CLINICAL NOTE</h2>
+                <textarea id="complaints" class="premium-input w-full h-40 resize-none" placeholder="Patient complaints..."></textarea>
+            </div>
+
         </div>
 
-
-               <div id="rxListWrapper" class="flex-1 overflow-y-auto scroll-pane p-4 bg-slate-50/40 relative pb-40">
-            <div id="rxList" class="space-y-2"></div>
-
-                   
-        <!-- Advice -->
-            <div id="advice-card" class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-4 mt-6 col-span-full w-full">
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Advice & Instructions
-                </h3>
-                <div class="space-y-3 mb-3">
-                    <div class="flex flex-wrap gap-1.5 items-center">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mr-1">Diet:</span>
-                        <button onclick="addAdvice('Low Fat Diet (LFD)')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">LFD</button>
-                        <button onclick="addAdvice('Bland Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">Bland</button>
-                        <button onclick="addAdvice('Soft Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">Soft</button>
-                        <button onclick="addAdvice('Salt restricted diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">SRD</button>
-                        <button onclick="addAdvice('Anti Diabetic Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">ADD</button>
-                        <button onclick="addAdvice('Strictly avoid fruit juice')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">No Juice</button>
-                        <button onclick="addAdvice('Strictly avoid coconut water')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">No Coconut Water</button>
-                    </div>
-                    <div class="flex flex-wrap gap-1.5 items-center">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mr-1">General:</span>
-                        <button onclick="addAdvice('Strict Rest')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Rest</button>
-                        <button onclick="addAdvice('Plenty of oral fluids')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Hydration</button>
-                        <button onclick="addAdvice('Warm saline gargles')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Gargles</button>
-                        <button onclick="addAdvice('Steam inhalation BID')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Steam</button>
-                        <button onclick="addAdvice('Use Mask')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Use Mask</button>
-                    </div>
-                    <div class="flex flex-wrap gap-1.5 items-center">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mr-1">Warnings:</span>
-                        <button onclick="addAdvice('Strictly avoid NSAIDs / Painkillers')" class="advice-pill !bg-red-50 !text-red-700 !border-red-200 !px-2 !py-1 !text-[10px] font-bold">No NSAIDs (CKD)</button>
-                        <button onclick="addAdvice('Restrict water intake as advised')" class="advice-pill !bg-amber-50 !text-amber-800 !border-amber-200 !px-2 !py-1 !text-[10px]">Restrict Water</button>
-                    </div>
-                </div>
-                <textarea id="generalAdvice" class="premium-input w-full h-16 resize-none" placeholder="Type general advice here..."></textarea>
-            </div>
-
-
-
-
-
- 
-
-            <!-- Drug Search -->
-            <div class="inline-search-container mt-4 no-print">
-                <input id="drugSearch" autocomplete="off" type="text" class="inline-search-input bg-blue-50 border-2 border-blue-500 text-blue-900 font-bold placeholder-blue-400 focus:bg-blue-100 focus:outline-none focus:boder-blue-600 focus:ring-4 focus:ring-blue-500/30 w-full px-4 py-3 rounded-1g shadow-sm" placeholder="Type drug name to add... (Use ↑/↓ to select, Enter to add)">
-                <svg class="w-5 h-5 inline-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <div id="results" class="absolute w-full mt-2 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-slate-100 max-h-[300px] overflow-y-auto hidden divide-y divide-slate-50 scroll-pane z-50"></div>
-            </div>
-
-              <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shrink-0">
-                <label class="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Days</label>
-                <input type="number" id="masterDays" value="5" class="bg-white border border-slate-300 rounded-lg w-16 text-center text-sm font-bold py-1 outline-none focus:border-brand-500" onchange="setGlobalDays(this.value)">
-                <span id="rxCount" class="px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px] font-black uppercase tracking-wider ml-1">0 Meds</span>
-            </div>
-
-
-            <!-- Tapering Engine -->
-            <div class="mt-6 no-print bg-white border border-rose-200 rounded-xl shadow-sm overflow-hidden">
-                <div onclick="document.getElementById('taperBody').classList.toggle('hidden')" class="bg-rose-50 hover:bg-rose-100 cursor-pointer px-4 py-3 flex justify-between items-center transition-colors">
-                    <h3 class="text-xs font-bold text-rose-600 uppercase tracking-wider m-0 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                        Tapering Engine
-                    </h3>
-                    <span class="text-rose-500 text-[10px] font-bold uppercase tracking-widest bg-white px-2 py-0.5 rounded border border-rose-200">Expand / Hide</span>
-                </div>
-                <div id="taperBody" class="hidden p-4 border-t border-rose-100">
-                    <div id="activeTapers" class="space-y-2 mb-3"></div>
-                    <div class="bg-rose-50 border border-rose-100 rounded-lg p-3">
-                        <input type="text" id="tDrug" class="premium-input !py-1.5 !text-xs font-bold text-slate-800 w-full mb-2" placeholder="Drug Name (e.g. Tab Wysolone)">
-                        <div id="taperPreview" class="flex flex-wrap items-center gap-1.5 mb-3 min-h-[24px]">
-                            <span class="text-[10px] text-slate-400 italic font-medium">Add steps below to build taper...</span>
+        <!-- RIGHT COLUMN: Rx panel -->
+        <div class="lg:col-span-9 flex flex-col h-[calc(100vh-100px)]">
+            
+            <div class="glass-card flex-1 flex flex-col overflow-hidden relative">
+                <div class="px-5 py-3 border-b border-slate-100 bg-white flex justify-between items-center z-10 gap-4">
+                    
+                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                        <span class="text-xl font-serif font-bold text-slate-800 pr-3 border-r-2 border-brand-200">Rx</span>
+                        
+                        <div class="flex flex-1 overflow-x-auto hide-scroll gap-2 items-center py-1">
+                            <button onclick="applyTemplate('viral_fever')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">Viral Fever</button>
+                            <button onclick="applyTemplate('viral_urti')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">Viral URTI</button>
+                            <button onclick="applyTemplate('acute_gastroenteritis')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">Gastroenteritis</button>
+                            <button onclick="applyTemplate('uti')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">UTI Protocol</button>
+                            <button onclick="applyTemplate('viral_urti_pregnancy')" class="whitespace-nowrap px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-full text-[10px] font-bold text-emerald-700 hover:bg-emerald-500 hover:text-white transition-all shadow-sm">URTI (Preg)</button>
                         </div>
-                        <div class="flex gap-2 items-center">
-                            <input type="text" id="tDose" class="premium-input !py-1.5 !text-xs w-24" placeholder="Dose (1 Tab)">
-                            <input type="text" id="tFreq" class="premium-input !py-1.5 !text-xs w-24" placeholder="Freq (1-0-0)" value="1-0-0">
-                            <input type="number" id="tDays" class="premium-input !py-1.5 !text-xs w-20 text-center" placeholder="Days">
-                            <button type="button" onclick="addTaperStep()" class="bg-white border border-rose-300 text-rose-600 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-rose-600 hover:text-white transition whitespace-nowrap">+ Add Step</button>
-                            <div class="flex-1 text-right border-l border-rose-200 pl-3 ml-2">
-                                <button type="button" onclick="saveTaperProtocol()" class="bg-slate-900 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold shadow-sm hover:bg-black transition whitespace-nowrap">Save Protocol</button>
+                    </div>
+
+                    <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shrink-0">
+                        <label class="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Days</label>
+                        <input type="number" id="masterDays" value="5" class="bg-white border border-slate-300 rounded-lg w-16 text-center text-sm font-bold py-1 outline-none focus:border-brand-500" onchange="setGlobalDays(this.value)">
+                        <span id="rxCount" class="px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px] font-black uppercase tracking-wider ml-1">0 Meds</span>
+                    </div>
+                </div>
+                
+                <div id="rxListWrapper" class="flex-1 overflow-y-auto scroll-pane p-5 bg-slate-50/30 relative pb-40">
+                    
+                    <div id="rxList" class="space-y-3"></div>
+
+                    <div class="inline-search-container mt-4 no-print">
+                        <input id="drugSearch" autocomplete="off" type="text" class="inline-search-input" placeholder="Type drug name to add... (Use ↑/↓ to select, Enter to add)">
+                        <svg class="w-5 h-5 inline-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        
+                        <div id="results" class="absolute w-full mt-2 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-slate-100 max-h-[300px] overflow-y-auto hidden divide-y divide-slate-50 scroll-pane z-50"></div>
+                    </div>
+
+                    <div class="mt-6 no-print bg-white border border-rose-200 rounded-xl shadow-sm overflow-hidden">
+                        <div onclick="document.getElementById('taperBody').classList.toggle('hidden')" class="bg-rose-50 hover:bg-rose-100 cursor-pointer px-4 py-3 flex justify-between items-center transition-colors">
+                            <h3 class="text-xs font-bold text-rose-600 uppercase tracking-wider m-0 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                Tapering Engine
+                            </h3>
+                            <span class="text-rose-500 text-[10px] font-bold uppercase tracking-widest bg-white px-2 py-0.5 rounded border border-rose-200">Expand / Hide</span>
+                        </div>
+                        
+                        <div id="taperBody" class="hidden p-4 pt-4 border-t border-rose-100">
+                            <div id="activeTapers" class="space-y-2 mb-3"></div>
+                            
+                            <div class="bg-rose-50 border border-rose-100 rounded-lg p-3">
+                                <input type="text" id="tDrug" class="premium-input !py-1.5 !text-xs font-bold text-slate-800 w-full mb-2" placeholder="Drug Name (e.g. Tab Wysolone)">
+                                
+                                <div id="taperPreview" class="flex flex-wrap items-center gap-1.5 mb-3 min-h-[24px]">
+                                    <span class="text-[10px] text-slate-400 italic font-medium">Add steps below to build taper...</span>
+                                </div>
+
+                                <div class="flex gap-2 items-center">
+                                    <input type="text" id="tDose" class="premium-input !py-1.5 !text-xs w-24" placeholder="Dose (1 Tab)">
+                                    <input type="text" id="tFreq" class="premium-input !py-1.5 !text-xs w-24" placeholder="Freq (1-0-0)" value="1-0-0">
+                                    <input type="number" id="tDays" class="premium-input !py-1.5 !text-xs w-20 text-center" placeholder="Days">
+                                    <button type="button" onclick="addTaperStep()" class="bg-white border border-rose-300 text-rose-600 px-3 py-1.5 rounded-lg text-[10px] font-bold hover:bg-rose-600 hover:text-white transition whitespace-nowrap">+ Add Step</button>
+                                    
+                                    <div class="flex-1 text-right border-l border-rose-200 pl-3 ml-2">
+                                        <button type="button" onclick="saveTaperProtocol()" class="bg-slate-900 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold shadow-sm hover:bg-black transition whitespace-nowrap">Save Protocol</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            
-            <!-- Follow-up -->
-            <div class="mt-4 bg-white border border-purple-200 rounded-xl p-4 shadow-sm no-print" id="invSection">
-                <div class="flex items-center gap-3">
-                    <h3 class="text-xs font-bold text-purple-600 uppercase tracking-wider m-0 shrink-0 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        Follow-up
-                    </h3>
-                    <div class="relative flex-1">
-                        <input type="text" id="fuSmartInput" class="premium-input w-full !text-sm !py-2 !pl-9 !border-purple-200 focus:!border-purple-500" placeholder="e.g. fu with cbc, lft, rft 3m or 7d" autocomplete="off">
-                        <svg class="w-4 h-4 absolute left-3 top-2.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <!-- ADVICE + KCO SIDE BY SIDE -->
+                    <div class="mt-6 flex gap-4 no-print items-stretch">
+                        
+                        <!-- Advice & Instructions — 60% -->
+<div class="hover-reveal-card bg-white border border-teal-200 rounded-xl p-4 shadow-sm flex flex-col" style="flex: 0 0 60%;">
+
+                            <h3 class="text-xs font-bold text-teal-600 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Advice & Instructions
+                            </h3>
+                            <div class="flex flex-wrap gap-1.5 mb-2">
+                                <button onclick="addAdvice('Strict Rest')" class="advice-pill !px-2 !py-1 !text-[10px]">Rest</button>
+                                <button onclick="addAdvice('Plenty of oral fluids')" class="advice-pill !px-2 !py-1 !text-[10px]">Hydration</button>
+                                <button onclick="addAdvice('Warm saline gargles')" class="advice-pill !px-2 !py-1 !text-[10px]">Gargles</button>
+                                <button onclick="addAdvice('Steam inhalation BID')" class="advice-pill !px-2 !py-1 !text-[10px]">Steam</button>
+                                <button onclick="addAdvice('Use Mask')" class="advice-pill !px-2 !py-1 !text-[10px]">Use Mask</button>
+                                <button onclick="addAdvice('Low Fat Diet (LFD)')" class="advice-pill !px-2 !py-1 !text-[10px]">LFD</button>
+                                <button onclick="addAdvice('Bland Diet')" class="advice-pill !px-2 !py-1 !text-[10px]">Bland Diet</button>
+                                <button onclick="addAdvice('Soft Diet')" class="advice-pill !px-2 !py-1 !text-[10px]">Soft Diet</button>
+                                <button onclick="addAdvice('Salt restricted diet')" class="advice-pill !px-2 !py-1 !text-[10px]">SRD</button>
+                                <button onclick="addAdvice('Anti Diabetic Diet')" class="advice-pill !px-2 !py-1 !text-[10px]">ADD</button>
+                                <button onclick="addAdvice('Strictly avoid NSAIDs / Painkillers')" class="advice-pill !bg-red-50 !text-red-700 !px-2 !py-1 !text-[10px]">No NSAIDs (CKD)</button>
+                                <button onclick="addAdvice('Strictly avoid fruit juice')" class="advice-pill !px-2 !py-1 !text-[10px]">No Juice</button>
+                                <button onclick="addAdvice('Strictly avoid coconut water')" class="advice-pill !px-2 !py-1 !text-[10px]">No Coconut Water</button>
+                                <button onclick="addAdvice('Restrict water intake as advised')" class="advice-pill !px-2 !py-1 !text-[10px]">Restrict Water</button>
+                            </div>
+                            <textarea id="generalAdvice" class="premium-input flex-1 resize-none" style="min-height: 60px;" placeholder="Type general advice here..."></textarea>
+                        </div>
+
+                        <!-- KCO — 40% -->
+<div id="kcoSection" class="hover-reveal-card bg-white border border-rose-200 rounded-xl p-4 shadow-sm flex flex-col" style="flex: 0 0 calc(40% - 1rem);">
+
+                            <h3 class="text-xs font-bold text-rose-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                Known Case Of (KCO)
+                            </h3>
+                            <div class="flex flex-wrap gap-1.5">
+                                <label class="kco-pill"><input type="checkbox"><span>DM</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>HTN</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>IHD</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>S/P CABG</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>S/P PTCA</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>Asthma</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>COPD</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>CKD</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>Epilepsy</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>Psychiatric Disorder</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>RA</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>PIH</span></label>
+                                <label class="kco-pill"><input type="checkbox"><span>GDM</span></label>
+                            </div>
+                        </div>
+
                     </div>
+
+                    <!-- Follow-up & Investigations -->
+                    <div class="mt-4 bg-white border border-purple-200 rounded-xl p-4 shadow-sm no-print" id="invSection">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="text-xs font-bold text-purple-600 uppercase tracking-wider m-0 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                Follow-up 
+                            </h3>
+                            <div class="flex items-center gap-2">
+                                <label class="text-[11px] !mb-0 text-purple-600 font-bold uppercase tracking-wide">Follow up in (Days):</label>
+                                <input type="number" id="fuDays" class="premium-input !py-1.5 !px-3 w-24 text-center text-sm font-bold border-purple-200" placeholder="e.g. 5">
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <label class="check-pill"><input type="checkbox"><span>CBC</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>ESR</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>CRP</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>RBS</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>FBS</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>PPBS</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>HbA1c</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Lipid Profile</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Urine RM</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Urine Microalbumin</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Creatinine</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Urea</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>eGFR</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Electrolytes</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Sodium</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Potassium</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Calcium</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Phosphorus</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Uric Acid</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>LFT</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>SGOT</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>SGPT</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>ALP</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Bilirubin</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Total Protein</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Albumin</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>TSH</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>FT3</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>FT4</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Anti TPO</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>ECG</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>2D Echo</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Troponin</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>NT-proBNP</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Fundoscopy</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Peripheral Doppler</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Vitamin B12</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Vitamin D3</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Iron Studies</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Ferritin</span></label>
+                            <label class="check-pill"><input type="checkbox"><span>Procalcitonin</span></label>
+                        </div>
+                    </div>
+
                 </div>
-                <div id="fuSmartChips" class="flex flex-wrap gap-2 mt-3 empty:hidden"></div>
-                <input type="hidden" id="fuDays">
-                <div id="fuHiddenBoxes" style="display:none;"></div>
             </div>
         </div>
-    </div>
-</main>
-
+    </main>
 </div>
 
 <script>
-// ══════════════════════════════════════════
-// LOCK
-// ══════════════════════════════════════════
-let keyBuffer = "";
-const TARGET = 1570014;
-function hashCode(s) {
-    let h = 0;
-    for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
-    return h;
-}
-if (sessionStorage.getItem('clinical_unlocked') !== 'true') {
-    document.getElementById('screen-layout').style.display = 'none';
-    document.getElementById('lock-screen').style.display = 'flex';
-    window.addEventListener('keydown', function L(e) {
-        if (e.key.length === 1) {
-            keyBuffer += e.key;
-            if (keyBuffer.length > 4) keyBuffer = keyBuffer.slice(-4);
-            if (hashCode(keyBuffer) === TARGET) {
-                sessionStorage.setItem('clinical_unlocked', 'true');
-                document.getElementById('lock-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('lock-screen').style.display = 'none';
-                    document.getElementById('screen-layout').style.display = 'block';
-                    document.getElementById("ptName")?.focus();
-                }, 500);
-                window.removeEventListener('keydown', L);
-            }
+    // ========================================================
+    // GHOST LOCK SCREEN ENGINE
+    // ========================================================
+    let keyBuffer = "";
+    const TARGET = 1570014; 
+
+    function hashCode(str) {
+        let h = 0;
+        for (let i = 0; i < str.length; i++) {
+            h = ((h << 5) - h) + str.charCodeAt(i);
+            h |= 0; 
         }
-    });
-} else {
-    document.getElementById('lock-screen').style.display = 'none';
-    document.getElementById('screen-layout').style.display = 'block';
-}
-
-// ══════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════
-let drugs = [], rxItems = [], currentSearchFocus = -1, tapers = [], currentTaperSteps = [];
-
-// ══════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════
-function extractDose(text) {
-    if (!text) return [0];
-    const str = String(text).toUpperCase();
-    return str.split(/\s*(?:\+|&)\s*/).map(p => {
-        let m;
-        if ((m = p.match(/(\d+(?:\.\d+)?)\s*(?:G|GM)\b/))) return +m[1] * 1000;
-        if ((m = p.match(/(\d+(?:\.\d+)?)\s*MG\b/))) return +m[1];
-        if ((m = p.match(/(\d+(?:\.\d+)?)\s*MCG\b/))) return +m[1] / 1000;
-        if ((m = p.match(/(\d+(?:\.\d+)?)\s*(?:IU|ML)\b/))) return +m[1];
-        if ((m = p.match(/(\d+(?:\.\d+)?)/))) return +m[1];
-        return 0;
-    });
-}
-
-// ══════════════════════════════════════════
-// DRUG SEARCH
-// ══════════════════════════════════════════
-const srchInput = document.getElementById("drugSearch");
-const netlifyAPI = "https://drugs.drmjp93.workers.dev";
-let searchDebounce;
-
-srchInput.addEventListener("keydown", e => {
-    const rd = document.getElementById("results");
-    if (!rd || rd.classList.contains("hidden")) return;
-    const items = rd.getElementsByClassName("search-item");
-    if (!items.length) return;
-    if (e.key === "ArrowDown") { currentSearchFocus++; activateSearchItem(items); e.preventDefault(); }
-    else if (e.key === "ArrowUp") { currentSearchFocus--; activateSearchItem(items); e.preventDefault(); }
-    else if (e.key === "Enter") { e.preventDefault(); (currentSearchFocus > -1 ? items[currentSearchFocus] : items[0]).click(); }
-});
-
-function activateSearchItem(items) {
-    Array.from(items).forEach(i => i.classList.remove("search-item-active"));
-    if (currentSearchFocus >= items.length) currentSearchFocus = 0;
-    if (currentSearchFocus < 0) currentSearchFocus = items.length - 1;
-    items[currentSearchFocus].classList.add("search-item-active");
-    items[currentSearchFocus].scrollIntoView({ block: "nearest", behavior: "smooth" });
-}
-
-srchInput.addEventListener("input", function () {
-    const q = this.value.toLowerCase().trim();
-    const rd = document.getElementById("results");
-    currentSearchFocus = -1;
-    if (q.length < 2) { rd.classList.add("hidden"); return; }
-    rd.innerHTML = `<div class="p-3 text-center text-xs font-semibold text-slate-400">Searching...</div>`;
-    rd.classList.remove("hidden");
-    clearTimeout(searchDebounce);
-    searchDebounce = setTimeout(async () => {
-        try {
-            const response = await fetch(`${netlifyAPI}?q=${encodeURIComponent(q)}`);
-            const matches = await response.json();
-            renderResults(matches);
-            setTimeout(() => document.querySelector('.inline-search-container').scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
-        } catch (error) {
-            rd.innerHTML = `<div class="p-3 text-center text-xs text-red-500 font-semibold">Error connecting to database.</div>`;
-        }
-    }, 250);
-});
-
-function renderResults(list) {
-    const rd = document.getElementById("results");
-    rd.innerHTML = "";
-    if (!list.length) {
-        rd.innerHTML = `<div class="p-3 text-center text-xs font-semibold text-slate-400">No molecules found</div>`;
-        rd.classList.remove("hidden");
-        return;
-    }
-    rd.classList.remove("hidden");
-    list.forEach(d => {
-        const item = document.createElement("div");
-        item.className = "search-item p-3 hover:bg-brand-50 cursor-pointer flex justify-between items-center transition-colors";
-        item.innerHTML = `<div><div class="font-bold text-sm text-slate-900">${d["FIRST BRAND"]}</div><div class="text-[10px] text-slate-500 font-bold mt-0.5"><i>(${d.Active_Content})</i></div></div><div class="text-[9px] bg-slate-100 text-slate-600 px-2 py-1 rounded font-bold uppercase tracking-wider text-right">Max:<br>${d.Max_Dose_Adult || 'N/A'}</div>`;
-        item.onclick = () => {
-            addDrug(d);
-            srchInput.value = "";
-            rd.classList.add("hidden");
-            srchInput.focus();
-
-
-            
-            setTimeout(() => {
-    const lastItem = rxItems[rxItems.length - 1];
-    const sigEl = document.getElementById(`sig-${lastItem.id}`);
-    if (sigEl) {
-        sigEl.focus();
-        sigEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-}, 50);
-
-            
-        };
-        rd.appendChild(item);
-    });
-}
-
-document.addEventListener('click', e => {
-    if (!srchInput.contains(e.target) && !document.getElementById('results').contains(e.target))
-        document.getElementById('results').classList.add('hidden');
-});
-
-// ══════════════════════════════════════════
-// TAPER ENGINE
-// ══════════════════════════════════════════
-function addTaperStep() {
-    const dose = document.getElementById('tDose').value.trim();
-    const freq = document.getElementById('tFreq').value.trim();
-    const days = document.getElementById('tDays').value.trim();
-    if (!dose || !freq || !days) { alert("Fill Dose, Freq, Days."); return; }
-    currentTaperSteps.push({ dose, freq, days });
-    document.getElementById('tDose').value = '';
-    document.getElementById('tDays').value = '';
-    document.getElementById('tDose').focus();
-    renderTaperBuilder();
-}
-
-function removeTaperStep(i) { currentTaperSteps.splice(i, 1); renderTaperBuilder(); }
-
-function renderTaperBuilder() {
-    const c = document.getElementById('taperPreview');
-    if (!currentTaperSteps.length) {
-        c.innerHTML = '<span class="text-[10px] text-slate-400 italic font-medium">Add steps below to build taper...</span>';
-        return;
-    }
-    c.innerHTML = currentTaperSteps.map((s, i) =>
-        `<span class="inline-flex items-center gap-1 bg-rose-100 text-rose-800 px-2 py-1 rounded text-[10px] font-bold border border-rose-200">${s.dose} (${s.freq}) x ${s.days}d<button type="button" onclick="removeTaperStep(${i})" class="ml-1 text-rose-500 hover:text-rose-800">&times;</button></span>`
-    ).join('<span class="text-slate-400 text-xs font-bold mx-0.5">➔</span>') +
-        '<span class="text-slate-400 text-xs font-bold mx-0.5">➔</span><span class="inline-flex items-center bg-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-bold">STOP</span>';
-}
-
-function saveTaperProtocol() {
-    const drug = document.getElementById('tDrug').value.trim();
-    if (!drug) return alert("Enter Drug Name.");
-    if (!currentTaperSteps.length) return alert("Add at least one step.");
-    tapers.push({ id: Date.now(), drug, steps: [...currentTaperSteps] });
-    document.getElementById('tDrug').value = '';
-    currentTaperSteps = [];
-    renderTaperBuilder();
-    renderActiveTapers();
-}
-
-function deleteTaperProtocol(id) { tapers = tapers.filter(t => t.id !== id); renderActiveTapers(); }
-
-function renderActiveTapers() {
-    const c = document.getElementById('activeTapers');
-    if (!tapers.length) { c.innerHTML = ''; return; }
-    c.innerHTML = tapers.map(t =>
-        `<div class="bg-white border border-rose-200 rounded-lg p-2.5 flex justify-between items-center shadow-sm">
-            <div>
-                <h4 class="text-xs font-bold text-slate-900">${t.drug}</h4>
-                <p class="text-[10px] font-bold text-rose-600 mt-0.5">${t.steps.map(s => `${s.dose} (${s.freq}) x ${s.days}d`).join(' ➔ ')} ➔ STOP</p>
-            </div>
-            <button type="button" onclick="deleteTaperProtocol(${t.id})" class="text-slate-300 hover:text-red-500 bg-slate-50 p-1.5 rounded">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            </button>
-        </div>`
-    ).join('');
-}
-
-// ══════════════════════════════════════════
-// RX: ADD / REMOVE
-// ══════════════════════════════════════════
-function normalizeDays(val) {
-    // Always return a display string like "5 Days", "1 Month"
-    if (typeof val === 'string' && /[a-zA-Z]/.test(val)) return val; // already formatted
-    const n = parseInt(val) || 5;
-    return n === 1 ? '1 Day' : `${n} Days`;
-}
-
-function setGlobalDays(val) {
-    const n = parseInt(val) || 1;
-    const str = normalizeDays(n);
-    rxItems.forEach(i => i.days = str);
-    renderRx();
-}
-
-function addDrug(d) {
-    const days = normalizeDays(parseInt(document.getElementById("masterDays").value) || 5);
-    rxItems.push({
-        id: Date.now() + Math.floor(Math.random() * 1000),
-        brand: d["FIRST BRAND"],
-        molecule: d.Active_Content,
-        maxRaw: d.Max_Dose_Adult || 'Not specified',
-        strength: extractDose(d.Active_Content),
-        max: extractDose(d.Max_Dose_Adult),
-        freqArr: ["1", "0", "0"],
-        days,
-        advice: "After Food",
-        rawSig: '',
-        customNote: '',
-        isSos: false,
-        isWeekly: false,
-        weeklyDay: ''
-    });
-    renderRx();
-}
-
-function removeDrug(id) { rxItems = rxItems.filter(i => i.id !== id); renderRx(); }
-
-// ══════════════════════════════════════════
-// RX: RENDER (full rebuild — only on add/remove/template)
-// ══════════════════════════════════════════
-function renderRx() {
-    const cont = document.getElementById("rxList");
-    const badge = document.getElementById("rxCount");
-
-     if (!rxItems.length) {
-        cont.innerHTML = ""; 
-        badge.innerText = "0 Meds";
-        return;
+        return h;
     }
 
-    badge.innerText = `${rxItems.length} Med${rxItems.length > 1 ? 's' : ''}`;
-    cont.innerHTML = "";
-
-    rxItems.forEach((item, idx) => {
-        // Safety check (skip for combos)
-        let safeHTML = '';
-        const isCombo = item.strength.length > 1 || /[+&]/.test(String(item.molecule));
-        if (!isCombo) {
-            const s = item.strength[0] || 0, m = item.max?.[0] || 0;
-            if (s > 0 && m > 0) {
-                const parsedDaily = (item.freqArr || []).reduce((sum, val) => {
-                    const num = val.includes('/') ? (parseInt(val.split('/')[0]) / parseInt(val.split('/')[1])) : parseFloat(val);
-                    return sum + (isNaN(num) ? 0 : num);
-                }, 0);
-                const daily = parseFloat((parsedDaily * s).toFixed(2));
-                const overdose = daily > m;
-                if (overdose) safeHTML = `<span class="safety-badge safety-over">⚠ OD: ${daily}/${m}mg</span>`;
-                else safeHTML = `<span class="safety-badge safety-ok">✓ Safe: ${daily}/${m}mg</span>`;
-            }
-        }
-
-        // Build freq display
-        let displayFreq = (item.freqArr || ["0","0","0"]).join(' - ');
-        if (item.isSos) displayFreq = 'SOS';
-        if (item.isWeekly) displayFreq = item.weeklyDay ? `Weekly (${item.weeklyDay})` : 'Weekly';
-
-        // Build advice display
-        const adviceTxt = [item.advice, (!item.isSos ? item.customNote : '')].filter(Boolean).join(' — ');
-
-        const card = document.createElement('div');
-        card.className = `rx-card`;
-        card.innerHTML = `
-            <div class="rx-sidebar" onclick="removeDrug(${item.id})" title="Remove">
-                <div class="rx-sidebar-icon"><span></span><span></span><span></span></div>
-            </div>
-            <div class="rx-main">
-                <div class="rx-header" style="display:flex;justify-content:space-between;">
-                    <div style="display:flex;gap:10px;">
-                        <div class="rx-num">${idx + 1}</div>
-                        <div class="rx-names">
-                            <div class="rx-brand">${item.brand}</div>
-                            <div class="rx-generic">${item.molecule}</div>
-                        </div>
-                    </div>
-                    <div style="display:flex;gap:8px;align-items:center;">
-                        ${safeHTML ? `<div style="align-self:center;">${safeHTML}</div>` : ''}
-                        <div class="rx-maxdose">Max: ${item.maxRaw}</div>
-                    </div>
-                </div>
-
-                <div style="padding:8px 10px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;gap:12px;align-items:center;">
-                    
-                    <div style="flex: 0 0 45%;"> 
-                        <input type="text"
-                               id="sig-${item.id}"
-                               placeholder="e.g. 1bbf 1/2bd 30d cc-Avoid Curd"
-                               class="premium-input w-full"
-                               style="padding:8px 12px;font-size:14px;font-weight:700;color:#1e293b;border:1px solid #cbd5e1;border-radius:6px;"
-                               value="${item.rawSig || ''}"
-                               autocomplete="off">
-                    </div>
-                    
-                    <div id="advice-display-${item.id}" 
-                         style="flex:1; font-size:11px; color:#475569; font-style:italic; padding:0 10px; border-left:1px dashed #cbd5e1; line-height:1.2; ${adviceTxt ? '' : 'display:none;'}">
-                        ↳ ${adviceTxt}
-                    </div>
-
-                    <div style="min-width:110px;text-align:right;border-left:2px solid #e2e8f0;padding-left:12px;">
-                        <div id="freq-display-${item.id}" style="font-size:14px;font-weight:900;color:#0f172a;letter-spacing:1px;">${displayFreq}</div>
-                        <div id="days-display-${item.id}" style="font-size:11px;font-weight:600;color:#64748b;margin-top:2px;">${item.days || ''}</div>
-                    </div>
-                </div>
-            </div>`;
-
-        // Attach input listener AFTER appending (no oninput in innerHTML — avoids reflow)
-        cont.appendChild(card);
-        const sigEl = card.querySelector(`#sig-${item.id}`);
-        sigEl.addEventListener('input', function () {
-            parseSmartSig(item.id, this.value);
-            updateCardDisplay(item.id);
-        });
-sigEl.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        srchInput.focus();
-        srchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-});
-
+    if (sessionStorage.getItem('clinical_unlocked') !== 'true') {
+        document.getElementById('screen-layout').style.display = 'none';
+        document.getElementById('lock-screen').style.display = 'flex';
         
-    });
-}
-
-// ══════════════════════════════════════════
-// RX: LIVE UPDATE (no full re-render)
-// ══════════════════════════════════════════
-function updateCardDisplay(id) {
-    const item = rxItems.find(x => x.id === id);
-    if (!item) return;
-
-    const freqEl = document.getElementById(`freq-display-${id}`);
-    const daysEl = document.getElementById(`days-display-${id}`);
-    const advEl  = document.getElementById(`advice-display-${id}`);
-
-    if (freqEl) {
-        let displayFreq = (item.freqArr || ["0","0","0"]).join(' - ');
-        if (item.isSos) displayFreq = 'SOS';
-        if (item.isWeekly) displayFreq = item.weeklyDay ? `Weekly (${item.weeklyDay})` : 'Weekly';
-        freqEl.textContent = displayFreq;
-    }
-    if (daysEl) daysEl.textContent = item.days || '';
-    if (advEl) {
-        const txt = [item.advice, (!item.isSos ? item.customNote : '')].filter(Boolean).join(' — ');
-        advEl.style.display = txt ? '' : 'none';
-        advEl.textContent = txt ? `↳ ${txt}` : '';
-    }
-}
-
-// ══════════════════════════════════════════
-// SMART SIG PARSER
-// ══════════════════════════════════════════
-function parseSmartSig(id, val) {
-    const item = rxItems.find(x => x.id === id);
-    if (!item) return;
-
-    item.rawSig = val;
-    let workingStr = val.trim();
-    item.customNote = '';
-    item.days = '';
-    item.isSos = false;
-    item.isWeekly = false;
-    item.weeklyDay = '';
-
-    // 1. Extract custom note (cc-)
-    const ccIndex = workingStr.toLowerCase().indexOf('cc-');
-    if (ccIndex !== -1) {
-        item.customNote = workingStr.substring(ccIndex + 3).trim();
-        workingStr = workingStr.substring(0, ccIndex).trim();
-    }
-
-    // 2. Extract duration
-    const durationMatch = workingStr.match(/(\d+)\s*(d|days?|w|wks?|weeks?|m|mos?|months?)\b/i);
-    if (durationMatch) {
-        const num = parseInt(durationMatch[1]);
-        const rawUnit = durationMatch[2].toLowerCase();
-        let unit;
-        if (rawUnit.startsWith('m')) unit = num === 1 ? 'Month' : 'Months';
-        else if (rawUnit.startsWith('w')) unit = num === 1 ? 'Week' : 'Weeks';
-        else unit = num === 1 ? 'Day' : 'Days';
-        item.days = `${num} ${unit}`;
-        workingStr = workingStr.replace(durationMatch[0], '').trim();
-    }
-
-    // 3. Parse tokens
-    const tokens = workingStr.toLowerCase().split(/\s+/);
-
-    const adviceMap = {
-        'af':  'After Food',
-        'es':  'Empty Stomach',
-        'sl':  'Sublingual',
-        'md':  'Mouth Dissolving (Do not swallow)',
-        'hgw': '+ Half glass water',
-        '1lw': '+ 1 Liter water',
-        'ad':  'Alternate Day',
-        'stat':'STAT - Take Immediately',
-        'bbf': 'Before Breakfast',
-        'bl':  'Before Lunch',
-        'bd':  'Before Dinner'
-    };
-
-    // slot: 0=Morning, 1=Noon, 2=Night
-    const slotMap = { 'bbf': 0, 'm': 0, 'bl': 1, 'an': 1, 'bd': 2, 'n': 2 };
-
-    let newFreq = ["0", "0", "0"];
-    let selectedAdvice = [];
-    let currentDose = "1";
-
-    tokens.forEach(t => {
-        if (!t) return;
-
-        if (t === 'sos')  { item.isSos = true; return; }
-        if (t === 'wo')   { item.isWeekly = true; return; }
-        if (['sun','mon','tue','wed','thu','fri','sat'].includes(t)) {
-            item.weeklyDay = t.charAt(0).toUpperCase() + t.slice(1);
-            return;
-        }
-        if (t === 'tds') { newFreq = [currentDose, currentDose, currentDose]; return; }
-        if (t === 'bid') { newFreq = [currentDose, "0", currentDose]; return; }
-        if (t === 'od')  { newFreq = [currentDose, "0", "0"]; return; }
-
-        if (t.includes('-') && /\d/.test(t)) {
-            const parts = t.split('-');
-            if (parts.length >= 3) newFreq = [parts[0], parts[1], parts[2]];
-            else if (parts.length === 2) newFreq = [parts[0], "0", parts[1]];
-            return;
-        }
-
-        // Pure dose token e.g. "1/2", "2", "1tsf"
-        const pureMatch = t.match(/^([\d\.\/]+(?:tsf|ml|drop)?)$/);
-        if (pureMatch) { currentDose = pureMatch[1].toUpperCase(); return; }
-
-        // Compound token e.g. "1bbf", "1/2bd"
-        const compMatch = t.match(/^([\d\.\/]+(?:tsf|ml|drop)?)?([a-z]+)$/);
-        if (compMatch) {
-            const dose = compMatch[1] ? compMatch[1].toUpperCase() : currentDose;
-            const code = compMatch[2];
-            if (slotMap[code] !== undefined) {
-                newFreq[slotMap[code]] = dose;
-                if (adviceMap[code]) selectedAdvice.push(adviceMap[code]);
-            } else if (adviceMap[code]) {
-                selectedAdvice.push(adviceMap[code]);
-            }
-        }
-    });
-
-    if ((item.isSos || item.isWeekly) && newFreq.every(f => f === "0")) newFreq[0] = currentDose;
-
-    item.freqArr = newFreq;
-
-    // Sort & consolidate advice
-    let uniqueAdvice = [...new Set(selectedAdvice)];
-    const hasBBF = uniqueAdvice.includes('Before Breakfast');
-    const hasBL  = uniqueAdvice.includes('Before Lunch');
-    const hasBD  = uniqueAdvice.includes('Before Dinner');
-    if (hasBBF && hasBL && hasBD) {
-        uniqueAdvice = uniqueAdvice.filter(a => !['Before Breakfast','Before Lunch','Before Dinner'].includes(a));
-        uniqueAdvice.unshift('Before Meals');
-    } else {
-        const order = ['Empty Stomach','Before Breakfast','Before Lunch','Before Dinner','After Food'];
-        uniqueAdvice.sort((a, b) => {
-            const ia = order.indexOf(a); const ib = order.indexOf(b);
-            return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
-        });
-    }
-    item.advice = uniqueAdvice.join(', ');
-}
-
-// ══════════════════════════════════════════
-// TEMPLATES
-// ══════════════════════════════════════════
-const templates = {
-    viral_fever: [
-        { brand:"DOLO 650",       molecule:"PARACETAMOL 650MG",              maxRaw:"4000 MG",          strength:[650],    max:[4000],    freqArr:["1","0","1"], advice:"After Food" },
-        { brand:"NAPROSYN 500",   molecule:"NAPROXEN 500MG",                 maxRaw:"1000 MG",          strength:[500],    max:[1000],    freqArr:["1","0","1"], advice:"After Food" },
-        { brand:"PANTOP 40",      molecule:"PANTOPRAZOLE 40MG",              maxRaw:"80 MG",            strength:[40],     max:[80],      freqArr:["1","0","0"], advice:"Before Breakfast" }
-    ],
-    viral_urti: [
-        { brand:"DIOMINIC DCA",   molecule:"PARACETAMOL + PHENYLEPHRINE + CPM", maxRaw:"",             strength:[650],    max:[4000],    freqArr:["1","0","1"], advice:"After Food" },
-        { brand:"NAPROSYN 500",   molecule:"NAPROXEN 500MG",                 maxRaw:"1000 MG",          strength:[500],    max:[1000],    freqArr:["1","0","1"], advice:"After Food" },
-        { brand:"PANTOP 40",      molecule:"PANTOPRAZOLE 40MG",              maxRaw:"80 MG",            strength:[40],     max:[80],      freqArr:["1","0","0"], advice:"Before Breakfast" },
-        { brand:"L DIO1 M",       molecule:"LEVOCETIRIZINE + MONTELUKAST",   maxRaw:"",                 strength:[5,10],   max:[5,10],    freqArr:["0","0","1"], advice:"At Night" }
-    ],
-    acute_gastroenteritis: [
-        { brand:"OFLOX OZ",       molecule:"OFLOXACIN 200MG + ORNIDAZOLE 500MG", maxRaw:"800+1500 MG", strength:[200,500],max:[800,1500],freqArr:["1","0","1"], advice:"After Food" },
-        { brand:"BUSCOPAN",       molecule:"HYOSCINE BUTYLBROMIDE",          maxRaw:"",                 strength:[10],     max:[80],      freqArr:["1","0","1"], advice:"For Abdominal Pain" },
-        { brand:"SPORLAC",        molecule:"LACTOBACILLUS",                  maxRaw:"",                 strength:[250],    max:[1000],    freqArr:["1","1","1"], advice:"With Water" },
-        { brand:"PANTOP D",       molecule:"PANTOPRAZOLE + DOMPERIDONE",     maxRaw:"",                 strength:[40],     max:[80],      freqArr:["1","0","0"], advice:"Before Breakfast" },
-        { brand:"ELECTRAL",       molecule:"ORS POWDER",                     maxRaw:"",                 strength:[1],      max:[10],      freqArr:["1","0","1"], advice:"Dissolve in 1L water" }
-    ],
-    viral_urti_pregnancy: [
-        { brand:"LETIZON M",      molecule:"LEVOCETIRIZINE + MONTELUKAST",   maxRaw:"",                 strength:[5,10],   max:[5,10],    freqArr:["0","0","1"], advice:"At Night" },
-        { brand:"DMR 20",         molecule:"DEXTROMETHORPHAN",               maxRaw:"",                 strength:[20],     max:[120],     freqArr:["1","1","0"], advice:"For Cough" },
-        { brand:"DOLO 650",       molecule:"PARACETAMOL 650MG",              maxRaw:"4000 MG",          strength:[650],    max:[4000],    freqArr:["1","0","1"], advice:"After Food" }
-    ],
-    uti: [
-        { brand:"SEPTRAN DS",     molecule:"CO-TRIMOXAZOLE 800/160MG",       maxRaw:"",                 strength:[800,160],max:[1600,320],freqArr:["1","0","1"], advice:"After Food" },
-        { brand:"CITRALKA SYRUP", molecule:"DISODIUM HYDROGEN CITRATE",      maxRaw:"",                 strength:[0],      max:[0],       freqArr:["1","1","0"], advice:"+ Half glass of water" },
-        { brand:"RTIF PLUS",      molecule:"CRANBERRY + D-MANNOSE",          maxRaw:"",                 strength:[0],      max:[0],       freqArr:["1","0","0"], advice:"After Food" },
-        { brand:"FOSFOMYCIN SACHET",molecule:"FOSFOMYCIN 3GM",              maxRaw:"3GM",               strength:[3],      max:[3],       freqArr:["1","0","0"], isSos:false, advice:"+ Half glass water, STAT" },
-        { brand:"CADMYLIN",       molecule:"N-ACETYLCYSTEINE",               maxRaw:"",                 strength:[0],      max:[0],       freqArr:["1","0","0"], advice:"After Food" }
-    ]
-};
-
-function applyTemplate(key) {
-    const t = templates[key];
-    if (!t) return;
-    const days = normalizeDays(parseInt(document.getElementById("masterDays").value) || 5);
-    rxItems = [...rxItems, ...t.map(x => ({
-        ...x,
-        id: Date.now() + Math.floor(Math.random() * 1000),
-        days,
-        rawSig: '',
-        customNote: '',
-        isSos: x.isSos || false,
-        isWeekly: false,
-        weeklyDay: ''
-    }))];
-    renderRx();
-}
-
-// ══════════════════════════════════════════
-// ADVICE
-// ══════════════════════════════════════════
-function addAdvice(text) {
-    const b = document.getElementById("generalAdvice");
-    if (!b.value.includes(text)) b.value = b.value ? b.value + "\n" + text : text;
-}
-
-// ══════════════════════════════════════════
-// QUICK ENTRY
-// ══════════════════════════════════════════
-const qInput  = document.getElementById('quickEntryInput');
-const qBtn    = document.getElementById('quickEntryBtn');
-const qChips  = document.getElementById('quickEntryChips');
-const qCard   = document.getElementById('quickEntryCard');
-const qStatus = document.getElementById('quickEntryStatus');
-
-const qSeq = [
-    { key:'name', label:'Name' }, { key:'age', label:'Age' }, { key:'sex', label:'Sex' },
-    { key:'bp', label:'BP' },     { key:'hr', label:'HR' },   { key:'temp', label:'Temp' },
-    { key:'rs', label:'R/S' },    { key:'cvs', label:'CVS' }, { key:'cns', label:'CNS' },
-    { key:'pa', label:'P/A' },    { key:'kco', label:'KCO' }, { key:'co', label:'C/O' }
-];
-
-function parseQuickEntry(str) {
-    let raw = str.trim();
-    let data = { name:[], age:'', sex:'', bp:'', hr:'', rs:'', cvs:'', cns:'', pa:'', temp:'', kco:[], co:'' };
-
-    const coMatch = raw.match(/c\/o-(.+)/i);
-    if (coMatch) { data.co = coMatch[1].trim(); raw = raw.replace(coMatch[0], ''); }
-
-    const tokens = raw.trim().split(/\s+/);
-    tokens.forEach(t => {
-        if (!t) return;
-        const tLow = t.toLowerCase();
-        if (tLow === 'm' || tLow === 'f') { data.sex = tLow.toUpperCase(); }
-        else if (/^\d{2,3}\/\d{2,3}$/.test(t)) { data.bp = t; }
-        else if (tLow.startsWith('rs-'))  { const v=t.substring(3).replace(/-/g,' '); data.rs=(v==='n')?'B/L AE+, Clear':v; }
-        else if (tLow.startsWith('cvs-')) { const v=t.substring(4).replace(/-/g,' '); data.cvs=(v==='n')?'S1S2+, No Murmur':v; }
-        else if (tLow.startsWith('pa-'))  { const v=t.substring(3).replace(/-/g,' '); data.pa=(v==='n')?'Soft, NT':v; }
-        else if (tLow.startsWith('cns-')) { const v=t.substring(4).replace(/-/g,' '); data.cns=(v==='n')?'Conscious, Oriented':v; }
-        else if (tLow.startsWith('t-'))   { const v=t.substring(2).replace(/-/g,' '); data.temp=(v==='n')?'Afebrile':v; }
-        else if (tLow.startsWith('kco-')) { data.kco=tLow.substring(4).split(',').filter(k=>k.trim()!==''); }
-        else if (/^\d+$/.test(t)) {
-            const num = parseInt(t,10);
-            if (num>=1&&num<=120&&!data.age) data.age=num.toString();
-            else if (num>=50&&num<=200&&!data.hr) data.hr=num.toString();
-        } else if (/^[a-zA-Z]+$/.test(t)) {
-            data.name.push(t.charAt(0).toUpperCase()+t.slice(1).toLowerCase());
-        }
-    });
-    data.name = data.name.join(' ');
-    return data;
-}
-
-function renderQuickChips(data) {
-    let nextFound = false;
-    qChips.innerHTML = qSeq.map(item => {
-        const val = (item.key==='kco'&&data.kco.length) ? data.kco.join(', ') : data[item.key];
-        if (val) return `<span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg border bg-emerald-100 text-emerald-700 border-emerald-300 shadow-sm">✓ ${item.label}: <span class="text-emerald-900">${val}</span></span>`;
-        if (!nextFound) { nextFound=true; return `<span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg border bg-indigo-50 text-indigo-600 border-indigo-300 animate-pulse shadow-sm">${item.label}</span>`; }
-        return `<span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg border bg-slate-100 text-slate-400 border-slate-200">${item.label}</span>`;
-    }).join('');
-}
-
-function executeQuickFill() {
-    if (!qInput.value.trim()) return;
-    const data = parseQuickEntry(qInput.value);
-    if (data.name) document.getElementById('ptName').value = data.name;
-    if (data.age)  document.getElementById('ptAge').value = data.age;
-    if (data.sex)  document.getElementById('ptSex').value = data.sex;
-    if (data.bp)   document.getElementById('bpInput').value = data.bp;
-    if (data.hr)   document.getElementById('ptPulse').value = data.hr;
-    if (data.temp) document.getElementById('ptTemp').value = data.temp;
-    if (data.rs)   document.getElementById('ptRS').value = data.rs;
-    if (data.cvs)  document.getElementById('ptCVS').value = data.cvs;
-    if (data.cns)  document.getElementById('ptCNS').value = data.cns;
-    if (data.pa)   document.getElementById('ptPA').value = data.pa;
-    if (data.co)   document.getElementById('complaints').value = data.co;
-    if (data.kco.length > 0) {
-        document.querySelectorAll('#kcoSection input[type="checkbox"]').forEach(chk => {
-            const lbl = chk.nextElementSibling.innerText.toLowerCase();
-            if (data.kco.some(k => lbl.includes(k.toLowerCase().trim()))) chk.checked = true;
-        });
-    }
-    qCard.classList.remove('border-l-indigo-500');
-    qCard.classList.add('border-l-emerald-500','bg-emerald-50/30');
-    qStatus.classList.remove('hidden');
-    setTimeout(() => {
-        qCard.classList.add('border-l-indigo-500');
-        qCard.classList.remove('border-l-emerald-500','bg-emerald-50/30');
-        qStatus.classList.add('hidden');
-    }, 2000);
-    qInput.value = '';
-    renderQuickChips(parseQuickEntry(''));
-    saveWorkspace();
-}
-
-qInput.addEventListener('input',  () => renderQuickChips(parseQuickEntry(qInput.value)));
-qInput.addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); executeQuickFill(); }});
-qBtn.addEventListener('click', executeQuickFill);
-renderQuickChips(parseQuickEntry(''));
-
-// Sync details cards open/close
-document.querySelectorAll('details.glass-card').forEach(card => {
-    card.addEventListener('toggle', () => {
-        if (card.dataset.syncing) return;
-        const isOpen = card.open;
-        document.querySelectorAll('details.glass-card').forEach(other => {
-            if (other !== card && other.open !== isOpen) {
-                other.dataset.syncing = 'true';
-                other.open = isOpen;
-                setTimeout(() => delete other.dataset.syncing, 10);
-            }
-        });
-    });
-});
-
-// ══════════════════════════════════════════
-// FOLLOW-UP ENGINE
-// ══════════════════════════════════════════
-document.getElementById('fuSmartInput').addEventListener('input', function () {
-    let val = this.value.toLowerCase().replace(/^fu\s+with\s+/i,'').replace(/^fu\s+/i,'').trim();
-    let days = '', durationLabel = '';
-    const timeMatch = val.match(/(\d+)\s*([dwmy])/i);
-    if (timeMatch) {
-        const num = parseInt(timeMatch[1],10), unit = timeMatch[2].toLowerCase();
-        if (unit==='d') { days=num; durationLabel=num+' Days'; }
-        if (unit==='w') { days=num*7; durationLabel=num+' Weeks'; }
-        if (unit==='m') { days=num*30; durationLabel=num+' Months'; }
-        if (unit==='y') { days=num*365; durationLabel=num+' Years'; }
-        val = val.replace(timeMatch[0],'').replace(/,/g,' ').replace(/\s+/g,' ').trim();
-    }
-    document.getElementById('fuDays').value = days;
-    let tests = val.split(/[\s,]+/).filter(Boolean);
-    let chipsHtml = tests.map(t=>`<span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-md text-[10px] font-bold uppercase border border-purple-200 shadow-sm">${t}</span>`).join('');
-    if (durationLabel) chipsHtml += `<span class="px-2.5 py-1 bg-amber-100 text-amber-800 rounded-md text-[10px] font-bold uppercase border border-amber-300 shadow-sm">⏱ ${durationLabel}</span>`;
-    document.getElementById('fuSmartChips').innerHTML = chipsHtml;
-    document.getElementById('fuHiddenBoxes').innerHTML = tests.map(t=>`<input type="checkbox" checked><span>${t.toUpperCase()}</span>`).join('');
-    saveWorkspace();
-});
-
-// ══════════════════════════════════════════
-// BP INPUT FORMATTING
-// ══════════════════════════════════════════
-document.getElementById('bpInput').addEventListener('input', function (e) {
-    let v = this.value.replace(/[^\d/]/g,'');
-    if (v.length>=3&&!v.includes('/')&&e.inputType!=='deleteContentBackward') v=v.substring(0,3)+'/'+v.substring(3);
-    this.value = v;
-});
-
-// ══════════════════════════════════════════
-// WORKSPACE SAVE / LOAD
-// ══════════════════════════════════════════
-function saveWorkspace() {
-    const data = {
-        ptName: document.getElementById('ptName').value,
-        date:   document.getElementById('date').value,
-        ptAge:  document.getElementById('ptAge').value,
-        ptSex:  document.getElementById('ptSex').value,
-        bpInput:document.getElementById('bpInput').value,
-        ptPulse:document.getElementById('ptPulse').value,
-        ptTemp: document.getElementById('ptTemp').value,
-        ptSpo2: document.getElementById('ptSpo2').value,
-        ptRS:   document.getElementById('ptRS').value,
-        ptCVS:  document.getElementById('ptCVS').value,
-        ptPA:   document.getElementById('ptPA').value,
-        ptCNS:  document.getElementById('ptCNS').value,
-        complaints:   document.getElementById('complaints').value,
-        fuDays:       document.getElementById('fuDays').value,
-        fuSmartInput: document.getElementById('fuSmartInput').value,
-        generalAdvice:document.getElementById('generalAdvice').value,
-        masterDays:   document.getElementById('masterDays').value,
-        rxItems, tapers, currentTaperSteps,
-        checkboxes: Array.from(document.querySelectorAll('input[type="checkbox"]')).map(c=>c.checked)
-    };
-    localStorage.setItem('clinicalWorkspaceState', JSON.stringify(data));
-}
-
-function loadWorkspace() {
-    const saved = localStorage.getItem('clinicalWorkspaceState');
-    if (saved) {
-        try {
-            const d = JSON.parse(saved);
-            const s = (id, v) => { if (v!==undefined&&document.getElementById(id)) document.getElementById(id).value=v; };
-            s('ptName',d.ptName); s('date',d.date); s('ptAge',d.ptAge); s('ptSex',d.ptSex);
-            s('bpInput',d.bpInput); s('ptPulse',d.ptPulse); s('ptTemp',d.ptTemp); s('ptSpo2',d.ptSpo2);
-            s('ptRS',d.ptRS); s('ptCVS',d.ptCVS); s('ptPA',d.ptPA); s('ptCNS',d.ptCNS);
-            s('complaints',d.complaints); s('fuDays',d.fuDays); s('fuSmartInput',d.fuSmartInput);
-            s('generalAdvice',d.generalAdvice); s('masterDays',d.masterDays);
-            if (d.rxItems) rxItems = d.rxItems;
-            if (d.tapers)  tapers  = d.tapers;
-            if (d.currentTaperSteps) currentTaperSteps = d.currentTaperSteps;
-            if (d.checkboxes) {
-                const cbs = document.querySelectorAll('input[type="checkbox"]');
-                cbs.forEach((c,i) => { if (d.checkboxes[i]!==undefined) c.checked=d.checkboxes[i]; });
-            }
-            // Restore fu chips display
-            if (d.fuSmartInput) document.getElementById('fuSmartInput').dispatchEvent(new Event('input'));
-        } catch(e) { console.error(e); initDefaults(); }
-    } else {
-        initDefaults();
-    }
-    renderRx();
-    renderTaperBuilder();
-    renderActiveTapers();
-    setInterval(saveWorkspace, 1500);
-}
-
-function initDefaults() {
-    document.getElementById("date").value = new Date().toISOString().slice(0,10);
-    document.getElementById("ptRS").value  = "BSBE/Clear";
-    document.getElementById("ptCVS").value = "S1,S2+; No murmur";
-    document.getElementById("ptSpo2").value= "98% with RA";
-    ["ptTemp","ptPA","ptCNS"].forEach(id => document.getElementById(id).value = "");
-}
-
-function clearWorkspace() {
-    if (!confirm("Clear all patient data and prescriptions?")) return;
-    rxItems = []; tapers = []; currentTaperSteps = [];
-    document.querySelectorAll('input[type="text"],input[type="number"],textarea').forEach(i=>i.value='');
-    document.querySelectorAll('input[type="checkbox"]').forEach(i=>i.checked=false);
-    document.getElementById('fuSmartChips').innerHTML = '';
-    document.getElementById('fuHiddenBoxes').innerHTML = '';
-    initDefaults();
-    document.getElementById('masterDays').value = 5;
-    renderTaperBuilder(); renderActiveTapers(); renderRx();
-    localStorage.removeItem('clinicalWorkspaceState');
-}
-
-// ══════════════════════════════════════════
-// PRINT
-// ══════════════════════════════════════════
-function prepareAndPrint() {
-    const pDiv = document.getElementById('print-layout');
-    const ptName = document.getElementById('ptName').value || '—';
-    const ptAge  = document.getElementById('ptAge').value;
-    const ptSex  = document.getElementById('ptSex').value === 'M' ? 'Male' : 'Female';
-    const date   = document.getElementById('date').value
-        ? new Date(document.getElementById('date').value).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
-        : '—';
-
-    const bp=document.getElementById('bpInput').value, pulse=document.getElementById('ptPulse').value;
-    const temp=document.getElementById('ptTemp').value, spo2=document.getElementById('ptSpo2').value;
-    const rs=document.getElementById('ptRS').value, cvs=document.getElementById('ptCVS').value;
-    const pa=document.getElementById('ptPA').value, cns=document.getElementById('ptCNS').value;
-
-    let vArr=[], sArr=[];
-    if(bp) vArr.push(`<b>BP</b> ${bp} mmHg`);
-    if(pulse) vArr.push(`<b>HR</b> ${pulse} bpm`);
-    if(temp) vArr.push(`<b>Temp</b> ${temp}`);
-    if(spo2) vArr.push(`<b>SpO₂</b> ${spo2}`);
-    if(rs)  sArr.push(`<b>R/S</b> ${rs}`);
-    if(cvs) sArr.push(`<b>CVS</b> ${cvs}`);
-    if(pa)  sArr.push(`<b>P/A</b> ${pa}`);
-    if(cns) sArr.push(`<b>CNS</b> ${cns}`);
-    const vitalsRow = (vArr.length||sArr.length)
-        ? `<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid #cbd5e1;font-size:11px;color:#475569;line-height:1.8;">${[...vArr,...sArr].join('<span style="margin:0 8px;color:#cbd5e1;">·</span>')}</div>`
-        : '';
-
-    const patientLine = `${ptName}${ptAge?` &nbsp;·&nbsp; ${ptAge} Yrs`:''}${ptSex?` &nbsp;·&nbsp; ${ptSex}`:''}`;
-    const kcoList = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]:checked')).map(c=>c.nextElementSibling.innerText).join(', ');
-    const complaints = document.getElementById('complaints').value.replace(/\n/g,'<br>');
-    const invList = Array.from(document.querySelectorAll('#fuHiddenBoxes input[type="checkbox"]:checked')).map((c,i,a)=>a[i].nextElementSibling?.innerText||'').filter(Boolean).join(', ');
-    const fuDays = document.getElementById('fuDays').value;
-    const generalAdvice = document.getElementById('generalAdvice').value.replace(/\n/g,'<br>');
-
-    const drugsHtml = `
-        <table style="width:100%;border-collapse:collapse;margin-top:10px;margin-bottom:20px;font-family:'Inter',sans-serif;page-break-inside:avoid;">
-            <thead>
-                <tr style="background:#f8fafc;border-bottom:2px solid #cbd5e1;">
-                    <th style="padding:10px 5px;text-align:left;font-size:11px;color:#64748b;width:5%;">#</th>
-                    <th style="padding:10px 5px;text-align:left;font-size:11px;color:#64748b;width:40%;">Medication</th>
-                    <th style="padding:10px 5px;text-align:center;font-size:10px;color:#64748b;width:13%;">Morning</th>
-                    <th style="padding:10px 5px;text-align:center;font-size:10px;color:#64748b;width:13%;">Noon</th>
-                    <th style="padding:10px 5px;text-align:center;font-size:10px;color:#64748b;width:13%;">Night</th>
-                    <th style="padding:10px 5px;text-align:center;font-size:10px;color:#64748b;width:10%;">Duration</th>
-                </tr>
-            </thead>
-            <tbody>
-            ${rxItems.map((item,i) => {
-                const f = item.freqArr || ["0","0","0"];
-                const getCell = val => {
-                    if (!val||val==='0') return '<span style="color:#000000;font-size:12px;">✕</span>';
-                    if (val==='1') return '<span style="color:#000;font-weight:900;font-size:14px;">1</span>';
-                    return `<span style="color:#000;font-weight:900;font-size:13px;">${val}</span>`;
-                };
-
-                let gridRow='';
-                const doseVal = f[0]!=='0'?f[0]:(f[1]!=='0'?f[1]:(f[2]!=='0'?f[2]:'1'));
-
-                // Consistent days display — use item.days as string directly
-                const daysDisplay = item.isWeekly
-                    ? `${parseInt(item.days)||item.days} Wks`
-                    : (item.days||'-');
-
-                if (item.isSos) {
-                    const reason = item.customNote ? `if ${item.customNote}` : 'if needed';
-                    gridRow=`<td colspan="3" style="text-align:center;padding:12px 5px;font-weight:900;background:#f8fafc;border:1px solid #e2e8f0;color:#000;font-size:12px;">${doseVal} — SOS ${reason}</td>`;
-                } else if (item.isWeekly) {
-                    const dayLabel=item.weeklyDay?`(${item.weeklyDay})`:'';
-                    gridRow=`<td colspan="3" style="text-align:center;padding:12px 5px;font-weight:900;background:#f8fafc;border:1px solid #e2e8f0;color:#000;font-size:12px;">${doseVal} — Weekly Once ${dayLabel}</td>`;
-                } else {
-                    gridRow=`<td style="padding:12px 5px;text-align:center;">${getCell(f[0])}</td><td style="padding:12px 5px;text-align:center;">${getCell(f[1])}</td><td style="padding:12px 5px;text-align:center;">${getCell(f[2])}</td>`;
+        window.addEventListener('keydown', function lockListener(e) {
+            if (e.key.length === 1) {
+                keyBuffer += e.key;
+                if (keyBuffer.length > 4) keyBuffer = keyBuffer.slice(-4);
+                
+                if (hashCode(keyBuffer) === TARGET) {
+                    sessionStorage.setItem('clinical_unlocked', 'true');
+                    document.getElementById('lock-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('lock-screen').style.display = 'none';
+                        document.getElementById('screen-layout').style.display = 'block';
+                        if(document.getElementById("ptName")) document.getElementById("ptName").focus();
+                    }, 500);
+                    window.removeEventListener('keydown', lockListener);
                 }
-
-                const subRowText = [item.advice, (!item.isSos?item.customNote:'')].filter(Boolean).join(' — ');
-                const rs = subRowText ? 'rowspan="2"' : '';
-                return `
-                <tr style="border-bottom:${subRowText?'0px':'1px solid #e2e8f0'};">
-                    <td ${rs} style="padding:12px 5px;font-size:12px;color:#475569;vertical-align:middle;">${i+1}</td>
-                    <td ${rs} style="padding:12px 5px;vertical-align:middle;">
-                        <div style="font-size:12px;font-weight:900;color:#000;line-height:1.2;">${item.brand}</div>
-                        <div style="font-size:9px;color:#64748b;font-style:italic;margin-top:4px;">(${item.molecule})</div>
-                    </td>
-                    ${gridRow}
-                    <td ${rs} style="padding:12px 5px;text-align:center;vertical-align:middle;">
-                        <span style="display:inline-block;border:1px solid #cbd5e1;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:900;color:#000;">${daysDisplay}</span>
-                    </td>
-                </tr>
-                ${subRowText?`<tr style="border-bottom:1px solid #e2e8f0;"><td colspan="3" style="padding:0 5px 12px 5px;text-align:center;vertical-align:top;"><div style="display:inline-block;padding:3px 12px;border-radius:4px;font-size:9px;color:#000;font-weight:800;border:1px dashed #cbd5e1;">↳ ${subRowText}</div></td></tr>`:''}`;
-            }).join('')}
-            </tbody>
-        </table>`;
-
-    const tapersHtml = tapers.length ? tapers.map(t=>`
-        <div style="margin-bottom:14px;border:0.5px solid #fca5a5;border-radius:6px;overflow:hidden;page-break-inside:avoid;">
-            <div style="background:#fee2e2;padding:5px 10px;font-weight:800;font-size:12px;color:#991b1b;">${t.drug} — Tapering Schedule</div>
-            <table style="width:100%;font-size:11px;border-collapse:collapse;background:#fff;">
-                ${t.steps.map((s,i)=>`<tr><td style="padding:4px 8px;border-bottom:0.5px solid #fecaca;width:55px;color:#64748b;">Step ${i+1}</td><td style="padding:4px 8px;border-bottom:0.5px solid #fecaca;font-weight:700;">${s.dose}</td><td style="padding:4px 8px;border-bottom:0.5px solid #fecaca;color:#475569;">(${s.freq})</td><td style="padding:4px 8px;border-bottom:0.5px solid #fecaca;font-weight:600;">× ${s.days} Days</td></tr>`).join('')}
-                <tr><td colspan="4" style="padding:5px 8px;background:#fef2f2;font-weight:800;text-align:center;color:#b91c1c;font-size:10px;letter-spacing:1px;">STOP MEDICATION</td></tr>
-            </table>
-        </div>`).join('') : '';
-
-    let fuString='';
-    if(fuDays&&invList) fuString=`Follow-up with <b>${invList}</b> in <b>${document.getElementById('fuSmartInput').value.match(/(\d+\s*[dwmy])/i)?.[0]||fuDays+' days'}</b>`;
-    else if(invList) fuString=`Follow-up with <b>${invList}</b>`;
-    else if(fuDays) fuString=`Follow-up in <b>${fuDays} days</b>`;
-    const fuBlock = fuString ? `
-        <div style="margin-top:18px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;">
-            <div style="font-size:10px;font-weight:800;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Follow-Up</div>
-            <div style="font-size:12px;color:#78350f;line-height:1.5;">${fuString}</div>
-        </div>` : '';
-
-    function leftSection(label, content) {
-        return `<div style="margin-bottom:16px;padding-left:8px;border-left:2px solid #e2e8f0;">
-            <div style="font-size:9px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${label}</div>
-            <div style="font-size:11px;color:#334155;line-height:1.7;">${content}</div>
-        </div>`;
+            }
+        });
+    } else {
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('screen-layout').style.display = 'block';
     }
-    const leftCol = [
-        complaints ? leftSection('Clinical Note', complaints) : '',
-        kcoList ? leftSection('Known Case Of', kcoList) : '',
-        generalAdvice ? leftSection('Advice / Instructions', generalAdvice) : '',
-    ].join('');
 
-    pDiv.innerHTML = `
-        <div style="margin-bottom:20px;padding:12px 16px;border:0.5px solid #e2e8f0;border-radius:8px;background:#fafbff;">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                <div style="font-size:15px;font-weight:800;color:#0f172a;letter-spacing:-0.01em;">${patientLine}</div>
-                <div style="font-size:11px;font-weight:600;color:#64748b;">${date}</div>
-            </div>
-            ${vitalsRow}
-        </div>
-        <div style="display:table;width:100%;border-collapse:collapse;">
-            <div style="display:table-cell;width:25%;padding-right:20px;border-right:0.5px solid #e2e8f0;vertical-align:top;">
-                ${leftCol||'<div style="font-size:11px;color:#cbd5e1;font-style:italic;">No notes.</div>'}
-            </div>
-            <div style="display:table-cell;width:75%;padding-left:22px;vertical-align:top;">
-                <div style="font-size:26px;font-weight:900;font-family:Georgia,serif;color:#1e293b;line-height:1;margin-bottom:6px;">℞</div>
-                ${drugsHtml||(!tapers.length?'<div style="color:#94a3b8;font-size:12px;font-style:italic;margin-bottom:14px;">No medications prescribed.</div>':'')}
-                ${tapersHtml}
-                ${fuBlock}
-                <div style="height:0.5px;background:#e2e8f0;margin-top:22px;margin-bottom:36px;"></div>
-            </div>
-        </div>
-        <div style="text-align:right;margin-top:8px;padding-top:14px;border-top:0.5px solid #e2e8f0;">
-            <div style="font-size:16px;font-weight:900;color:#0f172a;letter-spacing:-0.01em;">Dr. Mit Panchani</div>
-            <div style="font-size:11.5px;font-weight:700;color:#334155;margin-top:2px;">MBBS, MD (Medicine)</div>
-            <div style="font-size:10px;font-weight:700;color:#334155;margin-top:2px;">FELLOW IN 2D ECHO, PGCIH</div>
-        </div> 
-        <div class="print-software-credit">Prescription Software developed by Dr. Mit Panchani</div>`;
+    // ========================================================
+    // APPLICATION LOGIC
+    // ========================================================
+
+    let drugs = [];
+    let rxItems = [];
+    let currentSearchFocus = -1;
+
+    let tapers = [];
+    let currentTaperSteps = [];
+
+    const quickAdviceOptions = [
+        { id: "After Food", label: "AF" },
+        { id: "Before Food", label: "BF" },
+        { id: "Before Breakfast", label: "BBF" },
+        { id: "Before Lunch", label: "BL" },
+        { id: "Before Dinner", label: "BD" },
+        { id: "Empty Stomach", label: "ES" },
+        { id: "With Food", label: "WF" },
+        { id: "Alternate Day", label: "AL D" },
+        { id: "+ Half glass of water", label: "+HGW" },
+        { id: "+ 1L water (ORS)", label: "+1LW" },
+        { id: "Weekly Once", label: "WO" },
+        { id: "SOS", label: "SOS" },
+        { id: "STAT", label: "STAT" },
+        { id: "MD", label: "MD" },
+        { id: "SUBLINGUAL", label: "SL" }
+    ];
+
+    function extractDose(text) {
+        if (!text) return [0];
+        const str = String(text).toUpperCase();
+        const parts = str.split(/\s*(?:\+|&)\s*/);
+        return parts.map(part => {
+            let mGrams = part.match(/(\d+(?:\.\d+)?)\s*(?:G|GM)\b/);
+            if (mGrams) return parseFloat(mGrams[1]) * 1000;
+            let mMg = part.match(/(\d+(?:\.\d+)?)\s*MG\b/);
+            if (mMg) return parseFloat(mMg[1]);
+            let mMcg = part.match(/(\d+(?:\.\d+)?)\s*MCG\b/);
+            if (mMcg) return parseFloat(mMcg[1]) / 1000;
+            let mOther = part.match(/(\d+(?:\.\d+)?)\s*(?:IU|ML)\b/);
+            if (mOther) return parseFloat(mOther[1]);
+            let fallback = part.match(/(\d+(?:\.\d+)?)/);
+            return fallback ? parseFloat(fallback[1]) : 0;
+        });
+    }
+
+    async function loadDrugs() {
+        const urls = [
+            "https://raw.githubusercontent.com/drmjp93/clinical-tools/refs/heads/main/data/drugs-1.json",
+            "https://raw.githubusercontent.com/drmjp93/clinical-tools/refs/heads/main/data/drugs-2.json",
+            "https://raw.githubusercontent.com/drmjp93/clinical-tools/refs/heads/main/data/drugs-3.json"
+        ];
+        try {
+            const responses = await Promise.all(urls.map(u => fetch(u)));
+            const data = await Promise.all(responses.map(r => r.json()));
+            drugs = data.flat();
+        } catch (e) { console.error("Database load error"); }
+    }
+    loadDrugs();
+
+    const searchInput = document.getElementById("drugSearch");
+    searchInput.addEventListener("keydown", function(e) {
+        let resDiv = document.getElementById("results");
+        if (!resDiv || resDiv.classList.contains("hidden")) return;
         
-    window.print();
-}
+        let items = resDiv.getElementsByClassName("search-item");
+        if (!items || items.length === 0) return;
 
-window.onload = loadWorkspace;
+        if (e.key === "ArrowDown") {
+            currentSearchFocus++;
+            addActive(items);
+            e.preventDefault();
+        } else if (e.key === "ArrowUp") {
+            currentSearchFocus--;
+            addActive(items);
+            e.preventDefault();
+        } else if (e.key === "Enter") {
+            e.preventDefault();
+            if (currentSearchFocus > -1) {
+                items[currentSearchFocus].click();
+            } else {
+                items[0].click();
+            }
+        }
+    });
+
+    function addActive(items) {
+        removeActive(items);
+        if (currentSearchFocus >= items.length) currentSearchFocus = 0;
+        if (currentSearchFocus < 0) currentSearchFocus = (items.length - 1);
+        items[currentSearchFocus].classList.add("search-item-active");
+        items[currentSearchFocus].scrollIntoView({block: "nearest", behavior: "smooth"});
+    }
+
+    function removeActive(items) {
+        for (let i = 0; i < items.length; i++) {
+            items[i].classList.remove("search-item-active");
+        }
+    }
+
+    searchInput.addEventListener("input", function() {
+        const q = this.value.toLowerCase().trim();
+        const resDiv = document.getElementById("results");
+        currentSearchFocus = -1;
+        
+        if (q.length < 2) { resDiv.classList.add("hidden"); return; }
+        
+        const terms = q.split(/\s+/);
+        let matches = drugs.filter(d => {
+            const searchable = `${d["FIRST BRAND"] || ""} ${d.Active_Content || ""}`.toLowerCase();
+            return terms.every(t => searchable.includes(t));
+        });
+
+        matches.sort((a, b) => {
+            const aContent = String(a.Active_Content || "").toUpperCase();
+            const bContent = String(b.Active_Content || "").toUpperCase();
+            const isCombo = (str) => /[+&/,]/.test(str) || /\bAND\b/.test(str);
+            const aIsCombo = isCombo(aContent);
+            const bIsCombo = isCombo(bContent);
+            if (aIsCombo && !bIsCombo) return 1;
+            if (!aIsCombo && bIsCombo) return -1;
+            if (!aIsCombo && !bIsCombo) {
+                if (aContent.length !== bContent.length) return aContent.length - bContent.length;
+            }
+            return String(a["FIRST BRAND"]).localeCompare(String(b["FIRST BRAND"]));
+        });
+
+        renderResults(matches.slice(0, 10));
+        
+        // SMART SCROLL
+        setTimeout(() => {
+            document.querySelector('.inline-search-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 50);
+    });
+
+    function renderResults(list) {
+        const resDiv = document.getElementById("results");
+        resDiv.innerHTML = "";
+        
+        if(list.length === 0) {
+            resDiv.innerHTML = `<div class="p-3 text-center text-xs font-semibold text-slate-400">No molecules found</div>`;
+            resDiv.classList.remove("hidden");
+            return;
+        }
+
+        resDiv.classList.remove("hidden");
+        
+        list.forEach((d, index) => {
+            const item = document.createElement("div");
+            item.className = "search-item p-3 hover:bg-brand-50 cursor-pointer flex justify-between items-center transition-colors";
+            item.innerHTML = `
+                <div>
+                    <div class="font-bold text-sm text-slate-900">${d["FIRST BRAND"]}</div>
+                    <div class="text-[10px] text-slate-500 font-bold mt-0.5"><i>(${d.Active_Content})</i></div>
+                </div>
+                <div class="text-[9px] bg-slate-100 text-slate-600 px-2 py-1 rounded font-bold uppercase tracking-wider text-right">
+                    Max: <br>${d.Max_Dose_Adult || 'N/A'}
+                </div>
+            `;
+            item.onclick = () => {
+                addDrug(d);
+                document.getElementById("drugSearch").value = "";
+                resDiv.classList.add("hidden");
+                
+                document.getElementById("drugSearch").focus();
+                
+                // SMART SCROLL
+                setTimeout(() => {
+                    document.querySelector('.inline-search-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 50);
+            };
+            resDiv.appendChild(item);
+        });
+    }
+
+    function addTaperStep() {
+        const dose = document.getElementById('tDose').value.trim();
+        const freq = document.getElementById('tFreq').value.trim();
+        const days = document.getElementById('tDays').value.trim();
+        
+        if(!dose || !freq || !days) {
+            alert("Please fill Dose, Freq, and Days.");
+            return;
+        }
+
+        currentTaperSteps.push({ dose, freq, days });
+        
+        document.getElementById('tDose').value = '';
+        document.getElementById('tDays').value = '';
+        document.getElementById('tDose').focus();
+
+        renderTaperBuilder();
+    }
+
+    function removeTaperStep(index) {
+        currentTaperSteps.splice(index, 1);
+        renderTaperBuilder();
+    }
+
+    function renderTaperBuilder() {
+        const container = document.getElementById('taperPreview');
+        if(currentTaperSteps.length === 0) {
+            container.innerHTML = '<span class="text-[10px] text-slate-400 italic font-medium">Add steps below to build taper...</span>';
+            return;
+        }
+        
+        const stepsHtml = currentTaperSteps.map((step, i) => `
+            <span class="inline-flex items-center gap-1 bg-rose-100 text-rose-800 px-2 py-1 rounded text-[10px] font-bold border border-rose-200">
+                ${step.dose} (${step.freq}) x ${step.days}d
+                <button type="button" onclick="removeTaperStep(${i})" class="ml-1 text-rose-500 hover:text-rose-800 leading-none pb-0.5">&times;</button>
+            </span>
+        `).join('<span class="text-slate-400 text-xs font-bold mx-0.5">➔</span>');
+        
+        container.innerHTML = stepsHtml + '<span class="text-slate-400 text-xs font-bold mx-0.5">➔</span><span class="inline-flex items-center bg-slate-200 text-slate-600 px-2 py-1 rounded text-[10px] font-bold">STOP</span>';
+    }
+
+    function saveTaperProtocol() {
+        const drug = document.getElementById('tDrug').value.trim();
+        if(!drug) return alert("Please enter the Drug Name (e.g. Tab Wysolone).");
+        if(currentTaperSteps.length === 0) return alert("Please add at least one step to the taper.");
+
+        tapers.push({
+            id: Date.now(),
+            drug: drug,
+            steps: [...currentTaperSteps]
+        });
+
+        document.getElementById('tDrug').value = '';
+        currentTaperSteps = [];
+        renderTaperBuilder();
+        renderActiveTapers();
+    }
+
+    function deleteTaperProtocol(id) {
+        tapers = tapers.filter(t => t.id !== id);
+        renderActiveTapers();
+    }
+
+    function renderActiveTapers() {
+        const container = document.getElementById('activeTapers');
+        if(tapers.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = tapers.map(t => {
+            const stepsStr = t.steps.map(s => `${s.dose} (${s.freq}) x ${s.days}d`).join(' ➔ ');
+            return `
+            <div class="bg-white border border-rose-200 rounded-lg p-2.5 flex justify-between items-center shadow-sm">
+                <div>
+                    <h4 class="text-xs font-bold text-slate-900">${t.drug}</h4>
+                    <p class="text-[10px] font-bold text-rose-600 mt-0.5">${stepsStr} ➔ STOP</p>
+                </div>
+                <button type="button" onclick="deleteTaperProtocol(${t.id})" class="text-slate-300 hover:text-red-500 bg-slate-50 p-1.5 rounded">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+            </div>
+            `;
+        }).join('');
+    }
+
+    function setGlobalDays(val) {
+        const masterVal = parseInt(val) || 1;
+        rxItems.forEach(item => item.days = masterVal);
+        renderRx();
+    }
+
+    function addDrug(d) {
+        const currentMasterDays = parseInt(document.getElementById("masterDays").value) || 5;
+        rxItems.push({
+            id: Date.now() + Math.floor(Math.random() * 1000),
+            brand: d["FIRST BRAND"],
+            molecule: d.Active_Content,
+            maxRaw: d.Max_Dose_Adult || 'Not specified',
+            strength: extractDose(d.Active_Content),
+            max: extractDose(d.Max_Dose_Adult),
+            freq: "1-0-0-0",
+            days: currentMasterDays,
+            advice: "" 
+        });
+        renderRx();
+    }
+
+    function renderRx() {
+        const container = document.getElementById("rxList");
+        const countBadge = document.getElementById("rxCount");
+        
+        if (rxItems.length === 0) {
+            container.innerHTML = `
+                <div class="py-10 flex flex-col items-center justify-center text-center opacity-50">
+                    <svg class="w-10 h-10 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    <p class="text-slate-500 text-sm font-semibold">Prescription pad is empty.</p>
+                    <p class="text-slate-400 text-xs mt-1">Search below to add medications.</p>
+                </div>`;
+            countBadge.innerText = "0 Meds";
+            return;
+        }
+
+        container.innerHTML = "";
+        countBadge.innerText = `${rxItems.length} Med${rxItems.length > 1 ? 's' : ''}`;
+
+        rxItems.forEach((item, index) => {
+            let parts = item.freq.split('-');
+            while(parts.length < 4) parts.push('0');
+            
+            const labels = ['M', 'AN', 'E', 'N'];
+            const pillsHTML = labels.map((lbl, idx) => {
+                const isActive = parts[idx] === '1';
+                return `<button type="button" onclick="toggleFreq(${item.id}, ${idx})" 
+                    class="px-2 py-0.5 rounded text-[10px] font-bold transition-all border ${isActive ? 'bg-brand-600 text-white border-brand-600 shadow-sm' : 'bg-white border-slate-200 text-slate-500 hover:border-brand-300 hover:text-brand-600'}">
+                    ${lbl}
+                </button>`;
+            }).join('');
+
+            const multiplier = parts.reduce((sum, val) => sum + parseInt(val), 0);
+            let isCombination = item.strength.length > 1 || String(item.molecule).includes('+') || String(item.molecule).includes('&');
+            
+            let doseStatusHTML = '';
+            let leftBorderColor = 'border-brand-500'; 
+
+            if (isCombination) {
+                doseStatusHTML = `<span class="text-slate-300 font-bold text-lg leading-none">-</span>`;
+            } else {
+                const s = item.strength[0] || 0;
+                const m = (item.max && item.max[0]) ? item.max[0] : 0;
+                if (s === 0 || m === 0) {
+                    doseStatusHTML = `<span class="text-slate-300 font-bold text-lg leading-none">-</span>`;
+                } else {
+                    const dailyDose = parseFloat((multiplier * s).toFixed(2));
+                    const isOverdose = dailyDose > m;
+                    if (isOverdose) leftBorderColor = 'border-red-500';
+                    doseStatusHTML = `
+                        <div class="flex items-center gap-1.5">
+                            <span class="${isOverdose ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'} px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider">
+                                ${isOverdose ? '⚠️ Over Dose' : '✓ Safe'}
+                            </span>
+                            <span class="text-[9px] font-bold text-slate-500 whitespace-nowrap">
+                                ${dailyDose} / ${m}mg
+                            </span>
+                        </div>`;
+                }
+            }
+
+            const currentAdviceArray = item.advice ? item.advice.split(',').map(s => s.trim()) : [];
+            const drugAdvicePillsHTML = quickAdviceOptions.map(adv => {
+                const isActive = currentAdviceArray.includes(adv.id);
+                return `
+                <button type="button" onclick="appendDrugAdvice(${item.id}, '${adv.id}')" title="${adv.id}"
+                    class="px-1.5 py-0.5 rounded border text-[9px] font-bold transition-all
+                    ${isActive ? 'bg-brand-100 border-brand-400 text-brand-700 shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-500 hover:text-brand-600 hover:border-brand-300 hover:bg-brand-50'}">
+                    ${adv.label}
+                </button>`;
+            }).join('');
+
+            const card = document.createElement("div");
+            card.className = `bg-white rounded-xl border border-slate-200 border-l-4 ${leftBorderColor} shadow-sm overflow-hidden flex relative group transition-all hover:border-brand-300`;
+            
+            card.innerHTML = `
+                <div onclick="removeDrug(${item.id})" class="w-8 bg-slate-50/50 hover:bg-red-100 flex items-center justify-center cursor-pointer transition-colors border-r border-slate-100" title="Delete Drug">
+                    <svg class="w-4 h-4 text-slate-300 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="flex-1 p-2 pl-3 flex flex-row items-center gap-3">
+                    <div class="w-[30%] min-w-[180px] flex flex-col justify-center">
+                        <div class="flex items-center gap-1.5 mb-0.5">
+                            <span class="text-[9px] font-black bg-slate-100 text-slate-500 px-1 py-0.5 rounded uppercase tracking-wider">#${index+1}</span>
+                            <h4 class="text-xs font-bold text-slate-900 leading-tight">${item.brand}</h4>
+                        </div>
+                        <p class="text-[9px] font-bold text-slate-500 leading-tight truncate pr-2" title="${item.molecule}"><i>(${item.molecule})</i></p>
+                        <p class="text-[8px] font-bold text-slate-400 mt-0.5">Max: <span class="text-slate-600">${item.maxRaw}</span></p>
+                    </div>
+                    <div class="w-[20%] min-w-[130px] flex flex-col justify-center gap-1">
+                        <div class="flex gap-1">${pillsHTML}</div>
+                        <div class="mt-0.5">${doseStatusHTML}</div>
+                    </div>
+                    <div class="flex-1 flex flex-col justify-center gap-1.5 pr-2">
+                        <input value="${item.advice}" onchange="updateAdvice(${item.id}, this.value)" class="premium-input w-full !py-1 !px-2 !text-[11px] !bg-slate-50 border-slate-200" placeholder="Custom Instructions...">
+                        <div class="flex flex-wrap gap-1">${drugAdvicePillsHTML}</div>
+                    </div>
+                </div>
+                <div class="w-14 bg-slate-50/80 border-l border-slate-100 flex flex-col items-center justify-center p-1.5">
+                    <span class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Days</span>
+                    <input type="number" value="${item.days}" onchange="updateDays(${item.id}, this.value)" class="w-full text-center premium-input !py-1 !px-0 !text-xs font-bold bg-white border-slate-200 shadow-sm">
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function removeDrug(id) { rxItems = rxItems.filter(i => i.id !== id); renderRx(); }
+    function updateDays(id, v) { const i = rxItems.find(x => x.id === id); if(i) i.days = v; }
+    function updateAdvice(id, v) { const i = rxItems.find(x => x.id === id); if(i) i.advice = v; }
+    
+    function appendDrugAdvice(id, text) {
+        const item = rxItems.find(x => x.id === id);
+        if (item) {
+            let currentAdvice = item.advice ? item.advice.split(',').map(s => s.trim()).filter(s => s !== '') : [];
+            if (currentAdvice.includes(text)) {
+                currentAdvice = currentAdvice.filter(a => a !== text);
+            } else {
+                currentAdvice.push(text);
+            }
+            item.advice = currentAdvice.join(', ');
+            renderRx();
+        }
+    }
+
+    function toggleFreq(id, idx) {
+        const item = rxItems.find(x => x.id === id);
+        if (item) {
+            let parts = item.freq.split('-');
+            while (parts.length < 4) parts.push('0');
+            parts[idx] = parts[idx] === '1' ? '0' : '1'; 
+            item.freq = parts.join('-');
+            renderRx();
+        }
+    }
+    
+    const templates = {
+      viral_fever: [
+        { brand:"DOLO 650", molecule:"PARACETAMOL 650MG", maxRaw:"4000 MG", strength:[650], max:[4000], freq:"1-0-1-0", days:5, advice:"After Food" },
+        { brand:"NAPROSYN 500", molecule:"NAPROXEN 500MG", maxRaw:"1000 MG", strength:[500], max:[1000], freq:"1-0-1-0", days:5, advice:"After Food" },
+        { brand:"PANTOP 40", molecule:"PANTOPRAZOLE 40MG", maxRaw:"80 MG", strength:[40], max:[80], freq:"1-0-0-0", days:5, advice:"Before Breakfast" }
+      ],
+      viral_urti: [
+        { brand:"DIOMINIC DCA", molecule:"PARACETAMOL + PHENYLEPHRINE + CPM", maxRaw:"", strength:[650], max:[4000], freq:"1-0-1-0", days:5, advice:"After Food" },
+        { brand:"NAPROSYN 500", molecule:"NAPROXEN 500MG", maxRaw:"1000 MG", strength:[500], max:[1000], freq:"1-0-1-0", days:5, advice:"After Food" },
+        { brand:"PANTOP 40", molecule:"PANTOPRAZOLE 40MG", maxRaw:"80 MG", strength:[40], max:[80], freq:"1-0-0-0", days:5, advice:"Before Breakfast" },
+        { brand:"L DIO1 M", molecule:"LEVOCETIRIZINE + MONTELUKAST", maxRaw:"", strength:[5,10], max:[5,10], freq:"0-0-0-1", days:5, advice:"At Night" }
+      ],
+      acute_gastroenteritis: [
+        { brand:"OFLOX OZ", molecule:"OFLOXACIN 200MG + ORNIDAZOLE 500MG", maxRaw:"800 MG + 1500 MG", strength:[200,500], max:[800,1500], freq:"1-0-1-0", days:5, advice:"After Food" },
+        { brand:"BUSCOPAN", molecule:"HYOSCINE BUTYLBROMIDE", maxRaw:"", strength:[10], max:[80], freq:"1-0-1-0", days:3, advice:"For Abdominal Pain" },
+        { brand:"SPORLAC", molecule:"LACTOBACILLUS", maxRaw:"", strength:[250], max:[1000], freq:"1-1-1-1", days:5, advice:"With Water" },
+        { brand:"PANTOP D", molecule:"PANTOPRAZOLE + DOMPERIDONE", maxRaw:"", strength:[40], max:[80], freq:"1-0-0-0", days:5, advice:"Before Breakfast" },
+        { brand:"ELECTRAL", molecule:"ORS POWDER", maxRaw:"", strength:[1], max:[10], freq:"1-0-1-0", days:3, advice:"Dissolve in 1L water" }
+      ],
+      viral_urti_pregnancy: [
+        { brand:"LETIZON M", molecule:"LEVOCETIRIZINE + MONTELUKAST", maxRaw:"", strength:[5,10], max:[5,10], freq:"0-0-0-1", days:5, advice:"At Night" },
+        { brand:"DMR 20", molecule:"DEXTROMETHORPHAN", maxRaw:"", strength:[20], max:[120], freq:"1-1-1-0", days:5, advice:"For Cough" },
+        { brand:"DOLO 650", molecule:"PARACETAMOL 650MG", maxRaw:"4000 MG", strength:[650], max:[4000], freq:"1-0-1-0", days:5, advice:"After Food" }
+      ],
+      uti: [
+        { brand:"SEPTRAN DS", molecule:"CO-TRIMOXAZOLE 800/160MG", maxRaw:"", strength:[800,160], max:[1600,320], freq:"1-0-1-0", days:5, advice:"After Food" },
+        { brand:"CITRALKA SYRUP", molecule:"DISODIUM HYDROGEN CITRATE", maxRaw:"", strength:[0], max:[0], freq:"1-1-1-0", days:5, advice:"+ Half glass of water" },
+        { brand:"RTIF PLUS", molecule:"CRANBERRY + D-MANNOSE", maxRaw:"", strength:[0], max:[0], freq:"1-0-0-0", days:5, advice:"After Food" },
+        { brand:"FOSFOMYCIN SACHET", molecule:"FOSFOMYCIN 3GM", maxRaw:"3GM", strength:[3], max:[3], freq:"1-0-0-0", days:1, advice:"+ Half glass of water, STAT" },
+        { brand:"CADMYLIN", molecule:"N-ACETYLCYSTEINE", maxRaw:"", strength:[0], max:[0], freq:"1-0-0-0", days:5, advice:"After Food" }
+      ]
+    };
+
+    function applyTemplate(key) {
+        const t = templates[key];
+        if(t) {
+            const currentMasterDays = parseInt(document.getElementById("masterDays").value) || 5;
+            const newItems = t.map(d => ({
+                ...d, 
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                days: currentMasterDays
+            }));
+            rxItems = [...rxItems, ...newItems];
+            renderRx();
+        }
+    }
+
+    function addAdvice(text) {
+        const box = document.getElementById("generalAdvice");
+        if (!box.value.includes(text)) {
+            box.value = box.value ? box.value + "\n" + text : text;
+        }
+    }
+
+    document.getElementById('bpInput').addEventListener('input', function(e) {
+        let val = this.value.replace(/[^\d/]/g, '');
+        if (val.length >= 3 && !val.includes('/') && e.inputType !== 'deleteContentBackward') {
+            val = val.substring(0, 3) + '/' + val.substring(3);
+        }
+        this.value = val;
+    });
+    
+    document.addEventListener('click', (e) => {
+        if (!document.getElementById('drugSearch').contains(e.target) && !document.getElementById('results').contains(e.target)) {
+            document.getElementById('results').classList.add('hidden');
+        }
+    });
+
+    // ========================================================
+    // LOCAL STORAGE ENGINE (CRASH RECOVERY)
+    // ========================================================
+    function saveWorkspace() {
+        const data = {
+            ptName: document.getElementById('ptName').value,
+            date: document.getElementById('date').value,
+            ptAge: document.getElementById('ptAge').value,
+            ptSex: document.getElementById('ptSex').value,
+            bpInput: document.getElementById('bpInput').value,
+            ptPulse: document.getElementById('ptPulse').value,
+            ptTemp: document.getElementById('ptTemp').value,
+            ptSpo2: document.getElementById('ptSpo2').value,
+            ptRS: document.getElementById('ptRS').value,
+            ptCVS: document.getElementById('ptCVS').value,
+            ptPA: document.getElementById('ptPA').value,
+            ptCNS: document.getElementById('ptCNS').value,
+            complaints: document.getElementById('complaints').value,
+            fuDays: document.getElementById('fuDays').value,
+            generalAdvice: document.getElementById('generalAdvice').value,
+            masterDays: document.getElementById('masterDays').value,
+            
+            tDrug: document.getElementById('tDrug') ? document.getElementById('tDrug').value : '',
+            tDose: document.getElementById('tDose') ? document.getElementById('tDose').value : '',
+            tFreq: document.getElementById('tFreq') ? document.getElementById('tFreq').value : '1-0-0',
+            tDays: document.getElementById('tDays') ? document.getElementById('tDays').value : '',
+
+            rxItems: rxItems,
+            tapers: tapers,
+            currentTaperSteps: currentTaperSteps,
+            checkboxes: Array.from(document.querySelectorAll('input[type="checkbox"]')).map(cb => cb.checked)
+        };
+        localStorage.setItem('clinicalWorkspaceState', JSON.stringify(data));
+    }
+
+    function loadWorkspace() {
+        const saved = localStorage.getItem('clinicalWorkspaceState');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                
+                if(data.ptName !== undefined) document.getElementById('ptName').value = data.ptName;
+                if(data.date !== undefined) document.getElementById('date').value = data.date;
+                if(data.ptAge !== undefined) document.getElementById('ptAge').value = data.ptAge;
+                if(data.ptSex !== undefined) document.getElementById('ptSex').value = data.ptSex;
+                if(data.bpInput !== undefined) document.getElementById('bpInput').value = data.bpInput;
+                if(data.ptPulse !== undefined) document.getElementById('ptPulse').value = data.ptPulse;
+                if(data.ptTemp !== undefined) document.getElementById('ptTemp').value = data.ptTemp;
+                if(data.ptSpo2 !== undefined) document.getElementById('ptSpo2').value = data.ptSpo2;
+                if(data.ptRS !== undefined) document.getElementById('ptRS').value = data.ptRS;
+                if(data.ptCVS !== undefined) document.getElementById('ptCVS').value = data.ptCVS;
+                if(data.ptPA !== undefined) document.getElementById('ptPA').value = data.ptPA;
+                if(data.ptCNS !== undefined) document.getElementById('ptCNS').value = data.ptCNS;
+                if(data.complaints !== undefined) document.getElementById('complaints').value = data.complaints;
+                if(data.fuDays !== undefined) document.getElementById('fuDays').value = data.fuDays;
+                if(data.generalAdvice !== undefined) document.getElementById('generalAdvice').value = data.generalAdvice;
+                if(data.masterDays !== undefined) document.getElementById('masterDays').value = data.masterDays;
+                
+                if(data.tDrug !== undefined && document.getElementById('tDrug')) document.getElementById('tDrug').value = data.tDrug;
+                if(data.tDose !== undefined && document.getElementById('tDose')) document.getElementById('tDose').value = data.tDose;
+                if(data.tFreq !== undefined && document.getElementById('tFreq')) document.getElementById('tFreq').value = data.tFreq;
+                if(data.tDays !== undefined && document.getElementById('tDays')) document.getElementById('tDays').value = data.tDays;
+
+                if(data.rxItems) rxItems = data.rxItems;
+                if(data.tapers) tapers = data.tapers;
+                if(data.currentTaperSteps) currentTaperSteps = data.currentTaperSteps;
+                
+                if(data.checkboxes) {
+                    const cbs = document.querySelectorAll('input[type="checkbox"]');
+                    cbs.forEach((cb, i) => {
+                        if(data.checkboxes[i] !== undefined) cb.checked = data.checkboxes[i];
+                    });
+                }
+            } catch(e) {
+                console.error("Could not load saved state", e);
+                initDefaults();
+            }
+        } else {
+            initDefaults();
+        }
+
+        renderRx();
+        renderTaperBuilder();
+        renderActiveTapers();
+        
+        setInterval(saveWorkspace, 1000);
+    }
+
+    function initDefaults() {
+        document.getElementById("date").value = new Date().toISOString().slice(0,10);
+        document.getElementById("ptRS").value = "BSBE/Clear";
+        document.getElementById("ptCVS").value = "S1,S2+; No murmur";
+        document.getElementById("ptSpo2").value = "98% with RA";
+        document.getElementById("ptTemp").value = "";
+        document.getElementById("ptPA").value = "";
+        document.getElementById("ptCNS").value = "";
+    }
+
+    function clearWorkspace() { 
+        if(confirm("Clear all patient data and prescriptions?")) { 
+            rxItems = []; 
+            document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(i => i.value=''); 
+            document.querySelectorAll('input[type="checkbox"]').forEach(i => i.checked = false);
+            
+            initDefaults();
+            document.getElementById('masterDays').value = 5;
+
+            tapers = [];
+            currentTaperSteps = [];
+            renderTaperBuilder();
+            renderActiveTapers();
+            renderRx(); 
+            
+            localStorage.removeItem('clinicalWorkspaceState');
+        } 
+    }
+
+    function prepareAndPrint() {
+        const printDiv = document.getElementById('print-layout');
+        
+        const date = document.getElementById('date').value || '________';
+        const ptName = document.getElementById('ptName').value || '_______________________';
+        const ptAge = document.getElementById('ptAge').value || '__';
+        const ptSex = document.getElementById('ptSex').value;
+        
+        const bp = document.getElementById('bpInput').value;
+        const pulse = document.getElementById('ptPulse').value;
+        const temp = document.getElementById('ptTemp').value;
+        const spo2 = document.getElementById('ptSpo2').value;
+        const rs = document.getElementById('ptRS').value;
+        const cvs = document.getElementById('ptCVS').value;
+        const pa = document.getElementById('ptPA').value;
+        const cns = document.getElementById('ptCNS').value;
+
+        let vitalsArr = [];
+        if (bp) vitalsArr.push(`<b>BP:</b> ${bp} mmHg`);
+        if (pulse) vitalsArr.push(`<b>HR:</b> ${pulse} bpm`);
+        if (temp) vitalsArr.push(`<b>Temp:</b> ${temp}`);
+        if (spo2) vitalsArr.push(`<b>SpO2:</b> ${spo2}`);
+        let vitalsStr = vitalsArr.join(' &nbsp;&nbsp;|&nbsp;&nbsp; ');
+
+        let sysArr = [];
+        if (rs) sysArr.push(`<b>R/S:</b> ${rs}`);
+        if (cvs) sysArr.push(`<b>CVS:</b> ${cvs}`);
+        if (pa) sysArr.push(`<b>P/A:</b> ${pa}`);
+        if (cns) sysArr.push(`<b>CNS:</b> ${cns}`);
+        let sysStr = sysArr.join(' &nbsp;&nbsp;|&nbsp;&nbsp; ');
+        
+        let examHtml = '';
+        if (vitalsStr || sysStr) {
+            examHtml = `<div style="margin-top: 6px; padding-top: 6px; border-top: 1px dashed #cbd5e1; font-size: 12px; color: #334155;">
+                ${vitalsStr} ${vitalsStr && sysStr ? '&nbsp;&nbsp;|&nbsp;&nbsp;' : ''} ${sysStr}
+            </div>`;
+        }
+        
+        const kcoList = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]:checked'))
+                             .map(cb => cb.nextElementSibling.innerText).join(', ');
+        const complaints = document.getElementById('complaints').value.replace(/\n/g, '<br>');
+        
+        const invList = Array.from(document.querySelectorAll('#invSection input[type="checkbox"]:checked'))
+                             .map(cb => cb.nextElementSibling.innerText).join(', ');
+        const fuDays = document.getElementById('fuDays').value;
+        const generalAdvice = document.getElementById('generalAdvice').value.replace(/\n/g, '<br>');
+
+        let drugsHtml = rxItems.map((item, index) => {
+            let freqText = item.freq;
+            let adviceText = item.advice ? `<span style="font-weight: 700; color: #1e293b;">${item.advice}</span>` : '';
+            return `
+                <div style="margin-bottom: 10px; padding-bottom: 8px; page-break-inside: avoid;">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;">
+                        <div style="font-weight: 800; font-size: 13px; color: #0f172a;">${index + 1}. ${item.brand}</div>
+                        <div style="font-size: 12px; font-weight: 700; color: #0f172a;">${freqText} &nbsp;&nbsp;|&nbsp;&nbsp; ${item.days} Days</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 11px;">
+                        <div style="color: #64748b; flex: 1; font-style: italic;">(${item.molecule})</div>
+                        <div style="text-align: right; margin-left: 15px;">${adviceText}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        let tapersHtml = '';
+        if (tapers.length > 0) {
+            let tItems = tapers.map(t => {
+                let stepsStr = t.steps.map((s, i) => `
+                    <tr>
+                        <td style="padding:4px 8px; border-bottom:1px solid #fecaca; width:60px;">Step ${i+1}</td>
+                        <td style="padding:4px 8px; border-bottom:1px solid #fecaca; font-weight:bold; color:#0f172a;">${s.dose}</td>
+                        <td style="padding:4px 8px; border-bottom:1px solid #fecaca; color:#475569;">(${s.freq})</td>
+                        <td style="padding:4px 8px; border-bottom:1px solid #fecaca; font-weight:600;">x ${s.days} Days</td>
+                    </tr>`).join('');
+                return `
+                <div style="margin-bottom: 15px; border: 1px solid #fca5a5; border-radius: 6px; overflow: hidden; page-break-inside: avoid;">
+                    <div style="background: #fee2e2; padding: 6px 10px; font-weight: 800; font-size: 13px; color: #991b1b; border-bottom: 1px solid #fca5a5;">${t.drug} (Tapering Schedule)</div>
+                    <table style="width:100%; font-size:12px; border-collapse: collapse; text-align:left; background: #fff;">
+                        ${stepsStr}
+                        <tr><td colspan="4" style="padding:6px 8px; background: #fef2f2; font-weight:800; text-align:center; color: #b91c1c; letter-spacing: 1px;">STOP MEDICATION</td></tr>
+                    </table>
+                </div>`;
+            }).join('');
+
+            tapersHtml = `
+                <div style="margin-top: 15px; margin-bottom: 15px;">
+                    ${tItems}
+                </div>
+            `;
+        }
+
+        let fuString = '';
+        if (fuDays || invList) {
+            if (fuDays && invList) {
+                fuString = `F/u with ${invList} reports in ${fuDays} days`;
+            } else if (invList) {
+                fuString = `F/u with ${invList} reports`;
+            } else if (fuDays) {
+                fuString = `F/u in ${fuDays} days`;
+            }
+        }
+
+        printDiv.innerHTML = `
+            <div style="margin-bottom: 25px; background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; justify-content: space-between; font-size: 14px; line-height: 1.5;">
+                    <div><b>Name:</b> ${ptName} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Age/Sex:</b> ${ptAge} Yrs / ${ptSex}</div>
+                    <div><b>Date:</b> ${date}</div>
+                </div>
+                ${examHtml}
+            </div>
+
+            <div style="display: table; width: 100%; border-collapse: collapse;">
+                <div style="display: table-cell; width: 32%; padding-right: 25px; border-right: 2px solid #e2e8f0; vertical-align: top;">
+                    ${complaints ? `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; color: #64748b;">CLINICAL NOTE</div>
+                        <div style="font-size: 13px; color: #0f172a; line-height: 1.5;">${complaints}</div>
+                    </div>` : ''}
+
+                    ${kcoList ? `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; color: #64748b;">Known Case Of</div>
+                        <div style="font-size: 13px; color: #0f172a; line-height: 1.5;">${kcoList}</div>
+                    </div>` : ''}
+
+                    ${generalAdvice ? `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; color: #64748b;">Advice / Instructions</div>
+                        <div style="font-size: 13px; color: #0f172a; line-height: 1.5;">${generalAdvice}</div>
+                    </div>` : ''}
+                </div>
+
+                <div style="display: table-cell; width: 68%; padding-left: 25px; vertical-align: top;">
+                    
+                    <div style="font-size: 24px; font-weight: 800; font-family: serif; color: #4f46e5; margin-bottom: 8px;">Rx</div>
+                    <div style="border-bottom: 2px dotted #cbd5e1; margin-bottom: 15px;"></div>
+
+                    ${drugsHtml || (tapers.length === 0 ? '<div style="color: #94a3b8; font-size: 13px; font-style: italic; margin-bottom: 15px;">No medications prescribed.</div>' : '')}
+
+                    ${tapersHtml}
+
+                    ${fuString ? `
+                    <div style="border-top: 2px dotted #cbd5e1; margin-top: 20px; padding-top: 15px;">
+                        <div style="font-size: 14px; font-weight: 800; color: #0f172a;">${fuString}</div>
+                    </div>` : ''}
+
+                    <div style="border-top: 2px dotted #cbd5e1; margin-top: 20px; margin-bottom: 40px;"></div>
+                </div>
+            </div>
+
+            <div style="text-align: right; page-break-inside: avoid; margin-top: 20px;">
+                <div style="font-weight: 800; font-size: 16px; color: #0f172a;">Dr. Mit Panchani</div>
+                <div style="font-size: 12px; color: #64748b; font-weight: 700; margin-top: 2px;">MBBS, MD (Medicine)</div>
+                <div style="font-size: 11px; color: #64748b; font-weight: 600; margin-top: 2px;">Fellow in 2D-Echo, PGCIH</div>
+            </div>
+        `;
+
+        window.print();
+    }
+
+    // Boot Application & Load Memory
+    window.onload = loadWorkspace;
+    
 </script>
+
 
 </body>
 </html>
