@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OPD ENGINE</title>
+    <title>OPD Prescritpion tool by Dr. Mit Panchani</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="black"/><text x="50" y="70" font-size="80" fill="white" font-family="Arial, sans-serif" font-weight="bold" text-anchor="middle">O</text></svg>'>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -18,6 +18,8 @@
             }
         }
     </script>
+
+
     <style>
         body { background-color: #f8fafc; overflow-y: auto; overflow-x: hidden; }
         .glass-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226,232,240,0.8); border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03); }
@@ -95,33 +97,33 @@
 
 
 
-    /* Auto-hiding Advice Card */
-    #advice-card {
-      max-height: 55px; /* Adjust this so ONLY the title shows */
-      overflow: hidden;
-      transition: max-height 0.4s ease-in-out;
-      cursor: pointer;
-    }
-
-    /* Expands on hover, AND stays open if you are typing inside it */
-    #advice-card:hover,
-    #advice-card:focus-within {
-      max-height: 1000px; /* Large enough to fit all content */
-      cursor: default;
+/* Auto-hiding for Advice and KCO cards */
+    .hover-reveal-card {
+        min-height: 42px; /* Lower this until the pills vanish */
+        max-height: 42px; 
+        overflow: hidden;
+        transition: max-height 0.4s ease-in-out;
+        cursor: pointer;
     }
     
-    /* Optional: Add a visual hint that it expands */
-    #advice-card h3::after {
-      content: ' (Hover to expand)';
-      font-size: 0.75rem;
-      color: #94a3b8;
-      font-weight: normal;
+    .hover-reveal-card:hover,
+    .hover-reveal-card:focus-within {
+        max-height: 1000px; /* Expands to fit content */
+        cursor: default;
     }
-    #advice-card:hover h3::after,
-    #advice-card:focus-within h3::after {
-      content: ''; /* Hides hint when open */
+    
+    .hover-reveal-card h3::after {
+        content: ' (Hover to expand)';
+        font-size: 0.7rem;
+        color: #94a3b8;
+        font-weight: normal;
+        margin-left: left; /* Pushes it to the right */
     }
-
+    
+    .hover-reveal-card:hover h3::after,
+    .hover-reveal-card:focus-within h3::after {
+        content: '';
+    }
 
 
 
@@ -156,37 +158,57 @@
 </style>
 
 </head>
+
+
+
+
 <body class="antialiased">
 
-<!-- LOCK SCREEN -->
-
-<div id="lock-screen" class="fixed inset-0 z-[9999] bg-[#0f172a] flex items-center justify-center transition-all duration-700">
-    <div class="text-slate-600 flex flex-col items-center select-none pointer-events-none">
-        <svg class="w-16 h-16 mb-6 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-        <p class="text-[10px] font-bold tracking-[0.3em] uppercase opacity-20">Console Locked</p>
+<div id="lock-screen" class="fixed inset-0 z-[9999] bg-[#0f172a] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-800 to-[#0f172a] flex flex-col items-center justify-center transition-all duration-700">
+    
+    <div class="flex flex-col items-center group w-full max-w-xs px-6">
+        <div class="relative flex items-center justify-center w-20 h-20 mb-6 rounded-full bg-slate-800/50 border border-slate-700/50 shadow-[0_0_30px_rgba(99,102,241,0.05)] group-hover:shadow-[0_0_40px_rgba(99,102,241,0.2)] transition-all duration-500">
+            <svg class="w-8 h-8 text-indigo-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        
+        <p class="text-[11px] font-bold tracking-[0.4em] text-slate-400 uppercase mb-8">Console Locked</p>
+        
+        <input type="password" 
+               id="mobilePinInput" 
+               inputmode="numeric" 
+               class="bg-transparent border-b-2 border-slate-700 text-center text-3xl text-indigo-400 tracking-[0.3em] w-40 pb-2 focus:border-indigo-500 focus:outline-none transition-colors placeholder-slate-700" 
+               placeholder="••••">
+               
+        <p class="text-[9px] text-slate-500 mt-5 font-semibold tracking-wider text-center">Tap above to unlock on mobile<br>or type anywhere on desktop</p>
     </div>
+
 </div>
+
+
 
 <div id="print-layout"></div>
 
 <div id="screen-layout" class="p-4 lg:p-6 min-h-screen" style="display:none;">
-    
-
 
             <header class="max-w-[1600px] mx-auto flex justify-between items-center sticky top-0 z-50 bg-[#f8fafc] py-2 px-4 border-b border-slate-200 mb-3 shadow-sm">
+
             <div class="flex items-center gap-4">
+
                 <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white shadow-md">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
                 </div>
+
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-none">OPD ENGINE</h1>
+                    <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-none">OPD Rx Tool by Dr. Mit Panchani</h1>
                 </div>
+
             </div>
+
             <div class="flex items-center gap-3">
 
                 <button onclick="clearWorkspace()" class="px-3 py-1.5 text-xs font-bold text-rose-500 hover:text-white hover:bg-rose-500 rounded-md transition-all border border-rose-200">Clear Data</button>
                 
-                   <button onclick="prepareAndPrint()" class="px-5 py-2 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-lg shadow-md transition-all flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>Print</button>
+                <button onclick="prepareAndPrint()" class="px-5 py-2 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-lg shadow-md transition-all flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>Print</button>
             </div>
         </header>
 
@@ -194,31 +216,40 @@
 <!-- SMART COMMAND LINE -->
  
 <div class="max-w-[1600px] mx-auto mb-3 w-full">
+
     <div class="glass-card px-4 py-2 border-l-4 border-l-indigo-500 shadow-sm transition-all flex flex-col justify-center" id="quickEntryCard">
         <div class="relative flex gap-2 items-center">
             
             <div class="relative flex-1">
+
                 <input type="text" id="quickEntryInput" class="inline-search-input !py-2 !pl-9 !pr-4 !text-sm !font-semibold !border-solid !border-2 !border-slate-300 focus:!border-indigo-500 w-full shadow-sm" placeholder="e.g. Ramila 45 f 130/80 88 rs-n cvs-n t-n kco-dm,htn c/o-fever and cough" autocomplete="off">
+
                 <span class="absolute left-3 top-2.5 text-indigo-500 font-bold text-sm">⌨️</span>
+                
             </div>
             
             <span id="quickEntryStatus" class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest hidden mr-1">✅ Loaded</span>
             
-            <button id="quickEntryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md transition-colors shrink-0">Execute</button>
+            <button id="quickEntryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md transition-colors shrink-0">ADD</button>
         </div>
         
         <div id="quickEntryChips" class="flex flex-wrap gap-1.5 mt-2 empty:hidden"></div>
+
     </div>
 </div>
 
-<main class="max-w-[1600px] mx-auto w-full flex flex-col gap-4">
+<main class="max-w-[1600px] mx-auto w-full flex flex-col gap-1">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
 
+       <!-- Demographics & Vitals -->
+       
         <details class="glass-card group bg-white/90 shadow-sm z-50 hidden">
+
             <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
                 <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-brand-500"></span> 1. Demographics & Vitals</span>
                 <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </summary>
+
             <div class="p-4 pt-0 space-y-3 border-t border-slate-100 mt-2 ">
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="input-label">Date</label><input type="date" id="date" class="premium-input !px-2"></div>
@@ -243,8 +274,10 @@
             </div>
         </details>
 
+         <!-- Clinical Note -->
       
         <details class="glass-card group bg-white/90 shadow-sm z-50 hidden">
+            
             <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
                 <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-amber-500"></span> 3. Clinical Note</span>
                 <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -256,8 +289,10 @@
     </div>
 
     <!-- RX PANEL -->
-    <div class="glass-card flex flex-col overflow-hidden relative h-[calc(100vh-230px)] shadow-sm">
-        <div class="px-5 py-3 border-b border-slate-100 bg-white flex justify-between items-center z-10 gap-4">
+
+    <div class="glass-card flex flex-col overflow-hidden relative h-[calc(100vh-230px)] shadow-sm mt-0.5px">
+
+        <div class="px-2 py-1 border-b border-slate-100 bg-white flex justify-between items-center z-10 gap-4 hidden ">
             <div class="flex items-center gap-3 flex-1 min-w-0">
                 <span class="text-xl font-serif font-bold text-slate-800 pr-3 border-r-2 border-brand-200">Rx</span>
                 <div class="flex flex-1 overflow-x-auto hide-scroll gap-2 items-center py-1">
@@ -271,93 +306,150 @@
           
         </div>
 
+            <div id="rxListWrapper" class="flex-1 overflow-y-auto scroll-pane p-4 bg-slate-50/40 relative pb-40">
 
-               <div id="rxListWrapper" class="flex-1 overflow-y-auto scroll-pane p-4 bg-slate-50/40 relative pb-40">
-            <div id="rxList" class="space-y-2"></div>
+            <div class="flex gap-4 items-start w-full mt-0 mb-2">
+            
+            <details onmouseenter="this.setAttribute('open', '')" onmouseleave="this.removeAttribute('open')" class="hover-reveal-card bg-white border border-slate-200 rounded-xl shadow-sm z-50 w-[35%]" id="kcoSection">
+                
+                <summary class="px-4 pt-4 pb-2 cursor-pointer flex items-center list-none outline-none [&::-webkit-details-marker]:hidden">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Known Case
+                    </h3>
+                </summary>
+                
+                <div class="px-4 pb-4 pt-2 border-t border-slate-100 flex flex-wrap gap-2">
+                    <label class="check-pill"><input type="checkbox"><span>DM</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>HTN</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>Hypothyroid</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>IHD</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>Hyperthyroid</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>S/P CABG</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>S/P PTCA</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>Asthma</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>COPD</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>CKD</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>Epilepsy</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>Psychiatric Disorder</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>RA</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>PIH</span></label>
+                    <label class="check-pill"><input type="checkbox"><span>GDM</span></label>
+                </div>
+                
+            </details>
 
-                   
-        <!-- Advice -->
-            <div id="advice-card" class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm mb-4 mt-6 col-span-full w-full">
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+
+            <div id="advice-card" class="hover-reveal-card bg-white border border-slate-200 rounded-xl px-4 py-4 shadow-sm flex flex-col w-[65%]">
+                
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                     <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Advice & Instructions
                 </h3>
-                <div class="space-y-3 mb-3">
+                
+                <div class="space-y-3 mb-4">
+
                     <div class="flex flex-wrap gap-1.5 items-center">
+                       
                         <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mr-1">Diet:</span>
-                        <button onclick="addAdvice('Low Fat Diet (LFD)')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">LFD</button>
-                        <button onclick="addAdvice('Bland Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">Bland</button>
-                        <button onclick="addAdvice('Soft Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">Soft</button>
-                        <button onclick="addAdvice('Salt restricted diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">SRD</button>
+
+
                         <button onclick="addAdvice('Anti Diabetic Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">ADD</button>
+
+                        <button onclick="addAdvice('Salt restricted diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">SRD</button>
+
+                        <button onclick="addAdvice('Soft Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">Soft</button>
+                     
+                        <button onclick="addAdvice('Bland Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">Bland</button>
+
+                        <button onclick="addAdvice('Low Fat Diet (LFD)')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">LFD</button>
+                        
                         <button onclick="addAdvice('Strictly avoid fruit juice')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">No Juice</button>
+
                         <button onclick="addAdvice('Strictly avoid coconut water')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">No Coconut Water</button>
+
                     </div>
+
                     <div class="flex flex-wrap gap-1.5 items-center">
+
                         <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mr-1">General:</span>
-                        <button onclick="addAdvice('Strict Rest')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Rest</button>
-                        <button onclick="addAdvice('Plenty of oral fluids')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Hydration</button>
+
                         <button onclick="addAdvice('Warm saline gargles')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Gargles</button>
                         <button onclick="addAdvice('Steam inhalation BID')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Steam</button>
+
+                        <button onclick="addAdvice('Strict Rest')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Rest</button>
+                        <button onclick="addAdvice('Plenty of oral fluids')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Hydration</button>
+                        
                         <button onclick="addAdvice('Use Mask')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Use Mask</button>
                     </div>
+
                     <div class="flex flex-wrap gap-1.5 items-center">
                         <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mr-1">Warnings:</span>
                         <button onclick="addAdvice('Strictly avoid NSAIDs / Painkillers')" class="advice-pill !bg-red-50 !text-red-700 !border-red-200 !px-2 !py-1 !text-[10px] font-bold">No NSAIDs (CKD)</button>
                         <button onclick="addAdvice('Restrict water intake as advised')" class="advice-pill !bg-amber-50 !text-amber-800 !border-amber-200 !px-2 !py-1 !text-[10px]">Restrict Water</button>
                     </div>
                 </div>
+
                 <textarea id="generalAdvice" class="premium-input w-full h-16 resize-none" placeholder="Type general advice here..."></textarea>
             </div>
+            
+        </div>
 
 
+            <!-- Added Drugs -->  
 
-
-
-  <details class="glass-card group bg-white/90 shadow-sm z-50" id="kcoSection">
-            <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
-                <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-rose-500"></span> 2. KCO</span>
-                <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </summary>
-            <div class="p-4 pt-0 border-t border-slate-100 mt-2 flex flex-wrap gap-2">
-                <label class="check-pill"><input type="checkbox"><span>DM</span></label>
-                <label class="check-pill"><input type="checkbox"><span>HTN</span></label>
-                <label class="check-pill"><input type="checkbox"><span>IHD</span></label>
-                <label class="check-pill"><input type="checkbox"><span>S/P CABG</span></label>
-                <label class="check-pill"><input type="checkbox"><span>S/P PTCA</span></label>
-                <label class="check-pill"><input type="checkbox"><span>Asthma</span></label>
-                <label class="check-pill"><input type="checkbox"><span>COPD</span></label>
-                <label class="check-pill"><input type="checkbox"><span>CKD</span></label>
-                <label class="check-pill"><input type="checkbox"><span>Epilepsy</span></label>
-                <label class="check-pill"><input type="checkbox"><span>Psychiatric Disorder</span></label>
-                <label class="check-pill"><input type="checkbox"><span>RA</span></label>
-                <label class="check-pill"><input type="checkbox"><span>PIH</span></label>
-                <label class="check-pill"><input type="checkbox"><span>GDM</span></label>
-                <label class="check-pill"><input type="checkbox"><span>Hyperthyroid</span></label>
-                <label class="check-pill"><input type="checkbox"><span>Hypothyroid</span></label>
-            </div>
-        </details>
-                
-
-
- 
+            <div id="rxList" class="space-y-2"></div>
 
             <!-- Drug Search -->
-            <div class="inline-search-container mt-4 no-print">
-                <input id="drugSearch" autocomplete="off" type="text" class="inline-search-input" placeholder="Type drug name to add... (Use ↑/↓ to select, Enter to add)">
-                <svg class="w-5 h-5 inline-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <div id="results" class="absolute w-full mt-2 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-slate-100 max-h-[300px] overflow-y-auto hidden divide-y divide-slate-50 scroll-pane z-50"></div>
-            </div>
 
-              <div class="flex items-center gap-3 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl shrink-0">
+            <div class="inline-search-container mt-3 no-print">
+
+    <input id="drugSearch" autocomplete="off" type="text" 
+           class="inline-search-input !bg-blue-50 !border-blue-400 !border-solid !text-blue-900 placeholder:!text-blue-400 focus:!bg-white focus:!border-blue-600 focus:!ring-4 focus:!ring-blue-100" 
+           placeholder="Type drug name to add... (Use ↑/↓ to select, Enter to add)">
+
+    <svg class="w-5 h-5 inline-search-icon !text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+    </svg>
+
+    <div id="results" class="absolute w-full mt-2 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-slate-100 max-h-[300px] overflow-y-auto hidden divide-y divide-slate-50 scroll-pane z-50"></div>
+
+</div>
+
+            <!-- Days bar -->
+             
+              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-1.5 rounded-xl shrink-0 mt-3">
+
                 <label class="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Days</label>
-                <input type="number" id="masterDays" value="5" class="bg-white border border-slate-300 rounded-lg w-16 text-center text-sm font-bold py-1 outline-none focus:border-brand-500" onchange="setGlobalDays(this.value)">
-                <span id="rxCount" class="px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-[10px] font-black uppercase tracking-wider ml-1">0 Meds</span>
+                
+                <input type="number" id="masterDays" value="5" class="bg-white border border-slate-300 rounded-lg w-15 text-center text-sm font-bold py-1 outline-none focus:border-brand-500" onchange="setGlobalDays(this.value)">
+                
+                <span id="rxCount" class="px-5 py-1.5 bg-slate-200 text-slate-700 rounded text-[12px] font-black uppercase tracking-wider ml-1">0 Meds</span>
             </div>
 
 
+            <!-- Follow-up -->
+
+            <div class="mt-3 bg-white border border-purple-200 rounded-xl p-1 shadow-sm no-print" id="invSection">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-xs font-bold text-purple-600 uppercase tracking-wider m-0 shrink-0 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        Follow-up
+                    </h3>
+                    <div class="relative flex-1">
+                        <input type="text" id="fuSmartInput" class="premium-input w-full !text-sm !py-2 !pl-9 !border-purple-200 focus:!border-purple-500" placeholder="e.g. fu with cbc, lft, rft 3m or 7d" autocomplete="off">
+                        <svg class="w-4 h-4 absolute left-3 top-2.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    </div>
+                </div>
+                <div id="fuSmartChips" class="flex flex-wrap gap-2 mt-3 empty:hidden"></div>
+                <input type="hidden" id="fuDays">
+                <div id="fuHiddenBoxes" style="display:none;"></div>
+            </div>
+
+            
             <!-- Tapering Engine -->
-            <div class="mt-6 no-print bg-white border border-rose-200 rounded-xl shadow-sm overflow-hidden">
+
+            <div class="mt-3 no-print bg-white border border-rose-200 rounded-xl shadow-sm overflow-hidden">
                 <div onclick="document.getElementById('taperBody').classList.toggle('hidden')" class="bg-rose-50 hover:bg-rose-100 cursor-pointer px-4 py-3 flex justify-between items-center transition-colors">
                     <h3 class="text-xs font-bold text-rose-600 uppercase tracking-wider m-0 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
@@ -386,22 +478,7 @@
             </div>
 
             
-            <!-- Follow-up -->
-            <div class="mt-4 bg-white border border-purple-200 rounded-xl p-4 shadow-sm no-print" id="invSection">
-                <div class="flex items-center gap-3">
-                    <h3 class="text-xs font-bold text-purple-600 uppercase tracking-wider m-0 shrink-0 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        Follow-up
-                    </h3>
-                    <div class="relative flex-1">
-                        <input type="text" id="fuSmartInput" class="premium-input w-full !text-sm !py-2 !pl-9 !border-purple-200 focus:!border-purple-500" placeholder="e.g. fu with cbc, lft, rft 3m or 7d" autocomplete="off">
-                        <svg class="w-4 h-4 absolute left-3 top-2.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    </div>
-                </div>
-                <div id="fuSmartChips" class="flex flex-wrap gap-2 mt-3 empty:hidden"></div>
-                <input type="hidden" id="fuDays">
-                <div id="fuHiddenBoxes" style="display:none;"></div>
-            </div>
+            
         </div>
     </div>
 </main>
@@ -409,39 +486,65 @@
 </div>
 
 <script>
+
+
 // ══════════════════════════════════════════
-// LOCK
+// LOCK ENGINE
 // ══════════════════════════════════════════
 let keyBuffer = "";
 const TARGET = 1570014;
+
 function hashCode(s) {
     let h = 0;
     for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
     return h;
 }
+
+function unlockConsole() {
+    sessionStorage.setItem('clinical_unlocked', 'true');
+    document.getElementById('lock-screen').style.opacity = '0';
+    setTimeout(() => {
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('screen-layout').style.display = 'block';
+        document.getElementById("ptName")?.focus();
+    }, 500);
+}
+
 if (sessionStorage.getItem('clinical_unlocked') !== 'true') {
     document.getElementById('screen-layout').style.display = 'none';
     document.getElementById('lock-screen').style.display = 'flex';
+    
+    // 1. Desktop listener (Original hidden typing)
     window.addEventListener('keydown', function L(e) {
         if (e.key.length === 1) {
             keyBuffer += e.key;
             if (keyBuffer.length > 4) keyBuffer = keyBuffer.slice(-4);
             if (hashCode(keyBuffer) === TARGET) {
-                sessionStorage.setItem('clinical_unlocked', 'true');
-                document.getElementById('lock-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('lock-screen').style.display = 'none';
-                    document.getElementById('screen-layout').style.display = 'block';
-                    document.getElementById("ptName")?.focus();
-                }, 500);
                 window.removeEventListener('keydown', L);
+                unlockConsole();
             }
         }
     });
+
+    // 2. Mobile listener (For the new input box)
+    const pinInput = document.getElementById('mobilePinInput');
+    if (pinInput) {
+        pinInput.addEventListener('input', function() {
+            let val = this.value;
+            if (val.length > 4) val = val.slice(-4);
+            if (hashCode(val) === TARGET) {
+                this.blur(); // Hide mobile keyboard
+                unlockConsole();
+            }
+        });
+    }
+
 } else {
     document.getElementById('lock-screen').style.display = 'none';
     document.getElementById('screen-layout').style.display = 'block';
 }
+
+
 
 // ══════════════════════════════════════════
 // STATE
