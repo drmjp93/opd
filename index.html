@@ -93,6 +93,39 @@
     .safety-ok   { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
     .safety-over { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
+
+
+    /* Auto-hiding Advice Card */
+    #advice-card {
+      max-height: 55px; /* Adjust this so ONLY the title shows */
+      overflow: hidden;
+      transition: max-height 0.4s ease-in-out;
+      cursor: pointer;
+    }
+
+    /* Expands on hover, AND stays open if you are typing inside it */
+    #advice-card:hover,
+    #advice-card:focus-within {
+      max-height: 1000px; /* Large enough to fit all content */
+      cursor: default;
+    }
+    
+    /* Optional: Add a visual hint that it expands */
+    #advice-card h3::after {
+      content: ' (Hover to expand)';
+      font-size: 0.75rem;
+      color: #94a3b8;
+      font-weight: normal;
+    }
+    #advice-card:hover h3::after,
+    #advice-card:focus-within h3::after {
+      content: ''; /* Hides hint when open */
+    }
+
+
+
+
+
     /* ── PRINT ── */
     @media print {
         @page { size: A4; margin: 5mm; }
