@@ -1442,32 +1442,38 @@ function prepareAndPrint() {
     window.print();
 }
 
-window.onload = async function() {
+window.onload = function() {
     // 1. Load your saved workspace first
     loadWorkspace();
     
-    // 2. Try to auto-paste from clipboard
-    try {
-        const text = await navigator.clipboard.readText();
-        
-        // If there is text in the clipboard, paste it into the smart box
-        if (text && text.trim() !== '') {
-            const qInput = document.getElementById('quickEntryInput');
-            qInput.value = text;
+    // 2. Auto-focus the smart box just in case you prefer pressing Ctrl+V
+    const qInput = document.getElementById('quickEntryInput');
+    if (qInput) qInput.focus();
+
+    // 3. The "First Click" Auto-Paste Engine
+    const autoPasteOnInteraction = async () => {
+        try {
+            const text = await navigator.clipboard.readText();
             
-            // Generate the preview chips
-            renderQuickChips(parseQuickEntry(text));
-            
-            // Optional: If you want it to automatically ADD the patient instantly, 
-            // remove the "//" from the line below:
-            // executeQuickFill(); 
+            // Only paste if there is text AND the box is currently empty
+            if (text && text.trim() !== '' && qInput.value === '') {
+                qInput.value = text;
+                renderQuickChips(parseQuickEntry(text));
+                
+                // executeQuickFill(); // Remove the "//" to auto-add instantly
+            }
+        } catch (err) {
+            console.log("Browser still blocking clipboard. Use the Paste button or Ctrl+V.");
         }
-    } catch (err) {
-        // This silently catches the error if the browser blocks the auto-paste 
-        // due to security or if the user hasn't granted permission yet.
-        console.log("Browser blocked auto-paste on load.");
-    }
+        
+        // Remove this listener so it doesn't keep pasting every time you click around your app!
+        document.removeEventListener('click', autoPasteOnInteraction);
+    };
+
+    // Listen for your very first click anywhere on the page
+    document.addEventListener('click', autoPasteOnInteraction);
 };
+
 
 </script>
 
