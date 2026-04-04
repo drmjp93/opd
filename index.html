@@ -1442,7 +1442,33 @@ function prepareAndPrint() {
     window.print();
 }
 
-window.onload = loadWorkspace;
+window.onload = async function() {
+    // 1. Load your saved workspace first
+    loadWorkspace();
+    
+    // 2. Try to auto-paste from clipboard
+    try {
+        const text = await navigator.clipboard.readText();
+        
+        // If there is text in the clipboard, paste it into the smart box
+        if (text && text.trim() !== '') {
+            const qInput = document.getElementById('quickEntryInput');
+            qInput.value = text;
+            
+            // Generate the preview chips
+            renderQuickChips(parseQuickEntry(text));
+            
+            // Optional: If you want it to automatically ADD the patient instantly, 
+            // remove the "//" from the line below:
+            // executeQuickFill(); 
+        }
+    } catch (err) {
+        // This silently catches the error if the browser blocks the auto-paste 
+        // due to security or if the user hasn't granted permission yet.
+        console.log("Browser blocked auto-paste on load.");
+    }
+};
+
 </script>
 
 </body>
