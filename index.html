@@ -1442,37 +1442,7 @@ function prepareAndPrint() {
     window.print();
 }
 
-window.onload = function() {
-    // 1. Load your saved workspace first
-    loadWorkspace();
-    
-    // 2. Auto-focus the smart box just in case you prefer pressing Ctrl+V
-    const qInput = document.getElementById('quickEntryInput');
-    if (qInput) qInput.focus();
-
-    // 3. The "First Click" Auto-Paste Engine
-    const autoPasteOnInteraction = async () => {
-        try {
-            const text = await navigator.clipboard.readText();
-            
-            // Only paste if there is text AND the box is currently empty
-            if (text && text.trim() !== '' && qInput.value === '') {
-                qInput.value = text;
-                renderQuickChips(parseQuickEntry(text));
-                
-                // executeQuickFill(); // Remove the "//" to auto-add instantly
-            }
-        } catch (err) {
-            console.log("Browser still blocking clipboard. Use the Paste button or Ctrl+V.");
-        }
-        
-        // Remove this listener so it doesn't keep pasting every time you click around your app!
-        document.removeEventListener('click', autoPasteOnInteraction);
-    };
-
-    // Listen for your very first click anywhere on the page
-    document.addEventListener('click', autoPasteOnInteraction);
-};
+window.onload = loadWorkspace;
 
 
 </script>
