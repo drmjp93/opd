@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -217,25 +218,40 @@
  
 <div class="max-w-[1600px] mx-auto mb-3 w-full">
 
-    <div class="glass-card px-4 py-2 border-l-4 border-l-indigo-500 shadow-sm transition-all flex flex-col justify-center" id="quickEntryCard">
-        <div class="relative flex gap-2 items-center">
+    <div class="glass-card mb-4 border-l-4 border-l-indigo-500 shadow-sm overflow-hidden transition-all" id="quickEntryCard">
+        
+        <div class="flex items-stretch border-b border-slate-100/50 bg-white/50">
             
-            <div class="relative flex-1">
-
-                <input type="text" id="quickEntryInput" class="inline-search-input !py-2 !pl-9 !pr-4 !text-sm !font-semibold !border-solid !border-2 !border-slate-300 focus:!border-indigo-500 w-full shadow-sm" placeholder="e.g. Ramila 45 f 130/80 88 rs-n cvs-n t-n kco-dm,htn c/o-fever and cough" autocomplete="off">
-
-                <span class="absolute left-3 top-2.5 text-indigo-500 font-bold text-sm">⌨️</span>
-                
+            <div class="flex items-center pl-4 pr-2 shrink-0">
+                <span class="text-indigo-500 font-bold text-sm">⌨️</span>
             </div>
             
-            <span id="quickEntryStatus" class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest hidden mr-1">✅ Loaded</span>
+            <input type="text" id="quickEntryInput" class="premium-input !border-none !bg-transparent !py-3 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none min-w-0" placeholder="e.g. Ramila 45 f 130/80 88 kco-dm,htn c/o-fever and cough" autocomplete="off">
             
-            <button id="quickEntryBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm font-bold shadow-md transition-colors shrink-0">ADD</button>
+            <div class="flex items-center pr-3 shrink-0">
+                <span id="quickEntryStatus" class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest hidden">✅ Loaded</span>
+            </div>
+            
+            <button id="quickEntryBtn" class="bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 px-8 text-sm font-black transition-all shrink-0 border-l border-indigo-100 uppercase tracking-wider">ADD</button>
         </div>
         
-        <div id="quickEntryChips" class="flex flex-wrap gap-1.5 mt-2 empty:hidden"></div>
+        <div id="quickEntryChips" class="px-4 py-2 bg-slate-50/50 flex-wrap gap-1.5 empty:hidden flex"></div>
 
     </div>
+
+    <div class="glass-card mt-2 border-l-4 border-l-teal-500 shadow-sm flex items-stretch overflow-hidden transition-all">
+            
+            <div class="flex items-center pl-4 pr-2">
+                <span class="text-teal-500 font-bold text-sm">💡</span>
+            </div>
+            
+            <input type="text" id="adviceSmartInput" class="premium-input !border-none !bg-transparent !py-2.5 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none" placeholder="Type advice shortcuts (e.g. srd, rest, steam) and press Tab..." autocomplete="off">
+            
+            <button id="adviceSmartBtn" class="bg-teal-50 hover:bg-teal-500 hover:text-white text-teal-700 px-6 text-xs font-bold transition-all shrink-0 border-l border-teal-100">Add Advice</button>
+            
+        </div>
+
+
 </div>
 
 <main class="max-w-[1600px] mx-auto w-full flex flex-col gap-1">
@@ -753,6 +769,31 @@ function setGlobalDays(val) {
 
 function addDrug(d) {
     const days = normalizeDays(parseInt(document.getElementById("masterDays").value) || 5);
+    
+    // 1. SMART CLASSIFICATION: Read the name and molecule
+    const brandLow = (d["FIRST BRAND"] || "").toLowerCase();
+    const molLow = (d.Active_Content || "").toLowerCase();
+    
+    // Detect medical devices (rotahalers, syringes, needles, pens, etc)
+    const isDevice = /(rotahaler|syringe|needle|spacer|device|meter|lancet|sensor|pen)/.test(brandLow) || /(rotahaler|syringe|needle|spacer|device|meter|lancet|sensor|pen)/.test(molLow);
+    
+    // Detect Insulins (by generic name or popular brand names)
+    const isInsulin = /(insulin|glargine|lispro|aspart|detemir|degludec|isophane)/.test(molLow) || /(mixtard|lantus|novomix|ryzodeg|tresiba|humalog|actrapid|insulatard|toujeo)/.test(brandLow);
+
+    // 2. APPLY CUSTOM RULES based on classification
+    let initialFreq = ["1", "0", "0"];
+    let initialAdvice = "After Food";
+    let initialDays = days;
+    
+    if (isDevice) {
+        initialFreq = ["-", "-", "-"]; // Blank out frequency slots
+        initialAdvice = "Use as directed";
+        initialDays = "-"; // Devices don't need a day count
+    } else if (isInsulin) {
+        initialFreq = ["0", "0", "0"]; // Insulin requires specific units to be typed
+        initialAdvice = "Subcutaneous";
+    }
+
     rxItems.push({
         id: Date.now() + Math.floor(Math.random() * 1000),
         brand: d["FIRST BRAND"],
@@ -760,14 +801,16 @@ function addDrug(d) {
         maxRaw: d.Max_Dose_Adult || 'Not specified',
         strength: extractDose(d.Active_Content),
         max: extractDose(d.Max_Dose_Adult),
-        freqArr: ["1", "0", "0"],
-        days,
-        advice: "After Food",
+        freqArr: initialFreq,
+        days: initialDays,
+        advice: initialAdvice,
         rawSig: '',
         customNote: '',
         isSos: false,
         isWeekly: false,
-        weeklyDay: ''
+        weeklyDay: '',
+        isDevice: isDevice,   // <--- Saving flag to memory
+        isInsulin: isInsulin  // <--- Saving flag to memory
     });
     renderRx();
 }
@@ -893,6 +936,7 @@ function updateCardDisplay(id) {
 
     if (freqEl) {
         let displayFreq = (item.freqArr || ["0","0","0"]).join(' - ');
+        if (item.isDevice && (item.freqArr || []).every(f => f === "-")) displayFreq = "As Directed";
         if (item.isSos) displayFreq = 'SOS';
         if (item.isWeekly) displayFreq = item.weeklyDay ? `Weekly (${item.weeklyDay})` : 'Weekly';
         freqEl.textContent = displayFreq;
@@ -908,6 +952,7 @@ function updateCardDisplay(id) {
 // ══════════════════════════════════════════
 // SMART SIG PARSER
 // ══════════════════════════════════════════
+
 function parseSmartSig(id, val) {
     const item = rxItems.find(x => x.id === id);
     if (!item) return;
@@ -915,7 +960,10 @@ function parseSmartSig(id, val) {
     item.rawSig = val;
     let workingStr = val.trim();
     item.customNote = '';
-    item.days = '';
+    
+    // Devices keep a blank day count. Regular drugs revert to Master Days.
+    item.days = item.isDevice ? '-' : normalizeDays(document.getElementById("masterDays").value || 5);
+    
     item.isSos = false;
     item.isWeekly = false;
     item.weeklyDay = '';
@@ -944,23 +992,15 @@ function parseSmartSig(id, val) {
     const tokens = workingStr.toLowerCase().split(/\s+/);
 
     const adviceMap = {
-        'af':  'After Food',
-        'es':  'Empty Stomach',
-        'sl':  'Sublingual',
-        'md':  'Mouth Dissolving (Do not swallow)',
-        'hgw': '+ Half glass water',
-        '1lw': '+ 1 Liter water',
-        'ad':  'Alternate Day',
-        'stat':'STAT - Take Immediately',
-        'bbf': 'Before Breakfast',
-        'bl':  'Before Lunch',
-        'bd':  'Before Dinner'
+        'af':  'After Food', 'es':  'Empty Stomach', 'sl':  'Sublingual', 'md':  'Mouth Dissolving (Do not swallow)',
+        'hgw': '+ Half glass water', '1lw': '+ 1 Liter water', 'ad':  'Alternate Day', 'stat':'STAT - Take Immediately',
+        'bbf': 'Before Breakfast', 'bl':  'Before Lunch', 'bd':  'Before Dinner', 'sc': 'Subcutaneous'
     };
 
-    // slot: 0=Morning, 1=Noon, 2=Night
     const slotMap = { 'bbf': 0, 'm': 0, 'bl': 1, 'an': 1, 'bd': 2, 'n': 2 };
 
-    let newFreq = ["0", "0", "0"];
+    // Set starting arrays based on class type
+    let newFreq = item.isDevice ? ["-", "-", "-"] : ["0", "0", "0"];
     let selectedAdvice = [];
     let currentDose = "1";
 
@@ -981,17 +1021,31 @@ function parseSmartSig(id, val) {
             const parts = t.split('-');
             if (parts.length >= 3) newFreq = [parts[0], parts[1], parts[2]];
             else if (parts.length === 2) newFreq = [parts[0], "0", parts[1]];
+            
+            // INSULIN FIX: If you type '10-0-10', auto-attach U to make it '10U-0-10U'
+            if (item.isInsulin) {
+                newFreq = newFreq.map(f => (/^\d+$/.test(f) && f !== "0" ? f + "U" : f));
+            }
             return;
         }
 
-        // Pure dose token e.g. "1/2", "2", "1tsf"
-        const pureMatch = t.match(/^([\d\.\/]+(?:tsf|ml|drop)?)$/);
-        if (pureMatch) { currentDose = pureMatch[1].toUpperCase(); return; }
+        // Added u/units to Regex to catch insulin typing like "10u"
+        const pureMatch = t.match(/^([\d\.\/]+(?:tsf|ml|drop|u|units?)?)$/);
+        if (pureMatch) { 
+            let d = pureMatch[1].toUpperCase();
+            // INSULIN FIX: Auto attach 'U' if it's just a raw number
+            if (item.isInsulin && /^[\d\.\/]+$/.test(d)) d += "U"; 
+            currentDose = d; 
+            return; 
+        }
 
-        // Compound token e.g. "1bbf", "1/2bd"
-        const compMatch = t.match(/^([\d\.\/]+(?:tsf|ml|drop)?)?([a-z]+)$/);
+        // Added u/units to Compound Regex to catch "10ubbf"
+        const compMatch = t.match(/^([\d\.\/]+(?:tsf|ml|drop|u|units?)?)?([a-z]+)$/);
         if (compMatch) {
-            const dose = compMatch[1] ? compMatch[1].toUpperCase() : currentDose;
+            let dose = compMatch[1] ? compMatch[1].toUpperCase() : currentDose;
+            // INSULIN FIX: Auto attach 'U' if it's just a raw number
+            if (item.isInsulin && /^[\d\.\/]+$/.test(dose)) dose += "U";
+            
             const code = compMatch[2];
             if (slotMap[code] !== undefined) {
                 newFreq[slotMap[code]] = dose;
@@ -1002,11 +1056,10 @@ function parseSmartSig(id, val) {
         }
     });
 
-    if ((item.isSos || item.isWeekly) && newFreq.every(f => f === "0")) newFreq[0] = currentDose;
+    if ((item.isSos || item.isWeekly) && newFreq.every(f => f === "0" || f === "-")) newFreq[0] = currentDose;
 
     item.freqArr = newFreq;
 
-    // Sort & consolidate advice
     let uniqueAdvice = [...new Set(selectedAdvice)];
     const hasBBF = uniqueAdvice.includes('Before Breakfast');
     const hasBL  = uniqueAdvice.includes('Before Lunch');
@@ -1170,8 +1223,16 @@ function executeQuickFill() {
     if (data.co)   document.getElementById('complaints').value = data.co;
     if (data.kco.length > 0) {
         document.querySelectorAll('#kcoSection input[type="checkbox"]').forEach(chk => {
-            const lbl = chk.nextElementSibling.innerText.toLowerCase();
-            if (data.kco.some(k => lbl.includes(k.toLowerCase().trim()))) chk.checked = true;
+            // 1. CHANGED to textContent so it can read hidden text when card is closed
+            const lbl = chk.nextElementSibling.textContent.toLowerCase().trim();
+            
+            if (data.kco.some(k => {
+                const term = k.toLowerCase().trim();
+                // 2. Exact match check so 'dm' doesn't accidentally trigger 'gdm'
+                return lbl === term || lbl.includes(` ${term}`) || lbl.includes(`${term} `) || lbl.includes(`/${term}`);
+            })) {
+                chk.checked = true;
+            }
         });
     }
     qCard.classList.remove('border-l-indigo-500');
@@ -1189,7 +1250,20 @@ function executeQuickFill() {
 }
 
 qInput.addEventListener('input',  () => renderQuickChips(parseQuickEntry(qInput.value)));
-qInput.addEventListener('keydown', e => { if (e.key==='Enter') { e.preventDefault(); executeQuickFill(); }});
+qInput.addEventListener('keydown', e => { 
+    if (e.key === 'Enter' || e.key === 'Tab') { 
+        e.preventDefault(); 
+        
+        // 1. Process the patient data just like Enter used to do
+        executeQuickFill(); 
+        
+        // 2. If you pressed Tab, automatically jump the cursor to the Advice box!
+        if (e.key === 'Tab') {
+            const adviceBox = document.getElementById('adviceSmartInput');
+            if (adviceBox) adviceBox.focus();
+        }
+    }
+});
 qBtn.addEventListener('click', executeQuickFill);
 renderQuickChips(parseQuickEntry(''));
 
@@ -1516,6 +1590,80 @@ function prepareAndPrint() {
                 el.addEventListener('change', updatePtSummary);
             }
         });
+
+        // ========================================================
+        // ADVICE SMART INPUT ENGINE
+        // ========================================================
+        const adviceInput = document.getElementById('adviceSmartInput');
+        const adviceBtn = document.getElementById('adviceSmartBtn');
+
+        // Your custom shortcut dictionary
+        const adviceDictionary = {
+            'srd': 'Salt restricted diet',
+            'add': 'Anti Diabetic Diet',
+            'lfd': 'Low Fat Diet (LFD)',
+            'rest': 'Strict Rest',
+            'steam': 'Steam inhalation BID',
+            'salt': 'Warm saline gargles',
+            'fluids': 'Plenty of oral fluids',
+            'hyd': 'Plenty of oral fluids',
+            'mask': 'Use Mask',
+            'bland': 'Bland Diet',
+            'soft': 'Soft Diet',
+            'nsaids': 'Strictly avoid NSAIDs / Painkillers',
+            'juice': 'Strictly avoid fruit juice',
+            'coconut': 'Strictly avoid coconut water',
+            'water': 'Restrict water intake as advised'
+        };
+
+        function processSmartAdvice() {
+            if (!adviceInput) return;
+            const val = adviceInput.value.toLowerCase().trim();
+            if (!val) return;
+
+            // Split by spaces or commas
+            const tokens = val.split(/[\s,]+/); 
+            
+            tokens.forEach(token => {
+                if (!token) return;
+                
+                // If it's in the dictionary, use the full text. Otherwise, use what you typed!
+                let textToAdd = adviceDictionary[token] || (token.charAt(0).toUpperCase() + token.slice(1));
+                
+                // Uses your existing addAdvice function to populate the text area
+                addAdvice(textToAdd);
+            });
+
+            // Flash visual feedback
+            const originalPh = adviceInput.placeholder;
+            adviceInput.value = '';
+            adviceInput.placeholder = '✅ Added to instructions!';
+            setTimeout(() => { adviceInput.placeholder = originalPh; }, 1500);
+        }
+
+       if (adviceInput && adviceBtn) {
+            adviceInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === 'Tab') {
+                    e.preventDefault();
+                    
+                    // 1. Process the advice shortcuts
+                    processSmartAdvice();
+                    
+                    // 2. If you pressed Tab, automatically jump to the Drug Search box!
+                    if (e.key === 'Tab') {
+                        const drugBox = document.getElementById('drugSearch');
+                        if (drugBox) {
+                            drugBox.focus();
+                            // Optional: gently scroll the page down so the drug search is in perfect view
+                            setTimeout(() => {
+                                document.querySelector('.inline-search-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 50);
+                        }
+                    }
+                }
+            });
+            adviceBtn.addEventListener('click', processSmartAdvice);
+        }
 
 window.onload = loadWorkspace;
 
