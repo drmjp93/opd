@@ -1108,10 +1108,14 @@ function parseQuickEntry(str) {
     const coMatch = raw.match(/c\/o-(.+)/i);
     if (coMatch) { data.co = coMatch[1].trim(); raw = raw.replace(coMatch[0], ''); }
 
+    // 1. ADDED: Our dictionary of words to automatically detect as KCOs
+    const autoKcoWords = ['dm', 'htn', 'hypo', 'hyper', 'ihd', 'ptca', 'cabg', 'epi', 'copd', 'pih', 'gdm', 'ckd', 'ra', 'asthma'];
+
     const tokens = raw.trim().split(/\s+/);
     tokens.forEach(t => {
         if (!t) return;
         const tLow = t.toLowerCase();
+        
         if (tLow === 'm' || tLow === 'f') { data.sex = tLow.toUpperCase(); }
         else if (/^\d{2,3}\/\d{2,3}$/.test(t)) { data.bp = t; }
         else if (tLow.startsWith('rs-'))  { const v=t.substring(3).replace(/-/g,' '); data.rs=(v==='n')?'B/L AE+, Clear':v; }
@@ -1119,7 +1123,14 @@ function parseQuickEntry(str) {
         else if (tLow.startsWith('pa-'))  { const v=t.substring(3).replace(/-/g,' '); data.pa=(v==='n')?'Soft, NT':v; }
         else if (tLow.startsWith('cns-')) { const v=t.substring(4).replace(/-/g,' '); data.cns=(v==='n')?'Conscious, Oriented':v; }
         else if (tLow.startsWith('t-'))   { const v=t.substring(2).replace(/-/g,' '); data.temp=(v==='n')?'Afebrile':v; }
-        else if (tLow.startsWith('kco-')) { data.kco=tLow.substring(4).split(',').filter(k=>k.trim()!==''); }
+        else if (tLow.startsWith('kco-')) { 
+            const customKcos = tLow.substring(4).split(',').filter(k=>k.trim()!=='');
+            data.kco = data.kco.concat(customKcos);
+        }
+        // 2. ADDED: The auto-detect catch!
+        else if (autoKcoWords.includes(tLow)) { 
+            data.kco.push(tLow); 
+        }
         else if (/^\d+$/.test(t)) {
             const num = parseInt(t,10);
             if (num>=1&&num<=120&&!data.age) data.age=num.toString();
@@ -1131,6 +1142,7 @@ function parseQuickEntry(str) {
     data.name = data.name.join(' ');
     return data;
 }
+
 
 function renderQuickChips(data) {
     let nextFound = false;
