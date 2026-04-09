@@ -613,14 +613,44 @@ const srchInput = document.getElementById("drugSearch");
 const netlifyAPI = "https://drugs.drmjp93.workers.dev";
 let searchDebounce;
 
+// 1. ADDED: A memory bank to hold the active search results
+let currentSearchList = []; 
+
 srchInput.addEventListener("keydown", e => {
     const rd = document.getElementById("results");
-    if (!rd || rd.classList.contains("hidden")) return;
+    
+    // Safety check: if no results, do nothing
+    if (!rd || rd.classList.contains("hidden") || !currentSearchList.length) return; 
+    
     const items = rd.getElementsByClassName("search-item");
     if (!items.length) return;
+    
     if (e.key === "ArrowDown") { currentSearchFocus++; activateSearchItem(items); e.preventDefault(); }
     else if (e.key === "ArrowUp") { currentSearchFocus--; activateSearchItem(items); e.preventDefault(); }
-    else if (e.key === "Enter") { e.preventDefault(); (currentSearchFocus > -1 ? items[currentSearchFocus] : items[0]).click(); }
+    else if (e.key === "Enter") { 
+        e.preventDefault(); 
+        
+        // 2. CHANGED: Pull the exact drug object directly from memory!
+        const selectedDrug = currentSearchFocus > -1 ? currentSearchList[currentSearchFocus] : currentSearchList[0];
+        
+        addDrug(selectedDrug);
+        
+        // Clean up UI
+        srchInput.value = "";
+        rd.classList.add("hidden");
+        srchInput.focus();
+        
+        setTimeout(() => {
+            const lastItem = rxItems[rxItems.length - 1];
+            if (lastItem) {
+                const sigEl = document.getElementById(`sig-${lastItem.id}`);
+                if (sigEl) {
+                    sigEl.focus();
+                    sigEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        }, 50);
+    }
 });
 
 function activateSearchItem(items) {
@@ -639,11 +669,15 @@ srchInput.addEventListener("input", function () {
     rd.innerHTML = `<div class="p-3 text-center text-xs font-semibold text-slate-400">Searching...</div>`;
     rd.classList.remove("hidden");
     clearTimeout(searchDebounce);
+    
     searchDebounce = setTimeout(async () => {
         try {
             const response = await fetch(`${netlifyAPI}?q=${encodeURIComponent(q)}`);
-            const matches = await response.json();
-            renderResults(matches);
+            
+            // 3. CHANGED: Save the results directly into our new memory bank!
+            currentSearchList = await response.json(); 
+            
+            renderResults(currentSearchList);
             setTimeout(() => document.querySelector('.inline-search-container').scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
         } catch (error) {
             rd.innerHTML = `<div class="p-3 text-center text-xs text-red-500 font-semibold">Error connecting to database.</div>`;
@@ -669,19 +703,17 @@ function renderResults(list) {
             srchInput.value = "";
             rd.classList.add("hidden");
             srchInput.focus();
-
-
             
             setTimeout(() => {
-    const lastItem = rxItems[rxItems.length - 1];
-    const sigEl = document.getElementById(`sig-${lastItem.id}`);
-    if (sigEl) {
-        sigEl.focus();
-        sigEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-}, 50);
-
-            
+                const lastItem = rxItems[rxItems.length - 1];
+                if (lastItem) {
+                    const sigEl = document.getElementById(`sig-${lastItem.id}`);
+                    if (sigEl) {
+                        sigEl.focus();
+                        sigEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }, 50);
         };
         rd.appendChild(item);
     });
