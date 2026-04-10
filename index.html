@@ -1693,6 +1693,88 @@ function prepareAndPrint() {
             adviceBtn.addEventListener('click', processSmartAdvice);
         }
 
+    // ══════════════════════════════════════════
+// CLOUD CLIPBOARD ENGINE: OPD RX PAGE
+// ══════════════════════════════════════════
+const CLOUD_API_URL = "https://clinic-clipboard.drmjp93.workers.dev"; // <-- Make sure this matches your worker!
+
+async function saveToCloudClipboard() {
+    const btn = event.target;
+    btn.innerText = "Saving...";
+
+    // Grab exactly from OPD IDs
+    const patientData = {
+        date: document.getElementById('date') ? document.getElementById('date').value : '',
+        sex: document.getElementById('ptSex') ? document.getElementById('ptSex').value : '',
+        name: document.getElementById('ptName') ? document.getElementById('ptName').value : '',
+        age: document.getElementById('ptAge') ? document.getElementById('ptAge').value : '',
+        bp: document.getElementById('bpInput') ? document.getElementById('bpInput').value : '',
+        pulse: document.getElementById('ptPulse') ? document.getElementById('ptPulse').value : '',
+        temp: document.getElementById('ptTemp') ? document.getElementById('ptTemp').value : '',
+        spo2: document.getElementById('ptSpo2') ? document.getElementById('ptSpo2').value : '',
+        rs: document.getElementById('ptRS') ? document.getElementById('ptRS').value : '',
+        cvs: document.getElementById('ptCVS') ? document.getElementById('ptCVS').value : '',
+        pa: document.getElementById('ptPA') ? document.getElementById('ptPA').value : '',
+        cns: document.getElementById('ptCNS') ? document.getElementById('ptCNS').value : ''
+    };
+
+    try {
+        await fetch(`${CLOUD_API_URL}/?action=save`, {
+            method: "POST",
+            body: JSON.stringify(patientData)
+        });
+        btn.innerText = "✓ Saved!";
+        setTimeout(() => btn.innerText = "↑ Send to Cloud", 2000);
+    } catch (e) {
+        alert("Failed to save to cloud");
+        btn.innerText = "↑ Send to Cloud";
+    }
+}
+
+async function loadFromCloudClipboard() {
+    const btn = event.target;
+    btn.innerText = "Fetching...";
+
+    try {
+        const res = await fetch(`${CLOUD_API_URL}/?action=load`);
+        const data = await res.json();
+
+        if (!data.name && !data.age) {
+            alert("Cloud clipboard is empty!");
+            btn.innerText = "↓ Fetch from Cloud";
+            return;
+        }
+
+        // Paste exactly into OPD IDs
+        if (data.date && document.getElementById('date')) document.getElementById('date').value = data.date;
+        if (data.name && document.getElementById('ptName')) document.getElementById('ptName').value = data.name;
+        if (data.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = data.age;
+        if (data.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = data.bp;
+        if (data.pulse && document.getElementById('ptPulse')) document.getElementById('ptPulse').value = data.pulse;
+        if (data.temp && document.getElementById('ptTemp')) document.getElementById('ptTemp').value = data.temp;
+        if (data.spo2 && document.getElementById('ptSpo2')) document.getElementById('ptSpo2').value = data.spo2;
+        if (data.rs && document.getElementById('ptRS')) document.getElementById('ptRS').value = data.rs;
+        if (data.cvs && document.getElementById('ptCVS')) document.getElementById('ptCVS').value = data.cvs;
+        if (data.pa && document.getElementById('ptPA')) document.getElementById('ptPA').value = data.pa;
+        if (data.cns && document.getElementById('ptCNS')) document.getElementById('ptCNS').value = data.cns;
+
+        // Smart translator for Gender (Fitness sends 'MALE', OPD needs 'M')
+        if (data.sex && document.getElementById('ptSex')) {
+            const s = data.sex.toUpperCase();
+            if (s.startsWith('M')) document.getElementById('ptSex').value = 'M';
+            else if (s.startsWith('F')) document.getElementById('ptSex').value = 'F';
+        }
+
+        btn.innerText = "✓ Fetched!";
+        setTimeout(() => btn.innerText = "↓ Fetch from Cloud", 2000);
+    } catch (e) {
+        alert("Failed to load from cloud");
+        btn.innerText = "↓ Fetch from Cloud";
+    }
+}
+
+
+
 window.onload = loadWorkspace;
 
 // ========================================================
