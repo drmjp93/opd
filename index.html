@@ -261,11 +261,6 @@
        
         <details class="glass-card group bg-white/90 shadow-sm z-50 hidden">
 
-            <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
-                <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-brand-500"></span> 1. Demographics & Vitals</span>
-                <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </summary>
-
             <div class="flex gap-2 mb-4 no-print pl-4 pt-2">
     <button type="button" onclick="saveToCloudClipboard()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded shadow transition-colors">↑ Send to Cloud</button>
     <button type="button" onclick="loadFromCloudClipboard()" class="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded shadow transition-colors">↓ Fetch from Cloud</button>
@@ -385,6 +380,11 @@
 
 
             <div id="advice-card" class="hover-reveal-card bg-white border border-slate-200 rounded-xl px-4 py-4 shadow-sm flex flex-col w-[65%]">
+
+                 <summary class="p-3 font-bold text-slate-800 cursor-pointer flex justify-between items-center list-none outline-none">
+                <span class="flex items-center gap-2 text-sm"><span class="w-2 h-2 rounded-full bg-brand-500"></span> 1. Demographics & Vitals</span>
+                <svg class="w-4 h-4 text-slate-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
                 
                 <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
                     <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
