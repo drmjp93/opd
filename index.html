@@ -1698,7 +1698,7 @@ window.onload = loadWorkspace;
 
   try {
     // CHANGED: Now using 'opd-tool-visits' so it tracks this specific app separately!
-    const resp = await fetch("https://api.counterapi.dev/v1/drmjp93in/opd-tool-visits/up");
+    const resp = await fetch("https://visits.drmjp93.workers.dev/?tool=opd");
     const j = await resp.json();
 
     if (j && j.count !== undefined) {
