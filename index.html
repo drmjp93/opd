@@ -191,76 +191,95 @@
 
 <div id="screen-layout" class="p-4 lg:p-6 min-h-screen" style="display:none;">
 
-            <header class="max-w-[1600px] mx-auto flex justify-between items-center sticky top-0 z-50 bg-[#f8fafc] py-2 px-4 border-b border-slate-200 mb-3 shadow-sm">
-
-            <div class="flex items-center gap-4">
-
+    <header class="max-w-[1600px] mx-auto flex justify-between items-center sticky top-0 z-40 bg-[#f8fafc] py-2 px-4 border-b border-slate-200 mb-3 shadow-sm no-print gap-4">
+            
+            <div class="flex items-center gap-3 shrink-0">
                 <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white shadow-md">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
                 </div>
-
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-none">OPD Rx Tool by Dr. Mit Panchani</h1>
+                    <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-none">OPD Rx Tool</h1>
+                </div>
+            </div>
+
+            <div class="flex-1 max-w-4xl relative group mx-2 flex items-center z-50">
+                <div class="relative w-full">
+                    <input type="text" id="archiveSearch" placeholder="Search by Name, Date, or Year (e.g. 'Rahul 2026')..." class="w-full py-2.5 pl-11 pr-4 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-brand-500 rounded-full text-[13px] font-bold text-slate-800 uppercase tracking-wide outline-none transition-all shadow-sm focus:shadow-md placeholder:text-slate-400 placeholder:normal-case placeholder:font-medium" oninput="searchArchive()">
+                    <svg class="w-5 h-5 text-slate-400 absolute left-4 top-[11px] group-focus-within:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    
+                <div id="searchResults" class="fixed top-[70px] left-1/2 -translate-x-1/2 w-[96vw] max-w-[1500px] bg-white border-2 border-slate-200 shadow-2xl rounded-xl hidden max-h-[60vh] overflow-y-auto z-[9999] divide-y divide-slate-100"></div>                </div>
+                <button type="button" onclick="saveToArchive()" id="btn-archive" class="ml-3 shrink-0 bg-slate-800 hover:bg-brand-600 text-white w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-all text-lg hover:scale-105" title="Save to Local EMR">💾</button>
+            </div>
+
+            <div class="flex items-center gap-3 shrink-0">
+                <input type="file" id="importFile" accept=".json" class="hidden" onchange="processImport(event)">
+                
+                <div class="flex items-center bg-amber-50 p-1 rounded-lg border border-amber-200 shadow-sm" title="Local Database Backup">
+                    <button type="button" onclick="exportDatabase()" class="px-2 py-1 text-[10px] uppercase font-bold text-amber-700 hover:bg-amber-100 rounded transition-colors">↓ Export DB</button>
+                    <div class="w-px h-4 bg-amber-300 mx-1"></div>
+                    <button type="button" onclick="document.getElementById('importFile').click()" class="px-2 py-1 text-[10px] uppercase font-bold text-amber-700 hover:bg-amber-100 rounded transition-colors">↑ Import DB</button>
                 </div>
 
-            </div>
-
-            <div class="flex items-center gap-3">
-
-                <button onclick="clearWorkspace()" class="px-3 py-1.5 text-xs font-bold text-rose-500 hover:text-white hover:bg-rose-500 rounded-md transition-all border border-rose-200">Clear Data</button>
+                <div class="flex items-center bg-blue-50 p-1 rounded-lg border border-blue-200 shadow-sm">
+                    <button type="button" onclick="saveToCloudClipboard()" class="px-2 py-1 text-[10px] uppercase font-bold text-blue-700 hover:bg-blue-100 rounded transition-colors">↑ Cloud</button>
+                    <div class="w-px h-4 bg-blue-300 mx-1"></div>
+                    <button type="button" onclick="loadFromCloudClipboard()" class="px-2 py-1 text-[10px] uppercase font-bold text-green-700 hover:bg-green-100 rounded transition-colors">↓ Fetch</button>
+                </div>
                 
-                <button onclick="prepareAndPrint()" class="px-5 py-2 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-lg shadow-md transition-all flex items-center"><svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>Print</button>
+                <button onclick="clearWorkspace()" class="px-3 py-1.5 text-xs font-bold text-rose-500 hover:text-white hover:bg-rose-500 rounded-md transition-all border border-rose-200">Clear Data</button>
+                <button onclick="prepareAndPrint()" class="px-4 py-1.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-lg shadow-md transition-all flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    Print
+                </button>
             </div>
         </header>
+           
 
 
 <!-- SMART COMMAND LINE -->
  
-<div class="max-w-[1600px] mx-auto mb-3 w-full">
+<div class="max-w-[1600px] mx-auto mb-3 w-full flex flex-row items-stretch gap-3 no-print">
 
-    <div class="glass-card mb-4 border-l-4 border-l-indigo-500 shadow-sm overflow-hidden transition-all" id="quickEntryCard">
-        
-        <div class="flex items-stretch border-b border-slate-100/50 bg-white/50">
-            
+    <div class="glass-card border-l-4 border-l-indigo-500 shadow-sm overflow-hidden transition-all w-[60%] flex flex-col justify-between min-h-[90px]" id="quickEntryCard">
+        <div class="flex items-stretch border-b border-slate-100/50 bg-white/50 h-[46px] shrink-0">
             <div class="flex items-center pl-4 pr-2 shrink-0">
                 <span class="text-indigo-500 font-bold text-sm">⌨️</span>
             </div>
-            
-            <input type="text" id="quickEntryInput" class="premium-input !border-none !bg-transparent !py-3 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none min-w-0" placeholder="e.g. Ramila 45 f 130/80 88 kco-dm,htn c/o-fever and cough" autocomplete="off">
-            
+            <input type="text" id="quickEntryInput" class="premium-input !border-none !bg-transparent !py-3 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none min-w-0" placeholder="e.g. Ramila 45 f 130/80 88 kco-dm,htn c/o-fever" autocomplete="off">
             <div class="flex items-center pr-3 shrink-0">
                 <span id="quickEntryStatus" class="text-[10px] font-bold text-emerald-500 uppercase tracking-widest hidden">✅ Loaded</span>
             </div>
-            
-            <button id="quickEntryBtn" class="bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 px-8 text-sm font-black transition-all shrink-0 border-l border-indigo-100 uppercase tracking-wider">ADD</button>
+            <button id="quickEntryBtn" class="bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 px-6 text-sm font-black transition-all shrink-0 border-l border-indigo-100 uppercase tracking-wider">ADD</button>
         </div>
-        
-        <div id="quickEntryChips" class="px-4 py-2 bg-slate-50/50 flex-wrap gap-1.5 empty:hidden flex"></div>
-
+        <div id="quickEntryChips" class="px-4 py-1.5 bg-slate-50/50 flex-wrap gap-1.5 empty:hidden flex flex-1 items-center"></div>
     </div>
 
-    <div class="glass-card mt-2 border-l-4 border-l-teal-500 shadow-sm flex items-stretch overflow-hidden transition-all">
-            
-            <div class="flex items-center pl-4 pr-2">
-                <span class="text-teal-500 font-bold text-sm">💡</span>
+    <div class="w-[40%] flex flex-col gap-2 h-full">
+        
+        <div class="glass-card border-l-4 border-l-amber-500 shadow-sm flex items-stretch overflow-hidden transition-all h-[42px] shrink-0">
+            <div class="flex items-center pl-3 pr-2">
+                <span class="text-amber-500 font-bold text-sm">📝</span>
             </div>
-            
-            <input type="text" id="adviceSmartInput" class="premium-input !border-none !bg-transparent !py-2.5 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none" placeholder="Type advice shortcuts (e.g. srd, rest, steam) and press Tab..." autocomplete="off">
-            
-            <button id="adviceSmartBtn" class="bg-teal-50 hover:bg-teal-500 hover:text-white text-teal-700 px-6 text-xs font-bold transition-all shrink-0 border-l border-teal-100">Add Advice</button>
-            
+            <input type="text" id="complaintsSmartInput" class="premium-input !border-none !bg-transparent !py-2 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none" placeholder="Type complaints here..." autocomplete="off">
+            <button id="complaintsSmartBtn" class="bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 px-4 text-xs font-bold transition-all shrink-0 border-l border-amber-100 uppercase">Add C/O</button>
         </div>
 
+        <div class="glass-card border-l-4 border-l-teal-500 shadow-sm flex items-stretch overflow-hidden transition-all h-[42px] shrink-0">
+            <div class="flex items-center pl-3 pr-2">
+                <span class="text-teal-500 font-bold text-sm">💡</span>
+            </div>
+            <input type="text" id="adviceSmartInput" class="premium-input !border-none !bg-transparent !py-2 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none" placeholder="Advice shortcuts (e.g. srd, rest)..." autocomplete="off">
+            <button id="adviceSmartBtn" class="bg-teal-50 hover:bg-teal-500 hover:text-white text-teal-700 px-4 text-xs font-bold transition-all shrink-0 border-l border-teal-100 uppercase">Advice</button>
+        </div>
+        
+    </div>
 
 </div>
 
 <main class="max-w-[1600px] mx-auto w-full flex flex-col gap-1">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 w-full">
 
-        <div class="flex gap-2 mb-4 no-print pl-4 pt-2">
-            <button type="button" onclick="saveToCloudClipboard()" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded shadow transition-colors">↑ Send to Cloud</button>
-            <button type="button" onclick="loadFromCloudClipboard()" class="bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded shadow transition-colors">↓ Fetch from Cloud</button>
-        </div>
+
 
        <!-- Demographics & Vitals -->
        
@@ -310,20 +329,25 @@
 <div class="lg:col-span-9 flex flex-col h-[calc(100vh-100px)]">
                 
                 <div class="glass-card mb-4 px-4 py-2.5 flex flex-wrap items-center justify-between gap-4 hidden border-l-4 border-l-emerald-500 shrink-0 transition-all duration-300" id="ptSummaryStrip">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm shadow-inner" id="sumInitials">PT</div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-800 leading-tight" id="sumName">Name</h3>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" id="sumAgeSex">Age / Sex</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-5 text-[11px] font-bold text-slate-600 bg-slate-50/80 px-4 py-1.5 rounded-lg border border-slate-200 shadow-sm">
-                        <div class="flex items-center gap-1.5" title="Blood Pressure"><span class="text-rose-500 font-black">BP</span> <span id="sumBP">--/--</span></div>
-                        <div class="flex items-center gap-1.5" title="Heart Rate"><span class="text-amber-500 font-black">HR</span> <span id="sumHR">--</span></div>
-                        <div class="flex items-center gap-1.5" title="Temperature"><span class="text-orange-500 font-black">Temp</span> <span id="sumTemp">--</span></div>
-                        <div class="flex items-center gap-1.5" title="SpO2"><span class="text-sky-500 font-black">O₂</span> <span id="sumSpo2">--</span></div>
-                    </div>
-                </div>
+    <div class="flex items-center gap-3 flex-1 min-w-0">
+        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-[15px] shadow-inner shrink-0" id="sumInitials">PT</div>
+        <div class="flex flex-col min-w-0 flex-1">
+            <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-[14px] font-bold text-slate-800 leading-tight whitespace-nowrap" id="sumName">Name</h3>
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-1.5 py-0.5 rounded whitespace-nowrap" id="sumAgeSex">Age / Sex</span>
+                <span class="text-[9px] font-bold text-rose-600 uppercase tracking-wider bg-rose-50 border border-rose-100 px-1.5 py-0.5 rounded hidden whitespace-nowrap" id="sumKCO">KCO: --</span>
+            </div>
+            <p class="text-[11px] font-medium text-slate-500 mt-0.5 italic truncate hidden w-full pr-4" id="sumCO">C/O: --</p>
+        </div>
+    </div>
+    
+    <div class="flex items-center gap-5 text-[11px] font-bold text-slate-600 bg-slate-50/80 px-4 py-1.5 rounded-lg border border-slate-200 shadow-sm shrink-0">
+        <div class="flex items-center gap-1.5" title="Blood Pressure"><span class="text-rose-500 font-black">BP</span> <span id="sumBP">--/--</span></div>
+        <div class="flex items-center gap-1.5" title="Heart Rate"><span class="text-amber-500 font-black">HR</span> <span id="sumHR">--</span></div>
+        <div class="flex items-center gap-1.5" title="Temperature"><span class="text-orange-500 font-black">Temp</span> <span id="sumTemp">--</span></div>
+        <div class="flex items-center gap-1.5" title="SpO2"><span class="text-sky-500 font-black">O₂</span> <span id="sumSpo2">--</span></div>
+    </div>
+</div>
 
 
 
@@ -1252,7 +1276,7 @@ function executeQuickFill() {
             if (data.kco.some(k => {
                 const term = k.toLowerCase().trim();
                 // 2. Exact match check so 'dm' doesn't accidentally trigger 'gdm'
-                return lbl === term || lbl.includes(` ${term}`) || lbl.includes(`${term} `) || lbl.includes(`/${term}`);
+                return lbl === term || lbl.startsWith(term) || lbl.includes(` ${term}`) || lbl.includes(`${term} `) || lbl.includes(`/${term}`);
             })) {
                 chk.checked = true;
             }
@@ -1276,14 +1300,11 @@ qInput.addEventListener('input',  () => renderQuickChips(parseQuickEntry(qInput.
 qInput.addEventListener('keydown', e => { 
     if (e.key === 'Enter' || e.key === 'Tab') { 
         e.preventDefault(); 
-        
-        // 1. Process the patient data just like Enter used to do
-        executeQuickFill(); 
-        
-        // 2. If you pressed Tab, automatically jump the cursor to the Advice box!
+        executeQuickFill(); // Automatically saves demographics
         if (e.key === 'Tab') {
-            const adviceBox = document.getElementById('adviceSmartInput');
-            if (adviceBox) adviceBox.focus();
+            // Jumps to the Complaints box
+            const coBox = document.getElementById('complaintsSmartInput');
+            if (coBox) coBox.focus();
         }
     }
 });
@@ -1422,7 +1443,13 @@ function clearWorkspace() {
 // ══════════════════════════════════════════
 // PRINT
 // ══════════════════════════════════════════
-function prepareAndPrint() {
+async function prepareAndPrint() {
+    
+    // --- NEW: AUTO-SAVE BEFORE PRINTING ---
+    const nameCheck = document.getElementById('ptName');
+    if (nameCheck && nameCheck.value.trim() !== '') {
+        await saveToArchive();
+    }
     const pDiv = document.getElementById('print-layout');
     const ptName = document.getElementById('ptName').value || '—';
     const ptAge  = document.getElementById('ptAge').value;
@@ -1576,34 +1603,78 @@ function prepareAndPrint() {
     window.print();
 }
 
-  // ========================================================
-        // LIVE PATIENT SUMMARY ENGINE
-        // ========================================================
-        function updatePtSummary() {
-            const name = document.getElementById('ptName').value.trim();
-            const age = document.getElementById('ptAge').value || '--';
-            const sex = document.getElementById('ptSex').value || '-';
-            const bp = document.getElementById('bpInput').value || '--/--';
-            const hr = document.getElementById('ptPulse').value || '--';
-            const temp = document.getElementById('ptTemp').value || '--';
-            const spo2 = document.getElementById('ptSpo2').value || '--';
+// ========================================================
+// LIVE PATIENT SUMMARY ENGINE
+// ========================================================
 
-            const strip = document.getElementById('ptSummaryStrip');
-            if (!strip) return;
 
-            if (name) {
-                strip.classList.remove('hidden'); // Show strip when name exists
-                document.getElementById('sumName').innerText = name;
-                document.getElementById('sumInitials').innerText = name.substring(0, 2).toUpperCase();
-                document.getElementById('sumAgeSex').innerText = `${age} Yrs / ${sex}`;
-                document.getElementById('sumBP').innerText = bp;
-                document.getElementById('sumHR').innerText = hr;
-                document.getElementById('sumTemp').innerText = temp;
-                document.getElementById('sumSpo2').innerText = spo2;
-            } else {
-                strip.classList.add('hidden'); // Hide strip if no patient name
-            }
+function updatePtSummary() {
+    const name = document.getElementById('ptName').value.trim();
+    const age = document.getElementById('ptAge').value || '--';
+    const sex = document.getElementById('ptSex').value || '-';
+    const bp = document.getElementById('bpInput').value || '--/--';
+    const hr = document.getElementById('ptPulse').value || '--';
+    const temp = document.getElementById('ptTemp').value || '--';
+    const spo2 = document.getElementById('ptSpo2').value || '--';
+
+    // Grab KCOs directly from the checked boxes
+    const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]:checked'));
+    const kcoTexts = kcoCheckboxes.map(cb => cb.nextElementSibling.textContent).join(', ');
+
+    // Grab Complaints and format them into a single line
+    const complaints = document.getElementById('complaints') ? document.getElementById('complaints').value.trim() : '';
+
+    const strip = document.getElementById('ptSummaryStrip');
+    if (!strip) return;
+
+    if (name) {
+        strip.classList.remove('hidden');
+        document.getElementById('sumName').innerText = name;
+        document.getElementById('sumInitials').innerText = name.substring(0, 2).toUpperCase();
+        document.getElementById('sumAgeSex').innerText = `${age} Yrs / ${sex}`;
+        document.getElementById('sumBP').innerText = bp;
+        document.getElementById('sumHR').innerText = hr;
+        document.getElementById('sumTemp').innerText = temp;
+        document.getElementById('sumSpo2').innerText = spo2;
+
+        // Toggle KCO visibility
+        const kcoEl = document.getElementById('sumKCO');
+        if (kcoTexts) {
+            kcoEl.innerText = `KCO: ${kcoTexts}`;
+            kcoEl.classList.remove('hidden');
+        } else {
+            kcoEl.classList.add('hidden');
         }
+
+        // Toggle Complaints visibility
+        const coEl = document.getElementById('sumCO');
+        if (complaints) {
+            coEl.innerText = `C/O: ${complaints.replace(/\n/g, ', ')}`;
+            coEl.classList.remove('hidden');
+        } else {
+            coEl.classList.add('hidden');
+        }
+
+    } else {
+        strip.classList.add('hidden');
+    }
+}
+
+// Attach listeners so the card updates instantly as you type ANYTHING
+['ptName', 'ptAge', 'ptSex', 'bpInput', 'ptPulse', 'ptTemp', 'ptSpo2', 'complaints'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.addEventListener('input', updatePtSummary);
+        el.addEventListener('change', updatePtSummary);
+    }
+});
+
+// Attach listeners to every KCO checkbox so the card updates when clicked
+
+
+document.querySelectorAll('#kcoSection input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', updatePtSummary);
+});
 
         // Attach listeners so it updates instantly as you type
         ['ptName', 'ptAge', 'ptSex', 'bpInput', 'ptPulse', 'ptTemp', 'ptSpo2'].forEach(id => {
@@ -1688,6 +1759,52 @@ function prepareAndPrint() {
             adviceBtn.addEventListener('click', processSmartAdvice);
         }
 
+// ========================================================
+// COMPLAINTS SMART INPUT ENGINE
+// ========================================================
+const coInput = document.getElementById('complaintsSmartInput');
+const coBtn = document.getElementById('complaintsSmartBtn');
+
+function processSmartComplaints() {
+    if (!coInput) return;
+    const val = coInput.value.trim();
+    if (!val) return;
+
+    const mainCoBox = document.getElementById('complaints');
+    if (mainCoBox) {
+        // If there's already text, append to a new line. Otherwise, just insert it.
+        mainCoBox.value = mainCoBox.value ? mainCoBox.value + '\n' + val : val;
+        
+        // Save the workspace so you don't lose it
+        if (typeof saveWorkspace === 'function') saveWorkspace();
+        updatePtSummary();
+    }
+
+    // Flash visual success feedback
+    const originalPh = coInput.placeholder;
+    coInput.value = '';
+    coInput.placeholder = '✅ Added to Clinical Note!';
+    setTimeout(() => { coInput.placeholder = originalPh; }, 1500);
+}
+
+if (coInput && coBtn) {
+    coInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === 'Tab') {
+            e.preventDefault();
+            processSmartComplaints(); // Automatically saves the complaints
+            
+            if (e.key === 'Tab') {
+                // Jumps to the Advice box
+                const adviceBox = document.getElementById('adviceSmartInput');
+                if (adviceBox) adviceBox.focus();
+            }
+        }
+    });
+    coBtn.addEventListener('click', processSmartComplaints);
+}
+
+
+
     // ══════════════════════════════════════════
 // CLOUD CLIPBOARD ENGINE: OPD RX PAGE
 // ══════════════════════════════════════════
@@ -1768,7 +1885,485 @@ async function loadFromCloudClipboard() {
     }
 }
 
+// ══════════════════════════════════════════════════════════
+// LOCAL EMR DATABASE (INDEXED-DB) & BACKUP ENGINE
+// ══════════════════════════════════════════════════════════
+const DB_NAME = "OPD_Local_EMR";
+const DB_VERSION = 1;
 
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains("patients")) {
+                db.createObjectStore("patients", { keyPath: "name" });
+            }
+        };
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject("DB Error");
+    });
+}
+
+// 1. Save Patient Data
+async function saveToArchive() {
+    const nameBox = document.getElementById('ptName');
+    if (!nameBox || !nameBox.value.trim()) return; // Fails silently if no name
+
+    const btn = document.getElementById('btn-archive');
+    if (btn) btn.innerText = "⏳";
+
+    const ptName = nameBox.value.trim().toUpperCase();
+    const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
+    const kcoData = kcoCheckboxes.map(cb => cb.checked);
+
+    // Grab everything EXCEPT the clinical complaints
+    const currentData = {
+        date: document.getElementById('date') ? document.getElementById('date').value : '',
+        sex: document.getElementById('ptSex') ? document.getElementById('ptSex').value : '',
+        name: ptName,
+        age: document.getElementById('ptAge') ? document.getElementById('ptAge').value : '',
+        bp: document.getElementById('bpInput') ? document.getElementById('bpInput').value : '',
+        pulse: document.getElementById('ptPulse') ? document.getElementById('ptPulse').value : '',
+        temp: document.getElementById('ptTemp') ? document.getElementById('ptTemp').value : '',
+        spo2: document.getElementById('ptSpo2') ? document.getElementById('ptSpo2').value : '',
+        rs: document.getElementById('ptRS') ? document.getElementById('ptRS').value : '',
+        cvs: document.getElementById('ptCVS') ? document.getElementById('ptCVS').value : '',
+        pa: document.getElementById('ptPA') ? document.getElementById('ptPA').value : '',
+        cns: document.getElementById('ptCNS') ? document.getElementById('ptCNS').value : '',
+        complaints: document.getElementById('complaints') ? document.getElementById('complaints').value : '', // <--- ADD THIS LINE
+        kco: kcoData,
+        rxItems: JSON.parse(JSON.stringify(rxItems)),
+        generalAdvice: document.getElementById('generalAdvice') ? document.getElementById('generalAdvice').value : '',
+        fuDays: document.getElementById('fuDays') ? document.getElementById('fuDays').value : '',
+        fuSmartInput: document.getElementById('fuSmartInput') ? document.getElementById('fuSmartInput').value : ''
+    };
+
+    const timestamp = new Date().toLocaleString('en-GB');
+    const searchDateStr = currentData.date; // E.g. "2026-04-14"
+    
+    const db = await openDB();
+    const tx = db.transaction("patients", "readwrite");
+    const store = tx.objectStore("patients");
+
+    const existingReq = store.get(ptName);
+    existingReq.onsuccess = () => {
+        let record = existingReq.result;
+        if (record) {
+            record.visits.push({ date: timestamp, searchDate: searchDateStr, details: currentData });
+            record.lastUpdate = timestamp;
+        } else {
+            record = { name: ptName, lastUpdate: timestamp, visits: [{ date: timestamp, searchDate: searchDateStr, details: currentData }] };
+        }
+        store.put(record);
+    };
+
+    tx.oncomplete = () => {
+        if(btn) { btn.innerText = "✓"; setTimeout(() => btn.innerText = "💾", 2000); }
+    };
+}
+
+
+// 2. Upgraded Search Database (Shows Age, Sex, and KCO)
+async function searchArchive() {
+    currentArchiveFocus = -1; // Resets the keyboard highlight every time you type
+    const queryRaw = document.getElementById('archiveSearch').value.toUpperCase().trim();
+    const resultsDiv = document.getElementById('searchResults');
+    
+    if (queryRaw.length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+    }
+
+    const queryTerms = queryRaw.split(/\s+/);
+
+    // This array perfectly matches the order of KCO checkboxes in your HTML
+    const kcoLabels = ['DM', 'HTN', 'Hypothyroid', 'IHD', 'Hyperthyroid', 'S/P CABG', 'S/P PTCA', 'Asthma', 'COPD', 'CKD', 'Epilepsy', 'Psychiatric', 'RA', 'PIH', 'GDM'];
+
+    const db = await openDB();
+    const tx = db.transaction("patients", "readonly");
+    const store = tx.objectStore("patients");
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+        const allPatients = request.result;
+        let matchedVisits = [];
+        
+        allPatients.forEach(p => {
+            const patientName = p.name || "";
+            let bestVisitMatch = null;
+
+            for (let i = p.visits.length - 1; i >= 0; i--) {
+                const v = p.visits[i];
+                const dateStr = v.date || "";
+                const searchDateStr = v.searchDate || "";
+                
+                const isMatch = queryTerms.every(term => {
+                    return patientName.includes(term) || dateStr.includes(term) || searchDateStr.includes(term);
+                });
+
+                if (isMatch) { bestVisitMatch = v; break; }
+            }
+
+            if (bestVisitMatch) {
+                matchedVisits.push({ name: p.name, visitDate: bestVisitMatch.date, details: bestVisitMatch.details });
+            }
+        });
+        
+        if (matchedVisits.length > 0) {
+            matchedVisits = matchedVisits.slice(0, 15);
+            
+            resultsDiv.innerHTML = matchedVisits.map((match, idx) => {
+                // Extract Age & Sex
+                const ageStr = match.details.age ? `${match.details.age}y` : '';
+                const sexStr = match.details.sex ? match.details.sex : '';
+                const demoStr = [ageStr, sexStr].filter(Boolean).join(' / ');
+                const demoBadge = demoStr ? `<span class="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-md border border-indigo-100 uppercase tracking-widest whitespace-nowrap">${demoStr}</span>` : '';
+
+                // Extract KCO
+                let kcoStr = '';
+                if (match.details.kco && Array.isArray(match.details.kco)) {
+                    kcoStr = match.details.kco.map((isChecked, i) => isChecked ? kcoLabels[i] : null).filter(Boolean).join(', ');
+                }
+                // We let KCO take up the remaining space, but prevent it from looking clumsy
+                const kcoBadge = kcoStr ? `<span class="text-[10px] bg-rose-50 text-rose-700 font-bold px-2.5 py-1 rounded-md border border-rose-100 uppercase tracking-widest truncate max-w-[40vw]">KCO: ${kcoStr}</span>` : '';
+
+               return `
+                <div class="archive-item p-3 hover:bg-slate-50 transition-colors flex justify-between items-center text-left group gap-4 border-l-4 border-transparent">
+                    <div class="flex items-center gap-4 flex-1 overflow-hidden cursor-pointer" onclick="loadVisitFromArchive(${idx})">
+                        <strong class="text-slate-800 text-[14px] group-hover:text-brand-600 transition-colors uppercase tracking-wide whitespace-nowrap min-w-[200px]">${match.name}</strong> 
+                        ${demoBadge} 
+                        ${kcoBadge}
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <span class="text-[10px] text-slate-500 bg-slate-100 border border-slate-200 px-2 py-1 rounded shadow-sm font-bold tracking-wider uppercase">LATEST: ${match.visitDate}</span>
+                        <button onclick="openHistoryModal('${match.name}')" class="bg-white hover:bg-brand-50 hover:text-brand-700 text-slate-600 border border-slate-200 hover:border-brand-300 px-3 py-1.5 rounded-lg shadow-sm text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 z-10">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            History
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+            
+            window.tempMatchedVisits = matchedVisits;
+            resultsDiv.style.display = 'block';
+        } else {
+            resultsDiv.innerHTML = `<div class="p-4 text-sm text-slate-400 italic text-center font-medium">No matching patients or dates found.</div>`;
+            resultsDiv.style.display = 'block';
+        }
+    };
+}
+
+// ========================================================
+// ARCHIVE KEYBOARD NAVIGATION ENGINE
+// ========================================================
+let currentArchiveFocus = -1;
+const archiveInput = document.getElementById("archiveSearch");
+
+if (archiveInput) {
+    archiveInput.addEventListener("keydown", function(e) {
+        const resultsDiv = document.getElementById("searchResults");
+        if (!resultsDiv || resultsDiv.style.display === 'none') return;
+        
+        const items = resultsDiv.getElementsByClassName("archive-item");
+        if (!items.length) return;
+        
+        if (e.key === "ArrowDown") {
+            e.preventDefault(); 
+            currentArchiveFocus++;
+            activateArchiveItem(items);
+        } 
+        else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            currentArchiveFocus--;
+            activateArchiveItem(items);
+        } 
+        else if (e.key === "Enter") {
+            e.preventDefault();
+            
+            // Figure out which row is highlighted (or default to the top one)
+            let targetRow = null;
+            if (currentArchiveFocus > -1) {
+                targetRow = items[currentArchiveFocus];
+            } else if (items.length > 0) {
+                targetRow = items[0];
+            }
+
+            if (targetRow) {
+                // NEW: Find the inner section that actually has the loadVisit function and click it!
+                const loadSection = targetRow.querySelector('[onclick^="loadVisit"]');
+                if (loadSection) {
+                    loadSection.click();
+                } else {
+                    targetRow.click(); // Fallback
+                }
+            }
+        }
+    });
+}
+
+function activateArchiveItem(items) {
+    // 1. Remove the highlight from all items
+    Array.from(items).forEach(i => {
+        i.classList.remove("bg-indigo-50", "border-indigo-500");
+        i.classList.add("border-transparent");
+    });
+    
+    // 2. Loop around if we hit the top or bottom of the list
+    if (currentArchiveFocus >= items.length) currentArchiveFocus = 0;
+    if (currentArchiveFocus < 0) currentArchiveFocus = items.length - 1;
+    
+    // 3. Add the highlight to the focused item (Blue background + Left border)
+    items[currentArchiveFocus].classList.remove("border-transparent");
+    items[currentArchiveFocus].classList.add("bg-indigo-50", "border-indigo-500");
+    
+    // 4. Smoothly scroll the dropdown list so the item is always in view
+    items[currentArchiveFocus].scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+
+// 3. Load Patient (Selectively)
+function loadVisitFromArchive(idx) {
+    if (!window.tempMatchedVisits || !window.tempMatchedVisits[idx]) return;
+    const latestVisit = window.tempMatchedVisits[idx].details;
+
+    if (latestVisit.date && document.getElementById('date')) document.getElementById('date').value = latestVisit.date;
+    if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
+    if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
+    if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = latestVisit.age;
+    if (latestVisit.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = latestVisit.bp;
+    if (latestVisit.pulse && document.getElementById('ptPulse')) document.getElementById('ptPulse').value = latestVisit.pulse;
+    if (latestVisit.temp && document.getElementById('ptTemp')) document.getElementById('ptTemp').value = latestVisit.temp;
+    if (latestVisit.spo2 && document.getElementById('ptSpo2')) document.getElementById('ptSpo2').value = latestVisit.spo2;
+    if (latestVisit.rs && document.getElementById('ptRS')) document.getElementById('ptRS').value = latestVisit.rs;
+    if (latestVisit.cvs && document.getElementById('ptCVS')) document.getElementById('ptCVS').value = latestVisit.cvs;
+    if (latestVisit.pa && document.getElementById('ptPA')) document.getElementById('ptPA').value = latestVisit.pa;
+    if (latestVisit.cns && document.getElementById('ptCNS')) document.getElementById('ptCNS').value = latestVisit.cns;
+
+    if (latestVisit.kco) {
+        const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
+        kcoCheckboxes.forEach((cb, i) => { if(latestVisit.kco[i] !== undefined) cb.checked = latestVisit.kco[i]; });
+    }
+    
+    if (latestVisit.rxItems) { rxItems = latestVisit.rxItems; renderRx(); }
+    if (latestVisit.generalAdvice !== undefined && document.getElementById('generalAdvice')) document.getElementById('generalAdvice').value = latestVisit.generalAdvice;
+    if (latestVisit.fuDays !== undefined && document.getElementById('fuDays')) document.getElementById('fuDays').value = latestVisit.fuDays;
+    
+    if (latestVisit.fuSmartInput !== undefined && document.getElementById('fuSmartInput')) {
+        document.getElementById('fuSmartInput').value = latestVisit.fuSmartInput;
+        document.getElementById('fuSmartInput').dispatchEvent(new Event('input')); // Render FU chips
+    }
+
+    // Complaints intentionally skipped so they stay blank!
+
+    document.getElementById('searchResults').style.display = 'none';
+    document.getElementById('archiveSearch').value = "";
+    updatePtSummary();
+
+   // --- NEW: Jump cursor directly to Demographics (Quick Entry) box ---
+    const qBox = document.getElementById('quickEntryInput');
+    if (qBox) qBox.focus();
+
+}
+
+// Hide search results if clicked outside
+document.addEventListener('click', function(event) {
+    const searchInput = document.getElementById('archiveSearch');
+    const resultsDiv = document.getElementById('searchResults');
+    if (searchInput && resultsDiv && !searchInput.contains(event.target) && !resultsDiv.contains(event.target)) {
+        resultsDiv.style.display = 'none';
+    }
+});
+
+// 4. Backup Export Engine
+async function exportDatabase() {
+    const db = await openDB();
+    const tx = db.transaction("patients", "readonly");
+    const store = tx.objectStore("patients");
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+        const allPatients = request.result;
+        if(allPatients.length === 0) {
+            alert("Archive is empty. Nothing to export.");
+            return;
+        }
+        const dataString = JSON.stringify(allPatients);
+        const blob = new Blob([dataString], {type: "application/json"});
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        const dateStr = new Date().toLocaleDateString('en-GB').replace(/\//g, '-');
+        link.download = `Clinic_Backup_${dateStr}.json`;
+        link.click();
+    };
+}
+
+// 5. Backup Import Engine
+function processImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!Array.isArray(data)) throw new Error("Invalid backup format");
+            
+            const db = await openDB();
+            const tx = db.transaction("patients", "readwrite");
+            const store = tx.objectStore("patients");
+
+            let count = 0;
+            data.forEach(patient => {
+                store.put(patient);
+                count++;
+            });
+
+            tx.oncomplete = () => {
+                alert(`Successfully imported ${count} patient records!`);
+                document.getElementById('importFile').value = '';
+            };
+            tx.onerror = () => { alert("Error importing records."); };
+            
+        } catch(err) {
+            alert("Failed to read the backup file. Ensure it is a valid JSON backup.");
+            console.error(err);
+        }
+    };
+    reader.readAsText(file);
+}
+
+// ========================================================
+// PATIENT HISTORY TIMELINE ENGINE
+// ========================================================
+
+async function openHistoryModal(patientName) {
+    const db = await openDB();
+    const tx = db.transaction("patients", "readonly");
+    const store = tx.objectStore("patients");
+    const request = store.get(patientName);
+
+    request.onsuccess = () => {
+        const p = request.result;
+        if (!p) return;
+
+        // Set Header Info
+        document.getElementById('historyModalTitle').innerText = p.name;
+        document.getElementById('histInitials').innerText = p.name.substring(0, 2).toUpperCase();
+        
+        const latest = p.visits[p.visits.length - 1].details;
+        const ageStr = latest.age ? `${latest.age}y` : '';
+        const sexStr = latest.sex ? latest.sex : '';
+        document.getElementById('historyModalSub').innerText = [ageStr, sexStr].filter(Boolean).join(' / ');
+
+        const timeline = document.getElementById('historyModalTimeline');
+        
+        // Reverse visits to show Newest -> Oldest
+        const reversedVisits = [...p.visits].reverse();
+        
+        timeline.innerHTML = reversedVisits.map((v, i) => {
+            const origIndex = p.visits.length - 1 - i; // Keep track of its real index to load it later!
+            const d = v.details;
+            
+            const bp = d.bp || '--/--';
+            const hr = d.pulse || '--';
+            const complaintsText = d.complaints ? d.complaints.replace(/\n/g, '<br>') : '<span class="text-slate-300 italic">No notes</span>';
+            
+            let rxHtml = '<span class="text-slate-300 italic">No medications prescribed</span>';
+            if (d.rxItems && d.rxItems.length > 0) {
+                rxHtml = d.rxItems.map(rx => `<span class="inline-block bg-brand-50 border border-brand-100 text-brand-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase mr-1 mb-1 shadow-sm">${rx.brand}</span>`).join('');
+            }
+
+            return `
+                <div class="relative md:pl-8">
+                    <div class="hidden md:block absolute left-[-6px] top-4 w-4 h-4 bg-brand-500 rounded-full border-[3px] border-white shadow-sm z-10"></div>
+                    
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex flex-wrap justify-between items-start gap-3 mb-3 border-b border-slate-100 pb-3">
+                            <div class="font-black text-slate-800 text-sm bg-slate-100 px-3 py-1 rounded-md border border-slate-200 uppercase tracking-widest">${v.date}</div>
+                            <button onclick="loadSpecificVisit('${p.name}', ${origIndex})" class="bg-slate-800 hover:bg-brand-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors shadow-sm shrink-0">
+                                Load this Visit
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-100/50">
+                                <div class="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-1.5 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg> C/O</div>
+                                <div class="text-[12px] font-medium text-slate-700 leading-snug">${complaintsText}</div>
+                            </div>
+                            <div class="bg-rose-50/50 p-2.5 rounded-lg border border-rose-100/50">
+                                <div class="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-1.5 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg> Vitals</div>
+                                <div class="text-[12px] font-bold text-slate-700">BP: <span class="text-rose-600">${bp}</span> <span class="text-slate-300 mx-1">|</span> HR: <span class="text-rose-600">${hr}</span></div>
+                            </div>
+                            <div class="md:col-span-2 bg-blue-50/30 p-2.5 rounded-lg border border-blue-100/50">
+                                <div class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1.5 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg> Rx Given</div>
+                                <div class="flex flex-wrap">${rxHtml}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('historyModal').classList.remove('hidden');
+    };
+}
+
+function closeHistoryModal() {
+    document.getElementById('historyModal').classList.add('hidden');
+}
+
+// Exactly the same logic as loadVisitFromArchive, but it loads a specific index and safely ignores complaints!
+async function loadSpecificVisit(patientName, visitIndex) {
+    const db = await openDB();
+    const tx = db.transaction("patients", "readonly");
+    const store = tx.objectStore("patients");
+    const req = store.get(patientName);
+
+    req.onsuccess = () => {
+        const p = req.result;
+        if (!p || !p.visits[visitIndex]) return;
+
+        const latestVisit = p.visits[visitIndex].details;
+        
+        // Paste into HTML
+        if (latestVisit.date && document.getElementById('date')) document.getElementById('date').value = latestVisit.date;
+        if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
+        if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
+        if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = latestVisit.age;
+        if (latestVisit.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = latestVisit.bp;
+        if (latestVisit.pulse && document.getElementById('ptPulse')) document.getElementById('ptPulse').value = latestVisit.pulse;
+        if (latestVisit.temp && document.getElementById('ptTemp')) document.getElementById('ptTemp').value = latestVisit.temp;
+        if (latestVisit.spo2 && document.getElementById('ptSpo2')) document.getElementById('ptSpo2').value = latestVisit.spo2;
+        if (latestVisit.rs && document.getElementById('ptRS')) document.getElementById('ptRS').value = latestVisit.rs;
+        if (latestVisit.cvs && document.getElementById('ptCVS')) document.getElementById('ptCVS').value = latestVisit.cvs;
+        if (latestVisit.pa && document.getElementById('ptPA')) document.getElementById('ptPA').value = latestVisit.pa;
+        if (latestVisit.cns && document.getElementById('ptCNS')) document.getElementById('ptCNS').value = latestVisit.cns;
+
+        if (latestVisit.kco) {
+            const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
+            kcoCheckboxes.forEach((cb, i) => { if(latestVisit.kco[i] !== undefined) cb.checked = latestVisit.kco[i]; });
+        }
+        
+        if (latestVisit.rxItems) { rxItems = latestVisit.rxItems; renderRx(); }
+        if (latestVisit.generalAdvice !== undefined && document.getElementById('generalAdvice')) document.getElementById('generalAdvice').value = latestVisit.generalAdvice;
+        if (latestVisit.fuDays !== undefined && document.getElementById('fuDays')) document.getElementById('fuDays').value = latestVisit.fuDays;
+        if (latestVisit.fuSmartInput !== undefined && document.getElementById('fuSmartInput')) {
+            document.getElementById('fuSmartInput').value = latestVisit.fuSmartInput;
+            document.getElementById('fuSmartInput').dispatchEvent(new Event('input'));
+        }
+
+        // Close Modal and Dropdown, then Update visual card
+        closeHistoryModal();
+        document.getElementById('searchResults').style.display = 'none';
+        document.getElementById('archiveSearch').value = "";
+        updatePtSummary();
+
+        // --- NEW: Jump cursor directly to Demographics (Quick Entry) box ---
+        const qBox = document.getElementById('quickEntryInput');
+        if (qBox) qBox.focus();
+
+    }
+}
 
 window.onload = loadWorkspace;
 
@@ -1796,6 +2391,31 @@ window.onload = loadWorkspace;
 
 
 </script>
+
+<div id="historyModal" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden border border-slate-200">
+        
+        <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center shrink-0">
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-black text-lg shadow-inner" id="histInitials">PT</div>
+                <div>
+                    <h2 class="text-xl font-black text-slate-800 tracking-tight" id="historyModalTitle">Patient Name</h2>
+                    <p class="text-xs font-bold text-slate-500 mt-0.5 uppercase tracking-widest" id="historyModalSub">-- YRS / M</p>
+                </div>
+            </div>
+            <button onclick="closeHistoryModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-100 hover:text-rose-600 text-slate-400 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 relative">
+            <div class="absolute left-[39px] top-6 bottom-6 w-0.5 bg-slate-200 rounded-full hidden md:block"></div>
+            <div id="historyModalTimeline" class="space-y-4">
+                </div>
+        </div>
+
+    </div>
+</div>
 
 </body>
 </html>
