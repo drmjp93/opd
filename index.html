@@ -1426,8 +1426,10 @@ function initDefaults() {
     ["ptTemp","ptPA","ptCNS"].forEach(id => document.getElementById(id).value = "");
 }
 
-function clearWorkspace() {
-    if (!confirm("Clear all patient data and prescriptions?")) return;
+function clearWorkspace(skipConfirm = false) {
+    // If skipConfirm is true, it won't show the popup warning!
+    if (!skipConfirm && !confirm("Clear all patient data and prescriptions?")) return;
+    
     rxItems = []; tapers = []; currentTaperSteps = [];
     document.querySelectorAll('input[type="text"],input[type="number"],textarea').forEach(i=>i.value='');
     document.querySelectorAll('input[type="checkbox"]').forEach(i=>i.checked=false);
@@ -1436,9 +1438,13 @@ function clearWorkspace() {
     initDefaults();
     document.getElementById('masterDays').value = 5;
     renderTaperBuilder(); renderActiveTapers(); renderRx();
-     updatePtSummary(); // <--- ADDED THIS LINE
+    updatePtSummary(); 
     localStorage.removeItem('clinicalWorkspaceState');
+    
+    // --- NEW: Smoothly scroll back to the top of the page ---
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
 
 // ══════════════════════════════════════════
 // PRINT
@@ -1601,7 +1607,14 @@ async function prepareAndPrint() {
         <div class="print-software-credit">Prescription Software developed by Dr. Mit Panchani</div>`;
         
     window.print();
+    
+        // --- NEW: Auto-clear form silently and scroll up after printing ---
+    // We wrap it in a tiny timeout to ensure the print dialog has fully captured the screen first
+    setTimeout(() => {
+        clearWorkspace(true);
+    }, 500);
 }
+
 
 // ========================================================
 // LIVE PATIENT SUMMARY ENGINE
