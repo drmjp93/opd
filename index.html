@@ -1951,6 +1951,14 @@ async function saveToArchive() {
         let record = existingReq.result;
         if (record) {
             record.visits.push({ date: timestamp, searchDate: searchDateStr, details: currentData });
+            
+            // --- NEW: THE VISIT CAP (Prevents Bloat) ---
+            // If they exceed 50 visits, remove the oldest one
+            if (record.visits.length > 50) {
+                record.visits.shift(); 
+            }
+            // -------------------------------------------
+
             record.lastUpdate = timestamp;
         } else {
             record = { name: ptName, lastUpdate: timestamp, visits: [{ date: timestamp, searchDate: searchDateStr, details: currentData }] };
@@ -1958,15 +1966,20 @@ async function saveToArchive() {
         store.put(record);
     };
 
+
     tx.oncomplete = () => {
         if(btn) { btn.innerText = "✓"; setTimeout(() => btn.innerText = "💾", 2000); }
     };
 }
 
 
-// 2. Upgraded Search Database (Shows Age, Sex, and KCO)
+// ========================================================
+// 2. ULTRA-OPTIMIZED EMR SEARCH (Debounce + Cursor)
+// ========================================================
+let archiveSearchTimeout = null; // Used for debouncing
+
 async function searchArchive() {
-    currentArchiveFocus = -1; // Resets the keyboard highlight every time you type
+    currentArchiveFocus = -1; 
     const queryRaw = document.getElementById('archiveSearch').value.toUpperCase().trim();
     const resultsDiv = document.getElementById('searchResults');
     
@@ -1975,84 +1988,109 @@ async function searchArchive() {
         return;
     }
 
-    const queryTerms = queryRaw.split(/\s+/);
+    // --- OPTIMIZATION 1: DEBOUNCING ---
+    // Wait 250ms after the user stops typing before hitting the database
+    clearTimeout(archiveSearchTimeout);
+    archiveSearchTimeout = setTimeout(async () => {
+        
+        const queryTerms = queryRaw.split(/\s+/);
+        const kcoLabels = ['DM', 'HTN', 'Hypothyroid', 'IHD', 'Hyperthyroid', 'S/P CABG', 'S/P PTCA', 'Asthma', 'COPD', 'CKD', 'Epilepsy', 'Psychiatric', 'RA', 'PIH', 'GDM'];
 
-    // This array perfectly matches the order of KCO checkboxes in your HTML
-    const kcoLabels = ['DM', 'HTN', 'Hypothyroid', 'IHD', 'Hyperthyroid', 'S/P CABG', 'S/P PTCA', 'Asthma', 'COPD', 'CKD', 'Epilepsy', 'Psychiatric', 'RA', 'PIH', 'GDM'];
-
-    const db = await openDB();
-    const tx = db.transaction("patients", "readonly");
-    const store = tx.objectStore("patients");
-    const request = store.getAll();
-
-    request.onsuccess = () => {
-        const allPatients = request.result;
+        const db = await openDB();
+        const tx = db.transaction("patients", "readonly");
+        const store = tx.objectStore("patients");
+        
+        // --- OPTIMIZATION 2: THE CURSOR ---
+        // Instead of getAll() (which crashes RAM), we read records one-by-one
+        const request = store.openCursor(); 
         let matchedVisits = [];
-        
-        allPatients.forEach(p => {
-            const patientName = p.name || "";
-            let bestVisitMatch = null;
 
-            for (let i = p.visits.length - 1; i >= 0; i--) {
-                const v = p.visits[i];
-                const dateStr = v.date || "";
-                const searchDateStr = v.searchDate || "";
-                
-                const isMatch = queryTerms.every(term => {
-                    return patientName.includes(term) || dateStr.includes(term) || searchDateStr.includes(term);
-                });
-
-                if (isMatch) { bestVisitMatch = v; break; }
-            }
-
-            if (bestVisitMatch) {
-                matchedVisits.push({ name: p.name, visitDate: bestVisitMatch.date, details: bestVisitMatch.details });
-            }
-        });
-        
-        if (matchedVisits.length > 0) {
-            matchedVisits = matchedVisits.slice(0, 15);
+        request.onsuccess = (event) => {
+            const cursor = event.target.result;
             
-            resultsDiv.innerHTML = matchedVisits.map((match, idx) => {
-                // Extract Age & Sex
-                const ageStr = match.details.age ? `${match.details.age}y` : '';
-                const sexStr = match.details.sex ? match.details.sex : '';
-                const demoStr = [ageStr, sexStr].filter(Boolean).join(' / ');
-                const demoBadge = demoStr ? `<span class="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-md border border-indigo-100 uppercase tracking-widest whitespace-nowrap">${demoStr}</span>` : '';
+            if (cursor) {
+                const p = cursor.value;
+                const patientName = p.name || "";
+                let bestVisitMatch = null;
 
-                // Extract KCO
-                let kcoStr = '';
-                if (match.details.kco && Array.isArray(match.details.kco)) {
-                    kcoStr = match.details.kco.map((isChecked, i) => isChecked ? kcoLabels[i] : null).filter(Boolean).join(', ');
+                // Search this patient's visits backwards
+                for (let i = p.visits.length - 1; i >= 0; i--) {
+                    const v = p.visits[i];
+                    const isMatch = queryTerms.every(term => {
+                        return patientName.includes(term) || (v.date || "").includes(term) || (v.searchDate || "").includes(term);
+                    });
+
+                    if (isMatch) { bestVisitMatch = v; break; }
                 }
-                // We let KCO take up the remaining space, but prevent it from looking clumsy
-                const kcoBadge = kcoStr ? `<span class="text-[10px] bg-rose-50 text-rose-700 font-bold px-2.5 py-1 rounded-md border border-rose-100 uppercase tracking-widest truncate max-w-[40vw]">KCO: ${kcoStr}</span>` : '';
 
-               return `
-                <div class="archive-item p-3 hover:bg-slate-50 transition-colors flex justify-between items-center text-left group gap-4 border-l-4 border-transparent">
-                    <div class="flex items-center gap-4 flex-1 overflow-hidden cursor-pointer" onclick="loadVisitFromArchive(${idx})">
-                        <strong class="text-slate-800 text-[14px] group-hover:text-brand-600 transition-colors uppercase tracking-wide whitespace-nowrap min-w-[200px]">${match.name}</strong> 
-                        ${demoBadge} 
-                        ${kcoBadge}
-                    </div>
-                    <div class="flex items-center gap-3 shrink-0">
-                        <span class="text-[10px] text-slate-500 bg-slate-100 border border-slate-200 px-2 py-1 rounded shadow-sm font-bold tracking-wider uppercase">LATEST: ${match.visitDate}</span>
-                        <button onclick="openHistoryModal('${match.name}')" class="bg-white hover:bg-brand-50 hover:text-brand-700 text-slate-600 border border-slate-200 hover:border-brand-300 px-3 py-1.5 rounded-lg shadow-sm text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 z-10">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            History
-                        </button>
-                    </div>
-                </div>
-            `}).join('');
-            
-            window.tempMatchedVisits = matchedVisits;
-            resultsDiv.style.display = 'block';
-        } else {
-            resultsDiv.innerHTML = `<div class="p-4 text-sm text-slate-400 italic text-center font-medium">No matching patients or dates found.</div>`;
-            resultsDiv.style.display = 'block';
-        }
-    };
+                if (bestVisitMatch) {
+                    matchedVisits.push({ 
+                        name: p.name, 
+                        visitDate: bestVisitMatch.date, 
+                        details: bestVisitMatch.details,
+                        totalVisits: p.visits.length 
+                    });
+                }
+
+                // If we found 15 matches, STOP SEARCHING IMMEDIATELY to save CPU/RAM!
+                if (matchedVisits.length >= 15) {
+                    renderSearchResults(matchedVisits, kcoLabels, resultsDiv);
+                } else {
+                    cursor.continue(); // Keep looking at the next patient
+                }
+            } else {
+                // The cursor reached the end of the database
+                renderSearchResults(matchedVisits, kcoLabels, resultsDiv);
+            }
+        };
+    }, 250); // 250 millisecond typing delay
 }
+
+// Helper function to draw the UI after the Cursor finishes
+function renderSearchResults(matchedVisits, kcoLabels, resultsDiv) {
+    if (matchedVisits.length > 0) {
+        resultsDiv.innerHTML = matchedVisits.map((match, idx) => {
+            const ageStr = match.details.age ? `${match.details.age}y` : '';
+            const sexStr = match.details.sex ? match.details.sex : '';
+            const demoStr = [ageStr, sexStr].filter(Boolean).join(' / ');
+            const demoBadge = demoStr ? `<span class="text-[11px] bg-indigo-50 text-indigo-700 font-bold px-2.5 py-1 rounded-md border border-indigo-100 uppercase tracking-widest whitespace-nowrap">${demoStr}</span>` : '';
+
+            const visitText = match.totalVisits === 1 ? '1 VISIT' : `${match.totalVisits} VISITS`;
+            const visitBadge = `<span class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-1 rounded-md border border-emerald-200 uppercase tracking-widest whitespace-nowrap shadow-sm flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>${visitText}</span>`;
+
+            let kcoStr = '';
+            if (match.details.kco && Array.isArray(match.details.kco)) {
+                kcoStr = match.details.kco.map((isChecked, i) => isChecked ? kcoLabels[i] : null).filter(Boolean).join(', ');
+            }
+            const kcoBadge = kcoStr ? `<span class="text-[10px] bg-rose-50 text-rose-700 font-bold px-2.5 py-1 rounded-md border border-rose-100 uppercase tracking-widest truncate max-w-[40vw]">KCO: ${kcoStr}</span>` : '';
+
+            return `
+            <div onclick="loadVisitFromArchive(${idx})" class="archive-item p-4 hover:bg-slate-50 cursor-pointer transition-colors flex justify-between items-center text-left group gap-6 border-l-4 border-transparent">
+                <div class="flex items-center gap-4 flex-1 overflow-hidden">
+                    <strong class="text-slate-800 text-[14px] group-hover:text-brand-600 transition-colors uppercase tracking-wide whitespace-nowrap min-w-[200px]">${match.name}</strong> 
+                    ${visitBadge}
+                    ${demoBadge} 
+                    ${kcoBadge}
+                </div>
+                
+                <div class="flex items-center gap-3 shrink-0">
+                    <span class="text-[11px] text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-md shadow-sm font-bold tracking-wider uppercase">LATEST: ${match.visitDate}</span>
+                    <button onclick="event.stopPropagation(); openHistoryModal('${match.name}')" class="bg-white hover:bg-brand-50 hover:text-brand-700 text-slate-600 border border-slate-200 hover:border-brand-300 px-3 py-1.5 rounded-lg shadow-sm text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 z-10">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        History
+                    </button>
+                </div>
+            </div>
+        `}).join('');
+        
+        window.tempMatchedVisits = matchedVisits;
+        resultsDiv.style.display = 'block';
+    } else {
+        resultsDiv.innerHTML = `<div class="p-4 text-sm text-slate-400 italic text-center font-medium">No matching patients or dates found.</div>`;
+        resultsDiv.style.display = 'block';
+    }
+}
+
 
 // ========================================================
 // ARCHIVE KEYBOARD NAVIGATION ENGINE
@@ -2242,6 +2280,9 @@ async function openHistoryModal(patientName) {
     const store = tx.objectStore("patients");
     const request = store.get(patientName);
 
+    // We need the labels here to translate the hidden checkboxes back into text!
+    const kcoLabels = ['DM', 'HTN', 'Hypothyroid', 'IHD', 'Hyperthyroid', 'S/P CABG', 'S/P PTCA', 'Asthma', 'COPD', 'CKD', 'Epilepsy', 'Psychiatric', 'RA', 'PIH', 'GDM'];
+
     request.onsuccess = () => {
         const p = request.result;
         if (!p) return;
@@ -2261,44 +2302,56 @@ async function openHistoryModal(patientName) {
         const reversedVisits = [...p.visits].reverse();
         
         timeline.innerHTML = reversedVisits.map((v, i) => {
-            const origIndex = p.visits.length - 1 - i; // Keep track of its real index to load it later!
+            const origIndex = p.visits.length - 1 - i; 
             const d = v.details;
             
             const bp = d.bp || '--/--';
             const hr = d.pulse || '--';
-            const complaintsText = d.complaints ? d.complaints.replace(/\n/g, '<br>') : '<span class="text-slate-300 italic">No notes</span>';
+            const complaintsText = d.complaints ? d.complaints.replace(/\n/g, '<br>') : '<span class="text-slate-300 italic">--</span>';
             
-            let rxHtml = '<span class="text-slate-300 italic">No medications prescribed</span>';
+            // Extract KCO for this specific visit
+            let kcoStr = '';
+            if (d.kco && Array.isArray(d.kco)) {
+                kcoStr = d.kco.map((isChecked, idx) => isChecked ? kcoLabels[idx] : null).filter(Boolean).join(', ');
+            }
+            const kcoHtml = kcoStr ? `<div class="text-[9px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 inline-block self-start mt-1 shadow-sm">KCO: ${kcoStr}</div>` : '';
+            
+            let rxHtml = '<span class="text-slate-300 italic">--</span>';
             if (d.rxItems && d.rxItems.length > 0) {
-                rxHtml = d.rxItems.map(rx => `<span class="inline-block bg-brand-50 border border-brand-100 text-brand-700 px-2 py-0.5 rounded text-[10px] font-bold uppercase mr-1 mb-1 shadow-sm">${rx.brand}</span>`).join('');
+                rxHtml = d.rxItems.map(rx => `<span class="inline-block bg-blue-50 text-blue-700 border border-blue-100 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">${rx.brand}</span>`).join(' ');
             }
 
             return `
-                <div class="relative md:pl-8">
-                    <div class="hidden md:block absolute left-[-6px] top-4 w-4 h-4 bg-brand-500 rounded-full border-[3px] border-white shadow-sm z-10"></div>
+                <div class="p-3 hover:bg-slate-50 transition-colors flex flex-col md:flex-row gap-3 items-start md:items-center">
                     
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="flex flex-wrap justify-between items-start gap-3 mb-3 border-b border-slate-100 pb-3">
-                            <div class="font-black text-slate-800 text-sm bg-slate-100 px-3 py-1 rounded-md border border-slate-200 uppercase tracking-widest">${v.date}</div>
-                            <button onclick="loadSpecificVisit('${p.name}', ${origIndex})" class="bg-slate-800 hover:bg-brand-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors shadow-sm shrink-0">
-                                Load this Visit
-                            </button>
+                    <div class="shrink-0 w-full md:w-28 flex md:flex-col justify-between md:justify-start gap-2">
+                        <span class="font-bold text-slate-800 text-[11px] bg-slate-100 px-2 py-1 rounded text-center border border-slate-200 tracking-wider">${v.date.split(',')[0]}</span>
+                        <button onclick="loadSpecificVisit('${p.name}', ${origIndex})" class="bg-slate-800 hover:bg-brand-600 text-white px-2 py-1 rounded md:rounded-md text-[9px] font-bold uppercase tracking-wider transition-colors shadow-sm w-full text-center">
+                            Load Visit
+                        </button>
+                    </div>
+                    
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-12 gap-3 w-full items-start">
+                        
+                        <div class="md:col-span-5 flex flex-col">
+                            <span class="text-[9px] font-bold text-amber-600 uppercase tracking-widest mb-0.5">Complaints & History</span>
+                            <div class="text-[11px] font-medium text-slate-700 leading-tight">${complaintsText}</div>
+                            ${kcoHtml}
                         </div>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="bg-amber-50/50 p-2.5 rounded-lg border border-amber-100/50">
-                                <div class="text-[9px] font-black text-amber-600 uppercase tracking-widest mb-1.5 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg> C/O</div>
-                                <div class="text-[12px] font-medium text-slate-700 leading-snug">${complaintsText}</div>
-                            </div>
-                            <div class="bg-rose-50/50 p-2.5 rounded-lg border border-rose-100/50">
-                                <div class="text-[9px] font-black text-rose-600 uppercase tracking-widest mb-1.5 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg> Vitals</div>
-                                <div class="text-[12px] font-bold text-slate-700">BP: <span class="text-rose-600">${bp}</span> <span class="text-slate-300 mx-1">|</span> HR: <span class="text-rose-600">${hr}</span></div>
-                            </div>
-                            <div class="md:col-span-2 bg-blue-50/30 p-2.5 rounded-lg border border-blue-100/50">
-                                <div class="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-1.5 flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg> Rx Given</div>
-                                <div class="flex flex-wrap">${rxHtml}</div>
+                        <div class="md:col-span-2 flex flex-col md:border-l md:border-slate-200 md:pl-3">
+                            <span class="text-[9px] font-bold text-rose-600 uppercase tracking-widest mb-0.5">Vitals</span>
+                            <div class="text-[11px] font-bold text-slate-700 leading-tight">
+                                BP: <span class="text-rose-600">${bp}</span><br>
+                                HR: <span class="text-rose-600">${hr}</span>
                             </div>
                         </div>
+                        
+                        <div class="md:col-span-5 flex flex-col md:border-l md:border-slate-200 md:pl-3">
+                            <span class="text-[9px] font-bold text-blue-600 uppercase tracking-widest mb-0.5">Prescribed</span>
+                            <div class="flex flex-wrap gap-1 mt-0.5">${rxHtml}</div>
+                        </div>
+                        
                     </div>
                 </div>
             `;
@@ -2393,7 +2446,7 @@ window.onload = loadWorkspace;
 </script>
 
 <div id="historyModal" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[85vh] flex flex-col overflow-hidden border border-slate-200">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden border border-slate-200">
         
         <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center shrink-0">
             <div class="flex items-center gap-4">
@@ -2408,9 +2461,8 @@ window.onload = loadWorkspace;
             </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 relative">
-            <div class="absolute left-[39px] top-6 bottom-6 w-0.5 bg-slate-200 rounded-full hidden md:block"></div>
-            <div id="historyModalTimeline" class="space-y-4">
+        <div class="flex-1 overflow-y-auto bg-white relative">
+            <div id="historyModalTimeline" class="divide-y divide-slate-200 flex flex-col">
                 </div>
         </div>
 
