@@ -1494,7 +1494,7 @@ function clearWorkspace(skipConfirm = false) {
 // ══════════════════════════════════════════
 async function prepareAndPrint() {
     
-    // --- NEW: AUTO-SAVE BEFORE PRINTING ---
+    // --- AUTO-SAVE BEFORE PRINTING ---
     const nameCheck = document.getElementById('ptName');
     if (nameCheck && nameCheck.value.trim() !== '') {
         await saveToArchive();
@@ -1521,8 +1521,9 @@ async function prepareAndPrint() {
     if(cvs) sArr.push(`<b>CVS</b> ${cvs}`);
     if(pa)  sArr.push(`<b>P/A</b> ${pa}`);
     if(cns) sArr.push(`<b>CNS</b> ${cns}`);
+    
     const vitalsRow = (vArr.length||sArr.length)
-        ? `<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid #cbd5e1;font-size:11px;color:#475569;line-height:1.8;">${[...vArr,...sArr].join('<span style="margin:0 8px;color:#cbd5e1;">·</span>')}</div>`
+        ? `<div style="margin-top:8px;padding-top:8px;border-top:0.5px solid #cbd5e1;font-size:11px;color:#475569;line-height:1.6;">${[...vArr,...sArr].join('<span style="margin:0 8px;color:#cbd5e1;">·</span>')}</div>`
         : '';
 
     const patientLine = `${ptName}${ptAge?` &nbsp;·&nbsp; ${ptAge} Yrs`:''}${ptSex?` &nbsp;·&nbsp; ${ptSex}`:''}`;
@@ -1532,41 +1533,49 @@ async function prepareAndPrint() {
     const fuDays = document.getElementById('fuDays').value;
     const generalAdvice = document.getElementById('generalAdvice').value.replace(/\n/g,'<br>');
 
+    // --- NEW: STACKED CLINICAL NOTES ---
+    let clinicalNotesArr = [];
+    if (complaints) clinicalNotesArr.push(`<tr><td style="width:50px;vertical-align:top;font-weight:800;color:#64748b;padding-bottom:3px;">C/O:</td><td style="padding-bottom:3px;color:#1e293b;">${complaints}</td></tr>`);
+    if (kcoList) clinicalNotesArr.push(`<tr><td style="width:50px;vertical-align:top;font-weight:800;color:#64748b;padding-bottom:3px;">KCO:</td><td style="padding-bottom:3px;color:#1e293b;">${kcoList}</td></tr>`);
+    if (generalAdvice) clinicalNotesArr.push(`<tr><td style="width:50px;vertical-align:top;font-weight:800;color:#64748b;padding-bottom:3px;">Advice:</td><td style="padding-bottom:3px;color:#1e293b;">${generalAdvice}</td></tr>`);
+    
+    const clinicalNotesBlock = clinicalNotesArr.length 
+        ? `<table style="width:100%; font-size:11px; margin-bottom:10px; border-collapse:collapse; line-height:1.4;">${clinicalNotesArr.join('')}</table>` 
+        : '';
+
    const drugsHtml = `
-        <table style="width:100%;border-collapse:collapse;margin-top:10px;margin-bottom:20px;font-family:'Inter',sans-serif;">
+        <table style="width:100%;border-collapse:collapse;margin-top:4px;margin-bottom:16px;font-family:'Inter',sans-serif;">
             <thead>
                 <tr style="background:#f8fafc;border-bottom:2px solid #cbd5e1;">
-                    <th style="padding:10px 5px;text-align:left;font-size:11px;color:#64748b;width:5%;">#</th>
-                    <th style="padding:10px 5px;text-align:left;font-size:11px;color:#64748b;width:40%;">Medication</th>
-                    <th style="padding:10px 5px;text-align:center;font-size:10px;color:#64748b;width:13%;">Morning</th>
-                    <th style="padding:10px 5px;text-align:center;font-size:10px;color:#64748b;width:13%;">Noon</th>
-                    <th style="padding:10px 5px;text-align:center;font-size:10px;color:#64748b;width:13%;">Night</th>
-                    <th style="padding:10px 5px;text-align:center;font-size:10px;color:#64748b;width:10%;">Duration</th>
+                    <th style="padding:6px 4px;text-align:left;font-size:11px;color:#64748b;width:5%;">#</th>
+                    <th style="padding:6px 4px;text-align:left;font-size:11px;color:#64748b;width:40%;">Medication</th>
+                    <th style="padding:6px 4px;text-align:center;font-size:10px;color:#64748b;width:13%;">Morning</th>
+                    <th style="padding:6px 4px;text-align:center;font-size:10px;color:#64748b;width:13%;">Noon</th>
+                    <th style="padding:6px 4px;text-align:center;font-size:10px;color:#64748b;width:13%;">Night</th>
+                    <th style="padding:6px 4px;text-align:center;font-size:10px;color:#64748b;width:10%;">Duration</th>
                 </tr>
             </thead>
             ${rxItems.map((item,i) => {
                 const f = item.freqArr || ["0","0","0"];
                 const getCell = val => {
                     if (!val||val==='0') return '<span style="color:#000000;font-size:12px;">✕</span>';
-                    if (val==='1') return '<span style="color:#000;font-weight:900;font-size:14px;">1</span>';
-                    return `<span style="color:#000;font-weight:900;font-size:13px;">${val}</span>`;
+                    if (val==='1') return '<span style="color:#000;font-weight:900;font-size:13px;">1</span>';
+                    return `<span style="color:#000;font-weight:900;font-size:12px;">${val}</span>`;
                 };
 
                 let gridRow='';
                 const doseVal = f[0]!=='0'?f[0]:(f[1]!=='0'?f[1]:(f[2]!=='0'?f[2]:'1'));
+                const daysDisplay = item.isWeekly ? `${parseInt(item.days)||item.days} Wks` : (item.days||'-');
 
-                const daysDisplay = item.isWeekly
-                    ? `${parseInt(item.days)||item.days} Wks`
-                    : (item.days||'-');
-
+                // REDUCED PADDING FOR ALL CELLS (from 12px to 6px)
                 if (item.isSos) {
                     const reason = item.customNote ? `if ${item.customNote}` : 'if needed';
-                    gridRow=`<td colspan="3" style="text-align:center;padding:12px 5px;font-weight:900;background:#f8fafc;border:1px solid #e2e8f0;color:#000;font-size:12px;">${doseVal} — SOS ${reason}</td>`;
+                    gridRow=`<td colspan="3" style="text-align:center;padding:6px 4px;font-weight:900;background:#f8fafc;border:1px solid #e2e8f0;color:#000;font-size:11px;">${doseVal} — SOS ${reason}</td>`;
                 } else if (item.isWeekly) {
                     const dayLabel=item.weeklyDay?`(${item.weeklyDay})`:'';
-                    gridRow=`<td colspan="3" style="text-align:center;padding:12px 5px;font-weight:900;background:#f8fafc;border:1px solid #e2e8f0;color:#000;font-size:12px;">${doseVal} — Weekly Once ${dayLabel}</td>`;
+                    gridRow=`<td colspan="3" style="text-align:center;padding:6px 4px;font-weight:900;background:#f8fafc;border:1px solid #e2e8f0;color:#000;font-size:11px;">${doseVal} — Weekly Once ${dayLabel}</td>`;
                 } else {
-                    gridRow=`<td style="padding:12px 5px;text-align:center;">${getCell(f[0])}</td><td style="padding:12px 5px;text-align:center;">${getCell(f[1])}</td><td style="padding:12px 5px;text-align:center;">${getCell(f[2])}</td>`;
+                    gridRow=`<td style="padding:6px 4px;text-align:center;">${getCell(f[0])}</td><td style="padding:6px 4px;text-align:center;">${getCell(f[1])}</td><td style="padding:6px 4px;text-align:center;">${getCell(f[2])}</td>`;
                 }
 
                 const subRowText = [item.advice, (!item.isSos?item.customNote:'')].filter(Boolean).join(' — ');
@@ -1574,27 +1583,27 @@ async function prepareAndPrint() {
                 return `
                 <tbody style="page-break-inside: avoid; break-inside: avoid;">
                     <tr style="border-bottom:${subRowText?'0px':'1px solid #e2e8f0'};">
-                        <td ${rs} style="padding:12px 5px;font-size:12px;color:#475569;vertical-align:middle;">${i+1}</td>
-                        <td ${rs} style="padding:12px 5px;vertical-align:middle;">
-                            <div style="font-size:12px;font-weight:900;color:#000;line-height:1.2;">${item.brand}</div>
-                            <div style="font-size:9px;color:#000;font-style:italic;margin-top:4px;">(${item.molecule})</div>
+                        <td ${rs} style="padding:6px 4px;font-size:11px;color:#475569;vertical-align:middle;">${i+1}</td>
+                        <td ${rs} style="padding:6px 4px;vertical-align:middle;">
+                            <div style="font-size:12px;font-weight:900;color:#000;line-height:1.1;">${item.brand}</div>
+                            <div style="font-size:9px;color:#000;font-style:italic;margin-top:2px;">(${item.molecule})</div>
                         </td>
                         ${gridRow}
-                        <td ${rs} style="padding:12px 5px;text-align:center;vertical-align:middle;">
-                            <span style="display:inline-block;border:1px solid #cbd5e1;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:900;color:#000;">${daysDisplay}</span>
+                        <td ${rs} style="padding:6px 4px;text-align:center;vertical-align:middle;">
+                            <span style="display:inline-block;border:1px solid #cbd5e1;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:900;color:#000;">${daysDisplay}</span>
                         </td>
                     </tr>
-                    ${subRowText?`<tr style="border-bottom:1px solid #e2e8f0;"><td colspan="3" style="padding:0 5px 12px 5px;text-align:center;vertical-align:top;"><div style="display:inline-block;padding:3px 12px;border-radius:4px;font-size:9px;color:#000;font-weight:800;border:1px dashed #cbd5e1;">↳ ${subRowText}</div></td></tr>`:''}
+                    ${subRowText?`<tr style="border-bottom:1px solid #e2e8f0;"><td colspan="3" style="padding:0 4px 6px 4px;text-align:center;vertical-align:top;"><div style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:9px;color:#000;font-weight:800;border:1px dashed #cbd5e1;">↳ ${subRowText}</div></td></tr>`:''}
                 </tbody>`;
             }).join('')}
         </table>`;
 
     const tapersHtml = tapers.length ? tapers.map(t=>`
-        <div style="margin-bottom:14px;border:0.5px solid #fca5a5;border-radius:6px;overflow:hidden;page-break-inside:avoid;">
-            <div style="background:#fee2e2;padding:5px 10px;font-weight:800;font-size:12px;color:#991b1b;">${t.drug} — Tapering Schedule</div>
-            <table style="width:100%;font-size:11px;border-collapse:collapse;background:#fff;">
-                ${t.steps.map((s,i)=>`<tr><td style="padding:4px 8px;border-bottom:0.5px solid #fecaca;width:55px;color:#64748b;">Step ${i+1}</td><td style="padding:4px 8px;border-bottom:0.5px solid #fecaca;font-weight:700;">${s.dose}</td><td style="padding:4px 8px;border-bottom:0.5px solid #fecaca;color:#475569;">(${s.freq})</td><td style="padding:4px 8px;border-bottom:0.5px solid #fecaca;font-weight:600;">× ${s.days} Days</td></tr>`).join('')}
-                <tr><td colspan="4" style="padding:5px 8px;background:#fef2f2;font-weight:800;text-align:center;color:#b91c1c;font-size:10px;letter-spacing:1px;">STOP MEDICATION</td></tr>
+        <div style="margin-bottom:10px;border:0.5px solid #fca5a5;border-radius:6px;overflow:hidden;page-break-inside:avoid;">
+            <div style="background:#fee2e2;padding:4px 8px;font-weight:800;font-size:11px;color:#991b1b;">${t.drug} — Tapering Schedule</div>
+            <table style="width:100%;font-size:10px;border-collapse:collapse;background:#fff;">
+                ${t.steps.map((s,i)=>`<tr><td style="padding:3px 8px;border-bottom:0.5px solid #fecaca;width:55px;color:#64748b;">Step ${i+1}</td><td style="padding:3px 8px;border-bottom:0.5px solid #fecaca;font-weight:700;">${s.dose}</td><td style="padding:3px 8px;border-bottom:0.5px solid #fecaca;color:#475569;">(${s.freq})</td><td style="padding:3px 8px;border-bottom:0.5px solid #fecaca;font-weight:600;">× ${s.days} Days</td></tr>`).join('')}
+                <tr><td colspan="4" style="padding:4px 8px;background:#fef2f2;font-weight:800;text-align:center;color:#b91c1c;font-size:9px;letter-spacing:1px;">STOP MEDICATION</td></tr>
             </table>
         </div>`).join('') : '';
 
@@ -1603,61 +1612,43 @@ async function prepareAndPrint() {
     else if(invList) fuString=`Follow-up with <b>${invList}</b>`;
     else if(fuDays) fuString=`Follow-up in <b>${fuDays} days</b>`;
     const fuBlock = fuString ? `
-        <div style="margin-top:18px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 12px;">
-            <div style="font-size:10px;font-weight:800;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Follow-Up</div>
-            <div style="font-size:12px;color:#78350f;line-height:1.5;">${fuString}</div>
+        <div style="margin-top:10px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:6px 10px;">
+            <div style="font-size:9px;font-weight:800;color:#92400e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px;">Follow-Up</div>
+            <div style="font-size:11px;color:#78350f;line-height:1.4;">${fuString}</div>
         </div>` : '';
 
-    function leftSection(label, content) {
-        return `<div style="margin-bottom:16px;padding-left:8px;border-left:2px solid #e2e8f0;">
-            <div style="font-size:9px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${label}</div>
-            <div style="font-size:11px;color:#334155;line-height:1.7;">${content}</div>
-        </div>`;
-    }
-    const leftCol = [
-        complaints ? leftSection('Clinical Note', complaints) : '',
-        kcoList ? leftSection('Known Case Of', kcoList) : '',
-        generalAdvice ? leftSection('Advice / Instructions', generalAdvice) : '',
-    ].join('');
-
+    // --- MAIN RENDER (Full Width, No Columns) ---
     pDiv.innerHTML = `
-        <div style="margin-bottom:20px;padding:12px 16px;border:0.5px solid #e2e8f0;border-radius:8px;background:#fafbff;">
+        <div style="margin-bottom:12px;padding:10px 14px;border:0.5px solid #e2e8f0;border-radius:8px;background:#fafbff;">
             <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                <div style="font-size:15px;font-weight:800;color:#0f172a;letter-spacing:-0.01em;">${patientLine}</div>
+                <div style="font-size:14px;font-weight:800;color:#0f172a;letter-spacing:-0.01em;">${patientLine}</div>
                 <div style="font-size:11px;font-weight:600;color:#64748b;">${date}</div>
             </div>
             ${vitalsRow}
         </div>
         
-        <div style="display:flex; align-items:flex-start; width:100%;">
-            <div style="width:25%; padding-right:20px; border-right:0.5px solid #e2e8f0; box-sizing:border-box;">
-                ${leftCol||'<div style="font-size:11px;color:#cbd5e1;font-style:italic;">No notes.</div>'}
-            </div>
-            <div style="width:75%; padding-left:22px; box-sizing:border-box;">
-                <div style="font-size:26px;font-weight:900;font-family:Georgia,serif;color:#1e293b;line-height:1;margin-bottom:6px;">℞</div>
-                ${drugsHtml||(!tapers.length?'<div style="color:#94a3b8;font-size:12px;font-style:italic;margin-bottom:14px;">No medications prescribed.</div>':'')}
-                ${tapersHtml}
-                ${fuBlock}
-                <div style="height:0.5px;background:#e2e8f0;margin-top:22px;margin-bottom:36px;"></div>
-            </div>
+        <div style="width:100%; box-sizing:border-box;">
+            ${clinicalNotesBlock}
+            
+            <div style="font-size:18px;font-weight:900;font-family:Georgia,serif;color:#1e293b;line-height:1;margin-top:6px;margin-bottom:4px;">℞</div>
+            ${drugsHtml||(!tapers.length?'<div style="color:#94a3b8;font-size:11px;font-style:italic;margin-bottom:10px;">No medications prescribed.</div>':'')}
+            
+            ${tapersHtml}
+            ${fuBlock}
         </div>
         
-        <div style="text-align:right;margin-top:8px;padding-top:14px;border-top:0.5px solid #e2e8f0;">
-            <div style="font-size:16px;font-weight:900;color:#0f172a;letter-spacing:-0.01em;">Dr. Mit Panchani</div>
-            <div style="font-size:11.5px;font-weight:700;color:#334155;margin-top:2px;">MBBS, MD (Medicine)</div>
-            <div style="font-size:10px;font-weight:700;color:#334155;margin-top:2px;">FELLOW IN 2D ECHO, PGCIH</div>
+        <div style="text-align:right;margin-top:12px;padding-top:12px;border-top:0.5px solid #e2e8f0;page-break-inside:avoid;">
+            <div style="font-size:15px;font-weight:900;color:#0f172a;letter-spacing:-0.01em;">Dr. Mit Panchani</div>
+            <div style="font-size:11px;font-weight:700;color:#334155;margin-top:2px;">MBBS, MD (Medicine)</div>
+            <div style="font-size:9.5px;font-weight:700;color:#334155;margin-top:2px;">FELLOW IN 2D ECHO, PGCIH</div>
         </div> 
-        <div class="print-software-credit">Prescription Software developed by Dr. Mit Panchani</div>`;
+        <div class="print-software-credit" style="page-break-inside:avoid;">Prescription Software developed by Dr. Mit Panchani</div>`;
         
     window.print();
     
-        // --- NEW: Auto-clear form silently and scroll up after printing ---
-    // We wrap it in a tiny timeout to ensure the print dialog has fully captured the screen first
-    setTimeout(() => {
-        clearWorkspace(true);
-    }, 500);
+    // Auto-clear form silently after printing
+    setTimeout(() => { clearWorkspace(true); }, 500);
 }
-
 
 // ========================================================
 // LIVE PATIENT SUMMARY ENGINE
