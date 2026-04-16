@@ -398,18 +398,18 @@
 
             <div id="rxListWrapper" class="flex-1 overflow-y-auto scroll-pane p-4 bg-slate-50/40 relative pb-40">
 
-            <div class="flex gap-4 items-start w-full mt-0 mb-2">
-            
-            <details onmouseenter="this.setAttribute('open', '')" onmouseleave="this.removeAttribute('open')" class="hover-reveal-card bg-white border border-slate-200 rounded-xl shadow-sm z-50 w-[35%]" id="kcoSection">
-                
-                <summary class="px-4 pt-4 pb-2 cursor-pointer flex items-center list-none outline-none [&::-webkit-details-marker]:hidden">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Known Case
-                    </h3>
-                </summary>
-                
-                <div class="px-4 pb-4 pt-2 border-t border-slate-100 flex flex-wrap gap-2">
+
+        <div class="flex items-center gap-4 mb-4 relative z-50">
+    
+    <div class="relative group">
+        <div class="cursor-pointer bg-white text-slate-600 px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-widest border border-slate-200 hover:border-brand-300 hover:text-brand-600 transition-colors shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Known Case
+        </div>
+        
+        <div class="absolute top-full left-0 pt-2 hidden group-hover:block w-[500px]">
+            <div class="bg-white p-4 rounded-xl shadow-2xl border border-slate-200 cursor-auto">
+                <div id="kcoSection" class="flex flex-wrap gap-2">
                     <label class="check-pill"><input type="checkbox"><span>DM</span></label>
                     <label class="check-pill"><input type="checkbox"><span>HTN</span></label>
                     <label class="check-pill"><input type="checkbox"><span>Hypothyroid</span></label>
@@ -426,50 +426,37 @@
                     <label class="check-pill"><input type="checkbox"><span>PIH</span></label>
                     <label class="check-pill"><input type="checkbox"><span>GDM</span></label>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="relative group">
+        <div class="cursor-pointer bg-white text-slate-600 px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-widest border border-slate-200 hover:border-brand-300 hover:text-brand-600 transition-colors shadow-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Advice & Instructions
+        </div>
+        
+        <div class="absolute top-full left-0 pt-2 hidden group-hover:block w-[600px]">
+            <div id="advice-card" class="bg-white p-4 rounded-xl shadow-2xl border border-slate-200 cursor-auto flex flex-col gap-3">
                 
-            </details>
-
-
-            <div id="advice-card" class="hover-reveal-card bg-white border border-slate-200 rounded-xl px-4 py-4 shadow-sm flex flex-col w-[65%]">
-
-                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <svg class="w-4 h-4 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Advice & Instructions
-                </h3>
-                
-                <div class="space-y-3 mb-4">
-
+                <div class="space-y-3 mb-2">
                     <div class="flex flex-wrap gap-1.5 items-center">
-                       
                         <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mr-1">Diet:</span>
-
-
                         <button onclick="addAdvice('Anti Diabetic Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">ADD</button>
-
                         <button onclick="addAdvice('Salt restricted diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">SRD</button>
-
                         <button onclick="addAdvice('Soft Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">Soft</button>
-                     
                         <button onclick="addAdvice('Bland Diet')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">Bland</button>
-
                         <button onclick="addAdvice('Low Fat Diet (LFD)')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">LFD</button>
-                        
                         <button onclick="addAdvice('Strictly avoid fruit juice')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">No Juice</button>
-
                         <button onclick="addAdvice('Strictly avoid coconut water')" class="advice-pill !bg-emerald-50 !text-emerald-700 !border-emerald-200 !px-2 !py-1 !text-[10px]">No Coconut Water</button>
-
                     </div>
 
                     <div class="flex flex-wrap gap-1.5 items-center">
-
                         <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mr-1">General:</span>
-
                         <button onclick="addAdvice('Warm saline gargles')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Gargles</button>
                         <button onclick="addAdvice('Steam inhalation BID')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Steam</button>
-
                         <button onclick="addAdvice('Strict Rest')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Rest</button>
                         <button onclick="addAdvice('Plenty of oral fluids')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Hydration</button>
-                        
                         <button onclick="addAdvice('Use Mask')" class="advice-pill !bg-sky-50 !text-sky-700 !border-sky-200 !px-2 !py-1 !text-[10px]">Use Mask</button>
                     </div>
 
@@ -482,8 +469,11 @@
 
                 <textarea id="generalAdvice" class="premium-input w-full h-16 resize-none" placeholder="Type general advice here..."></textarea>
             </div>
-            
         </div>
+    </div>
+
+</div>
+
 
 
             <!-- Added Drugs -->  
@@ -506,36 +496,34 @@
 
 </div>
 
-            <!-- Days bar -->
-             
-              <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-1.5 rounded-xl shrink-0 mt-3">
-
-                <label class="text-[11px] font-bold text-slate-600 uppercase tracking-widest">Days</label>
-                
-                <input type="number" id="masterDays" value="5" class="bg-white border border-slate-300 rounded-lg w-15 text-center text-sm font-bold py-1 outline-none focus:border-brand-500" onchange="setGlobalDays(this.value)">
-                
-                <span id="rxCount" class="px-5 py-1.5 bg-slate-200 text-slate-700 rounded text-[12px] font-black uppercase tracking-wider ml-1">0 Meds</span>
-            </div>
-
-
+            <!-- Days bar --> 
             <!-- Follow-up -->
+             
+              
+            <div class="mt-4 flex flex-wrap md:flex-nowrap items-stretch bg-white border border-slate-200 rounded-xl shadow-sm mb-4 relative">
+    
+    <div class="flex items-center gap-3 px-4 py-2.5 border-r border-slate-100 bg-slate-50 rounded-l-xl shrink-0">
+        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Days</span>
+        <input type="number" id="globalDays" value="5" min="1" class="w-15 px-2 py-1 border border-slate-200 rounded text-center font-bold text-slate-700 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500">
+        <span id="rxCount" class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-1 rounded uppercase tracking-widest">0 Meds</span>
+    </div>
 
-            <div class="mt-3 bg-white border border-purple-200 rounded-xl p-1 shadow-sm no-print" id="invSection">
-                <div class="flex items-center gap-3">
-                    <h3 class="text-xs font-bold text-purple-600 uppercase tracking-wider m-0 shrink-0 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                        Follow-up
-                    </h3>
-                    <div class="relative flex-1">
-                        <input type="text" id="fuSmartInput" class="premium-input w-full !text-sm !py-2 !pl-9 !border-purple-200 focus:!border-purple-500" placeholder="e.g. fu with cbc, lft, rft 3m or 7d" autocomplete="off">
-                        <svg class="w-4 h-4 absolute left-3 top-2.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    </div>
-                </div>
-                <div id="fuSmartChips" class="flex flex-wrap gap-2 mt-3 empty:hidden"></div>
-                <input type="hidden" id="fuDays">
-                <div id="fuHiddenBoxes" style="display:none;"></div>
-            </div>
+    <div class="flex-1 flex items-center gap-3 px-4 py-2.5 relative overflow-hidden">
+        <svg class="w-4 h-4 text-purple-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <span class="text-[10px] font-bold text-purple-700 uppercase tracking-widest shrink-0 hidden sm:block">Follow-Up</span>
+        
+        <input type="text" id="fuSmartInput" class="flex-1 min-w-[150px] text-sm outline-none placeholder:text-slate-300 font-medium text-slate-700 bg-transparent" placeholder="e.g. fu with cbc, lft 7d...">
+        
+        <div id="fuSmartChips" class="flex flex-wrap gap-1.5 items-center shrink-0"></div>
+        <input type="hidden" id="fuDays" value="5">
+        <div id="fuHiddenBoxes" class="hidden"></div>
+    </div>
+</div>
 
+
+
+            <!-- Days bar --> 
+            <!-- Follow-up -->
             
             <!-- Tapering Engine -->
 
@@ -839,6 +827,7 @@ function setGlobalDays(val) {
     const str = normalizeDays(n);
     rxItems.forEach(i => i.days = str);
     renderRx();
+    autoSyncFollowUpDays();
 }
 
 function addDrug(d) {
@@ -887,6 +876,7 @@ function addDrug(d) {
         isInsulin: isInsulin  // <--- Saving flag to memory
     });
     renderRx();
+    autoSyncFollowUpDays();
 }
 
 function removeDrug(id) { rxItems = rxItems.filter(i => i.id !== id); renderRx(); }
@@ -995,6 +985,7 @@ sigEl.addEventListener('keydown', function (e) {
 
         
     });
+autoSyncFollowUpDays();
 }
 
 // ══════════════════════════════════════════
@@ -1202,6 +1193,7 @@ function applyTemplate(key) {
         weeklyDay: ''
     }))];
     renderRx();
+    autoSyncFollowUpDays();
 }
 
 // ══════════════════════════════════════════
@@ -1370,28 +1362,45 @@ document.querySelectorAll('details.glass-card').forEach(card => {
 });
 
 // ══════════════════════════════════════════
-// FOLLOW-UP ENGINE
+// FOLLOW-UP ENGINE (Patched for Smart Sync)
 // ══════════════════════════════════════════
 document.getElementById('fuSmartInput').addEventListener('input', function () {
     let val = this.value.toLowerCase().replace(/^fu\s+with\s+/i,'').replace(/^fu\s+/i,'').trim();
-    let days = '', durationLabel = '';
+    let manualDays = '', durationLabel = '';
+    
+    // 1. Check if you typed a time override (like '7d' or '3w')
     const timeMatch = val.match(/(\d+)\s*([dwmy])/i);
+    
     if (timeMatch) {
+        // You typed a manual override!
         const num = parseInt(timeMatch[1],10), unit = timeMatch[2].toLowerCase();
-        if (unit==='d') { days=num; durationLabel=num+' Days'; }
-        if (unit==='w') { days=num*7; durationLabel=num+' Weeks'; }
-        if (unit==='m') { days=num*30; durationLabel=num+' Months'; }
-        if (unit==='y') { days=num*365; durationLabel=num+' Years'; }
+        if (unit==='d') { manualDays=num; durationLabel=num+' Days'; }
+        if (unit==='w') { manualDays=num*7; durationLabel=num+' Weeks'; }
+        if (unit==='m') { manualDays=num*30; durationLabel=num+' Months'; }
+        if (unit==='y') { manualDays=num*365; durationLabel=num+' Years'; }
         val = val.replace(timeMatch[0],'').replace(/,/g,' ').replace(/\s+/g,' ').trim();
+        
+        document.getElementById('fuDays').value = manualDays; // Apply override
+    } else {
+        // You didn't type a time override. Re-calculate the max drug days so they aren't lost!
+        if (typeof autoSyncFollowUpDays === 'function') {
+            autoSyncFollowUpDays();
+        }
     }
-    document.getElementById('fuDays').value = days;
+    
+    // 2. Draw the visual pills (Chips)
     let tests = val.split(/[\s,]+/).filter(Boolean);
     let chipsHtml = tests.map(t=>`<span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-md text-[10px] font-bold uppercase border border-purple-200 shadow-sm">${t}</span>`).join('');
     if (durationLabel) chipsHtml += `<span class="px-2.5 py-1 bg-amber-100 text-amber-800 rounded-md text-[10px] font-bold uppercase border border-amber-300 shadow-sm">⏱ ${durationLabel}</span>`;
+    
     document.getElementById('fuSmartChips').innerHTML = chipsHtml;
+    
+    // 3. Draw the hidden checkboxes for the Print Engine to find
     document.getElementById('fuHiddenBoxes').innerHTML = tests.map(t=>`<input type="checkbox" checked><span>${t.toUpperCase()}</span>`).join('');
+    
     saveWorkspace();
 });
+
 
 // ══════════════════════════════════════════
 // BP INPUT FORMATTING
@@ -1608,10 +1617,23 @@ async function prepareAndPrint() {
             </table>
         </div>`).join('') : '';
 
+    // --- SMART TIME TRANSLATOR FOR PRINT ---
+    let printTimeLabel = fuDays ? fuDays + ' Days' : '';
+    const timeMatch = document.getElementById('fuSmartInput').value.match(/(\d+)\s*([dwmy])/i);
+    
+    if (timeMatch) {
+        const num = parseInt(timeMatch[1], 10);
+        const unit = timeMatch[2].toLowerCase();
+        if (unit === 'd') printTimeLabel = num + (num === 1 ? ' Day' : ' Days');
+        if (unit === 'w') printTimeLabel = num + (num === 1 ? ' Week' : ' Weeks');
+        if (unit === 'm') printTimeLabel = num + (num === 1 ? ' Month' : ' Months');
+        if (unit === 'y') printTimeLabel = num + (num === 1 ? ' Year' : ' Years');
+    }
+
     let fuString='';
-    if(fuDays&&invList) fuString=`Follow-up with <b>${invList}</b> in <b>${document.getElementById('fuSmartInput').value.match(/(\d+\s*[dwmy])/i)?.[0]||fuDays+' days'}</b>`;
-    else if(invList) fuString=`Follow-up with <b>${invList}</b>`;
-    else if(fuDays) fuString=`Follow-up in <b>${fuDays} days</b>`;
+    if (printTimeLabel && invList) fuString = `Follow-up with <b>${invList}</b> in <b>${printTimeLabel}</b>`;
+    else if (invList) fuString = `Follow-up with <b>${invList}</b>`;
+    else if (printTimeLabel) fuString = `Follow-up in <b>${printTimeLabel}</b>`;
     
     // Removed yellow background, changed to pure black border
     const fuBlock = fuString ? `
@@ -2634,6 +2656,39 @@ async function restoreFromCloud() {
         btn.classList.remove('animate-pulse');
     }
 }
+
+function autoSyncFollowUpDays() {
+    const fuDaysInput = document.getElementById('fuDays');
+    if (!fuDaysInput) return;
+
+    let maxDays = 0;
+    
+    // 1. Scan the prescription array to find the longest duration
+    if (typeof rxItems !== 'undefined' && rxItems.length > 0) {
+        rxItems.forEach(item => {
+            const d = parseInt(item.days);
+            if (!isNaN(d) && d > maxDays) {
+                maxDays = d;
+            }
+        });
+    } 
+    // 2. If no drugs are added yet, pull from the Global Days box
+    else {
+        const globalDays = document.getElementById('globalDays'); 
+        if (globalDays && !isNaN(parseInt(globalDays.value))) {
+            maxDays = parseInt(globalDays.value);
+        }
+    }
+
+    // 3. Update the hidden Follow-Up value
+    if (maxDays > 0) {
+        fuDaysInput.value = maxDays;
+    }
+}
+
+// Attach a listener so if you manually change the left-side "Days" box, it updates instantly
+document.getElementById('globalDays').addEventListener('input', autoSyncFollowUpDays);
+
 
 window.onload = loadWorkspace;
 
