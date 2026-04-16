@@ -2550,6 +2550,12 @@ async function syncToCloud() {
         });
 
         if (!response.ok) throw new Error(`Server returned ${response.status}`);
+
+             // 🚨 NEW: Actually check what GitHub told Cloudflare!
+        const result = await response.json();
+        if (!result.success) {
+            throw new Error("Cloudflare reached GitHub, but GitHub REJECTED the save. Check your Token permissions and Gist ID!");
+        }
         
         // 3. Success UI Feedback
         btn.classList.add('bg-green-100');
