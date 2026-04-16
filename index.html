@@ -2030,9 +2030,29 @@ async function saveToArchive() {
 
 
 // ========================================================
-// 2. ULTRA-OPTIMIZED EMR SEARCH (Debounce + Cursor + Zero-State)
+// 2. ULTRA-OPTIMIZED EMR SEARCH (Zero-State Sort + AM/PM)
 // ========================================================
 let archiveSearchTimeout = null; 
+
+// 🌟 NEW HELPER 1: Converts 24h (14:30) to 12h AM/PM (2:30 PM)
+function formatTimeAmPm(dateStr) {
+    if (!dateStr) return "";
+    return dateStr.replace(/\b([01]?\d|2[0-3]):([0-5]\d)(?::[0-5]\d)?\b/g, (match, hr, min) => {
+        let h = parseInt(hr, 10);
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12; // Convert 0 to 12
+        return `${h}:${min} ${ampm}`;
+    });
+}
+
+// 🌟 NEW HELPER 2: Converts date strings into numbers for perfect sorting
+function getSortableTime(dateStr) {
+    if (!dateStr) return 0;
+    // Fixes DD/MM/YYYY format before parsing
+    let normalized = dateStr.replace(/\b(\d{1,2})\/(\d{1,2})\/(\d{4})\b/, '$2/$1/$3');
+    let parsedDate = new Date(normalized);
+    return isNaN(parsedDate) ? 0 : parsedDate.getTime();
+}
 
 async function searchArchive() {
     currentArchiveFocus = -1; 
@@ -2042,52 +2062,46 @@ async function searchArchive() {
     
     const kcoLabels = ['DM', 'HTN', 'Hypothyroid', 'IHD', 'Hyperthyroid', 'S/P CABG', 'S/P PTCA', 'Asthma', 'COPD', 'CKD', 'Epilepsy', 'Psychiatric', 'RA', 'PIH', 'GDM'];
 
-    // --- NEW: ZERO-STATE SEARCH (Empty Box, but clicked inside) ---
+    // --- ZERO-STATE SEARCH (Empty Box) ---
     if (queryRaw === "") {
         clearTimeout(archiveSearchTimeout);
         const db = await openDB();
         const tx = db.transaction("patients", "readonly");
         const store = tx.objectStore("patients");
         
-        // Open cursor backwards ("prev") to grab the newest patients instantly
-        const request = store.openCursor(null, "prev"); 
-        let recentVisits = [];
-
-        request.onsuccess = (event) => {
-            const cursor = event.target.result;
-            if (cursor) {
-                const p = cursor.value;
-                // Grab their most recent visit
+        const req = store.getAll();
+        req.onsuccess = () => {
+            const allPatients = req.result;
+            let allVisits = [];
+            
+            // Gather the most recent visit from EVERY patient
+            allPatients.forEach(p => {
                 if (p.visits && p.visits.length > 0) {
                     const lastVisit = p.visits[p.visits.length - 1];
-                    recentVisits.push({ 
+                    allVisits.push({ 
                         name: p.name, 
                         visitDate: lastVisit.date, 
                         details: lastVisit.details,
                         totalVisits: p.visits.length 
                     });
                 }
+            });
 
-                // Stop after finding the 10 most recent
-                if (recentVisits.length >= 10) { 
-                    renderSearchResults(recentVisits, kcoLabels, resultsDiv, true);
-                } else {
-                    cursor.continue();
-                }
-            } else {
-                renderSearchResults(recentVisits, kcoLabels, resultsDiv, true);
-            }
+            // 🌟 Sort all visits mathematically from Latest to Oldest
+            allVisits.sort((a, b) => getSortableTime(b.visitDate) - getSortableTime(a.visitDate));
+
+            // Slice only the top 10 newest for the UI
+            renderSearchResults(allVisits.slice(0, 10), kcoLabels, resultsDiv, true);
         };
-        return; // Stop here, do not run the normal search
+        return; 
     }
 
-    // --- HIDE IF ONLY 1 LETTER TYPED ---
     if (queryRaw.length > 0 && queryRaw.length < 2) {
         resultsDiv.style.display = 'none';
         return;
     }
 
-    // --- OPTIMIZATION 1: DEBOUNCING FOR NORMAL SEARCH ---
+    // --- NORMAL SEARCH ---
     clearTimeout(archiveSearchTimeout);
     archiveSearchTimeout = setTimeout(async () => {
         
@@ -2096,7 +2110,6 @@ async function searchArchive() {
         const tx = db.transaction("patients", "readonly");
         const store = tx.objectStore("patients");
         
-        // --- OPTIMIZATION 2: THE CURSOR ---
         const request = store.openCursor(); 
         let matchedVisits = [];
 
@@ -2127,22 +2140,23 @@ async function searchArchive() {
                 }
 
                 if (matchedVisits.length >= 15) {
+                    matchedVisits.sort((a, b) => getSortableTime(b.visitDate) - getSortableTime(a.visitDate));
                     renderSearchResults(matchedVisits, kcoLabels, resultsDiv, false);
                 } else {
                     cursor.continue(); 
                 }
             } else {
+                matchedVisits.sort((a, b) => getSortableTime(b.visitDate) - getSortableTime(a.visitDate));
                 renderSearchResults(matchedVisits, kcoLabels, resultsDiv, false);
             }
         };
     }, 250); 
 }
 
-// Helper function (Updated with 'isRecent' flag for the clinical header)
+// Helper function to draw the UI
 function renderSearchResults(matchedVisits, kcoLabels, resultsDiv, isRecent = false) {
     if (matchedVisits.length > 0) {
         
-        // Adds a sleek divider bar if showing recent patients
         const headerHtml = isRecent ? `<div class="bg-slate-100 text-slate-500 text-[10px] font-black uppercase tracking-widest px-4 py-1.5 border-b border-slate-200 shadow-inner">10 Most Recent Patients</div>` : '';
 
         const listHtml = matchedVisits.map((match, idx) => {
@@ -2160,6 +2174,9 @@ function renderSearchResults(matchedVisits, kcoLabels, resultsDiv, isRecent = fa
             }
             const kcoBadge = kcoStr ? `<span class="text-[10px] bg-rose-50 text-rose-700 font-bold px-2.5 py-1 rounded-md border border-rose-100 uppercase tracking-widest truncate max-w-[40vw]">KCO: ${kcoStr}</span>` : '';
 
+            // 🌟 NEW: Convert the time right before displaying it
+            const displayDate = formatTimeAmPm(match.visitDate);
+
             return `
             <div onclick="loadVisitFromArchive(${idx})" class="archive-item p-4 hover:bg-slate-50 cursor-pointer transition-colors flex justify-between items-center text-left group gap-6 border-l-4 border-transparent">
                 <div class="flex items-center gap-4 flex-1 overflow-hidden">
@@ -2170,7 +2187,7 @@ function renderSearchResults(matchedVisits, kcoLabels, resultsDiv, isRecent = fa
                 </div>
                 
                 <div class="flex items-center gap-3 shrink-0">
-                    <span class="text-[11px] text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-md shadow-sm font-bold tracking-wider uppercase">LATEST: ${match.visitDate}</span>
+                    <span class="text-[11px] text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-md shadow-sm font-bold tracking-wider uppercase">LATEST: ${displayDate}</span>
                     <button onclick="event.stopPropagation(); openHistoryModal('${match.name}')" class="bg-white hover:bg-brand-50 hover:text-brand-700 text-slate-600 border border-slate-200 hover:border-brand-300 px-3 py-1.5 rounded-lg shadow-sm text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 z-10">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         History
