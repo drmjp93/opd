@@ -1620,12 +1620,14 @@ async function prepareAndPrint() {
             <div style="font-size:10.5px;color:#000;line-height:1.3;">${fuString}</div>
         </div>` : '';
 
-    // Enforce margins and force B&W explicitly just in case the browser tries anything weird
+       // Enforce margins and force B&W strictly FOR THE PRINTER ONLY
     const printStyles = `
         <style>
-            @page { margin: 0.5cm; }
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            * { color: #000 !important; }
+            @media print {
+                @page { margin: 0.5cm; }
+                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                * { color: #000 !important; }
+            }
         </style>
     `;
 
@@ -1657,9 +1659,13 @@ async function prepareAndPrint() {
         <div class="print-software-credit" style="page-break-inside:avoid; font-size: 8px; color: #555; text-align: center; margin-top: 6px;">Prescription Software developed by Dr. Mit Panchani</div>`;
         
     window.print();
-    setTimeout(() => { clearWorkspace(true); }, 500);
+    
+    // 🌟 THE CLEANUP FIX: Destroy the print HTML immediately after so styles can't linger
+    setTimeout(() => { 
+        pDiv.innerHTML = ''; 
+        clearWorkspace(true); 
+    }, 500);
 }
-
 // ========================================================
 // LIVE PATIENT SUMMARY ENGINE
 // ========================================================
