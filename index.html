@@ -2518,9 +2518,8 @@ async function loadSpecificVisit(patientName, visitIndex) {
 // CLOUDFLARE CLOUD BACKUP ENGINE
 // ========================================================
 const CLOUD_CONFIG = {
-    // 🔴 PASTE YOUR ACTUAL WORKER URL HERE:
-    workerUrl: "https://YOUR-WORKER-URL.workers.dev", 
-    // This is "Mit-Clinic-OPD-2026" safely obfuscated in Base64
+
+    workerUrl: "https://opd-sync.drmjp93.workers.dev", 
     authSecret: atob("TWl0LUNsaW5pYy1PUEQtMjAyNg==") 
 };
 
