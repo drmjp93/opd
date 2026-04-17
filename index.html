@@ -2686,7 +2686,23 @@ function autoSyncFollowUpDays() {
 }
 
 // Attach a listener so if you manually change the left-side "Days" box, it updates instantly
-document.getElementById('globalDays').addEventListener('input', autoSyncFollowUpDays);
+document.getElementById('globalDays').addEventListener('input', function () {
+    const newDays = normalizeDays(this.value || 5);
+    if (typeof rxItems !== 'undefined') {
+        rxItems.forEach(item => {
+            // Only override days that were set by globalDays (not explicitly typed in sig)
+            if (!item.isDevice) {
+                const sigVal = item.rawSig || '';
+                const hasDuration = /\d+\s*(d|days?|w|wks?|weeks?|m|mos?|months?)\b/i.test(sigVal);
+                if (!hasDuration) {
+                    item.days = newDays;
+                    updateCardDisplay(item.id);
+                }
+            }
+        });
+    }
+    autoSyncFollowUpDays();
+});
 
 
 window.onload = loadWorkspace;
