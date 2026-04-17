@@ -831,7 +831,7 @@ function setGlobalDays(val) {
 }
 
 function addDrug(d) {
-    const days = normalizeDays(parseInt(document.getElementById("masterDays").value) || 5);
+    const days = normalizeDays(parseInt(document.getElementById("globalDays").value) || 5);
     
     // 1. SMART CLASSIFICATION: Read the name and molecule
     const brandLow = (d["FIRST BRAND"] || "").toLowerCase();
@@ -1027,7 +1027,7 @@ function parseSmartSig(id, val) {
     item.customNote = '';
     
     // Devices keep a blank day count. Regular drugs revert to Master Days.
-    item.days = item.isDevice ? '-' : normalizeDays(document.getElementById("masterDays").value || 5);
+    item.days = item.isDevice ? '-' : normalizeDays(document.getElementById("globalDays").value || 5);
     
     item.isSos = false;
     item.isWeekly = false;
@@ -1181,7 +1181,7 @@ const templates = {
 function applyTemplate(key) {
     const t = templates[key];
     if (!t) return;
-    const days = normalizeDays(parseInt(document.getElementById("masterDays").value) || 5);
+    const days = normalizeDays(parseInt(document.getElementById("globalDays").value) || 5);
     rxItems = [...rxItems, ...t.map(x => ({
         ...x,
         id: Date.now() + Math.floor(Math.random() * 1000),
@@ -1432,7 +1432,7 @@ function saveWorkspace() {
         fuDays:       document.getElementById('fuDays').value,
         fuSmartInput: document.getElementById('fuSmartInput').value,
         generalAdvice:document.getElementById('generalAdvice').value,
-        masterDays:   document.getElementById('masterDays').value,
+        globalDays:   document.getElementById('globalDays').value,
         rxItems, tapers, currentTaperSteps,
         checkboxes: Array.from(document.querySelectorAll('input[type="checkbox"]')).map(c=>c.checked)
     };
@@ -1449,7 +1449,7 @@ function loadWorkspace() {
             s('bpInput',d.bpInput); s('ptPulse',d.ptPulse); s('ptTemp',d.ptTemp); s('ptSpo2',d.ptSpo2);
             s('ptRS',d.ptRS); s('ptCVS',d.ptCVS); s('ptPA',d.ptPA); s('ptCNS',d.ptCNS);
             s('complaints',d.complaints); s('fuDays',d.fuDays); s('fuSmartInput',d.fuSmartInput);
-            s('generalAdvice',d.generalAdvice); s('masterDays',d.masterDays);
+            s('generalAdvice',d.generalAdvice); s('globalDays',d.globalDays);
             if (d.rxItems) rxItems = d.rxItems;
             if (d.tapers)  tapers  = d.tapers;
             if (d.currentTaperSteps) currentTaperSteps = d.currentTaperSteps;
@@ -1488,7 +1488,7 @@ function clearWorkspace(skipConfirm = false) {
     document.getElementById('fuSmartChips').innerHTML = '';
     document.getElementById('fuHiddenBoxes').innerHTML = '';
     initDefaults();
-    document.getElementById('masterDays').value = 5;
+    document.getElementById('globalDays').value = 5;
     renderTaperBuilder(); renderActiveTapers(); renderRx();
     updatePtSummary(); 
     localStorage.removeItem('clinicalWorkspaceState');
