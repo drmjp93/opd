@@ -1889,16 +1889,20 @@ if (coInput && coBtn) {
 
 
 
-    // ══════════════════════════════════════════
+// ══════════════════════════════════════════
 // CLOUD CLIPBOARD ENGINE: OPD RX PAGE
 // ══════════════════════════════════════════
-const CLOUD_API_URL = "https://clipboard.drmjp93.workers.dev"; // <-- Make sure this matches your worker!
+const CLOUD_API_URL = "https://clipboard.drmjp93.workers.dev"; 
 
 async function saveToCloudClipboard() {
-    const btn = event.target;
-    btn.innerText = "Saving...";
+    // 1. Safely grab the button, then grab ONLY the text span inside it
+    const btn = event.target.closest('button');
+    const textSpan = btn.querySelector('span');
+    const originalText = textSpan.innerText;
+    
+    // 2. Change just the text span using a short word
+    textSpan.innerText = "SAVING...";
 
-    // Grab exactly from OPD IDs
     const patientData = {
         date: document.getElementById('date') ? document.getElementById('date').value : '',
         sex: document.getElementById('ptSex') ? document.getElementById('ptSex').value : '',
@@ -1919,17 +1923,22 @@ async function saveToCloudClipboard() {
             method: "POST",
             body: JSON.stringify(patientData)
         });
-        btn.innerText = "✓ Saved!";
-        setTimeout(() => btn.innerText = "↑ Send to Cloud", 2000);
+        textSpan.innerText = "SAVED!";
+        setTimeout(() => { textSpan.innerText = originalText; }, 2000);
     } catch (e) {
         alert("Failed to save to cloud");
-        btn.innerText = "↑ Send to Cloud";
+        textSpan.innerText = originalText;
     }
 }
 
 async function loadFromCloudClipboard() {
-    const btn = event.target;
-    btn.innerText = "Fetching...";
+    // 1. Safely grab the button, then grab ONLY the text span inside it
+    const btn = event.target.closest('button');
+    const textSpan = btn.querySelector('span');
+    const originalText = textSpan.innerText;
+    
+    // 2. Change just the text span using a short word
+    textSpan.innerText = "FETCHING";
 
     try {
         const res = await fetch(`${CLOUD_API_URL}/?action=load`);
@@ -1937,7 +1946,7 @@ async function loadFromCloudClipboard() {
 
         if (!data.name && !data.age) {
             alert("Cloud clipboard is empty!");
-            btn.innerText = "↓ Fetch from Cloud";
+            textSpan.innerText = originalText;
             return;
         }
 
@@ -1961,11 +1970,11 @@ async function loadFromCloudClipboard() {
             else if (s.startsWith('F')) document.getElementById('ptSex').value = 'F';
         }
 
-        btn.innerText = "✓ Fetched!";
-        setTimeout(() => btn.innerText = "↓ Fetch from Cloud", 2000);
+        textSpan.innerText = "FETCHED!";
+        setTimeout(() => { textSpan.innerText = originalText; }, 2000);
     } catch (e) {
         alert("Failed to load from cloud");
-        btn.innerText = "↓ Fetch from Cloud";
+        textSpan.innerText = originalText;
     }
 }
 
