@@ -1970,6 +1970,9 @@ async function loadFromCloudClipboard() {
             else if (s.startsWith('F')) document.getElementById('ptSex').value = 'F';
         }
 
+        // --- NEW LINE: Force the visual summary card to wake up and show the data ---
+        if (typeof updatePtSummary === 'function') updatePtSummary();
+        
         textSpan.innerText = "FETCHED!";
         setTimeout(() => { textSpan.innerText = originalText; }, 2000);
     } catch (e) {
