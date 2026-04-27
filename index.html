@@ -479,6 +479,15 @@
 
             <div id="rxList" class="space-y-2"></div>
 
+
+            <div id="recentDrugsContainer" class="mt-4 mb-2 hidden no-print">
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Recently Used
+                </div>
+                <div id="recentDrugsList" class="flex overflow-x-auto hide-scroll gap-2 pb-2 items-stretch"></div>
+            </div>
+
             <!-- Drug Search -->
 
             <div class="inline-search-container mt-3 no-print">
@@ -2716,6 +2725,77 @@ document.getElementById('globalDays').addEventListener('input', function () {
     autoSyncFollowUpDays();
 });
 
+// ══════════════════════════════════════════
+// RECENT MEDICINES ENGINE
+// ══════════════════════════════════════════
+let recentDrugs = [];
+
+function loadRecentDrugs() {
+    try {
+        const stored = localStorage.getItem('clinicalRecentDrugs');
+        if (stored) {
+            recentDrugs = JSON.parse(stored);
+            renderRecentDrugs();
+        }
+    } catch (e) { console.error(e); }
+}
+
+function renderRecentDrugs() {
+    const cont = document.getElementById('recentDrugsContainer');
+    const list = document.getElementById('recentDrugsList');
+    if (!cont || !list) return;
+
+    if (recentDrugs.length === 0) {
+        cont.classList.add('hidden');
+        return;
+    }
+    cont.classList.remove('hidden');
+
+    list.innerHTML = recentDrugs.map((drug, i) => {
+        let displayFreq = (drug.freqArr || ["0","0","0"]).join('-');
+        if (drug.isSos) displayFreq = 'SOS';
+        if (drug.isWeekly) displayFreq = 'Weekly';
+
+        return `<button type="button" onclick="addRecentDrug(${i})" class="shrink-0 flex flex-col justify-center px-3 py-1.5 bg-white border border-slate-200 rounded-xl hover:border-brand-400 hover:bg-brand-50 transition-all shadow-sm text-left max-w-[140px]">
+            <span class="text-[11px] font-bold text-slate-800 truncate w-full">${drug.brand}</span>
+            <span class="text-[9px] font-semibold text-slate-500 truncate w-full">${displayFreq} ${drug.advice ? '· ' + drug.advice.split(',')[0] : ''}</span>
+        </button>`;
+    }).join('');
+}
+
+function addRecentDrug(index) {
+    const templateDrug = recentDrugs[index];
+    if (!templateDrug) return;
+
+    const currentDays = normalizeDays(document.getElementById("globalDays").value || 5);
+    const newItem = JSON.parse(JSON.stringify(templateDrug)); // Deep copy to prevent reference bugs
+    
+    newItem.id = Date.now() + Math.floor(Math.random() * 1000);
+    newItem.days = templateDrug.isDevice ? '-' : currentDays;
+
+    rxItems.push(newItem);
+    renderRx();
+    autoSyncFollowUpDays();
+    saveWorkspace();
+}
+
+function learnRecentDrug(id) {
+    const item = rxItems.find(x => x.id === id);
+    // Only learn if the user actually typed a frequency/instruction
+    if (!item || !item.brand || !item.rawSig || item.rawSig.trim() === '') return;
+
+    // Remove it if it already exists so we can bump it to the front
+    const existingIdx = recentDrugs.findIndex(d => d.brand === item.brand);
+    if (existingIdx !== -1) recentDrugs.splice(existingIdx, 1);
+    
+    // Save the exact state
+    const copy = JSON.parse(JSON.stringify(item));
+    recentDrugs.unshift(copy);
+    recentDrugs = recentDrugs.slice(0, 15); // Keep the top 15 most recent
+    
+    localStorage.setItem('clinicalRecentDrugs', JSON.stringify(recentDrugs));
+    renderRecentDrugs();
+}
 
 window.onload = loadWorkspace;
 
