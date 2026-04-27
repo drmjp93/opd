@@ -991,7 +991,11 @@ sigEl.addEventListener('keydown', function (e) {
     }
 });
 
-        
+// ADD THIS LINE: Learns the drug as soon as you click away from the input box
+        sigEl.addEventListener('blur', function () {
+            learnRecentDrug(item.id);
+        });
+    
     });
 autoSyncFollowUpDays();
 }
