@@ -984,7 +984,7 @@ function renderRx() {
             updateCardDisplay(item.id);
         });
 sigEl.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === 'Tab') {
         e.preventDefault();
         srchInput.focus();
         srchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2760,7 +2760,7 @@ function renderRecentDrugs() {
         if (drug.isSos) displayFreq = 'SOS';
         if (drug.isWeekly) displayFreq = 'Weekly';
 
-        return `<button type="button" onclick="addRecentDrug(${i})" class="shrink-0 flex flex-col justify-center px-3 py-1.5 bg-white border border-slate-200 rounded-xl hover:border-brand-400 hover:bg-brand-50 transition-all shadow-sm text-left max-w-[140px]">
+       return `<button type="button" tabindex="-1" onclick="addRecentDrug(${i})" class="shrink-0 flex flex-col justify-center px-3 py-1.5 bg-white border border-slate-200 rounded-xl hover:border-brand-400 hover:bg-brand-50 transition-all shadow-sm text-left max-w-[140px]">
             <span class="text-[11px] font-bold text-slate-800 truncate w-full">${drug.brand}</span>
             <span class="text-[9px] font-semibold text-slate-500 truncate w-full">${displayFreq} ${drug.advice ? '· ' + drug.advice.split(',')[0] : ''}</span>
         </button>`;
