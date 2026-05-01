@@ -286,8 +286,7 @@
             <div class="flex items-center pl-3 pr-2">
                 <span class="text-amber-500 font-bold text-sm">📝</span>
             </div>
-            <input type="text" id="complaintsSmartInput" class="premium-input !border-none !bg-transparent !py-2 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none" placeholder="Type complaints here..." autocomplete="off">
-            <button id="complaintsSmartBtn" class="bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 px-4 text-xs font-bold transition-all shrink-0 border-l border-amber-100 uppercase">Add C/O</button>
+                <input type="text" id="complaintsSmartInput" class="premium-input !border-none !bg-transparent !py-2 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none" placeholder="TYPE COMPLAINTS HERE..." autocomplete="off" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">            <button id="complaintsSmartBtn" class="bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 px-4 text-xs font-bold transition-all shrink-0 border-l border-amber-100 uppercase">Add C/O</button>
         </div>
 
         <div class="glass-card border-l-4 border-l-teal-500 shadow-sm flex items-stretch overflow-hidden transition-all h-[42px] shrink-0">
@@ -485,7 +484,7 @@
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Recently Used
                 </div>
-                <div id="recentDrugsList" class="flex overflow-x-auto hide-scroll gap-2 pb-2 items-stretch"></div>
+                <div id="recentDrugsList" class="flex overflow-x-auto hide-scroll gap-2 pb-2 items-stretch" style="flex-wrap:nowrap;"></div>
             </div>
 
             <!-- Drug Search -->
@@ -1479,6 +1478,7 @@ function loadWorkspace() {
     renderTaperBuilder();
     renderActiveTapers();
     updatePtSummary(); // <--- ADDED THIS LINE
+    loadRecentDrugs(); // ← ADDED THIS LINE
     setInterval(saveWorkspace, 1500);
 }
 
@@ -1864,7 +1864,7 @@ const coBtn = document.getElementById('complaintsSmartBtn');
 
 function processSmartComplaints() {
     if (!coInput) return;
-    const val = coInput.value.trim();
+    const val = coInput.value.trim().toUpperCase();
     if (!val) return;
 
     const mainCoBox = document.getElementById('complaints');
@@ -2755,12 +2755,12 @@ function renderRecentDrugs() {
     }
     cont.classList.remove('hidden');
 
-    list.innerHTML = recentDrugs.map((drug, i) => {
+   list.innerHTML = recentDrugs.map((drug, i) => {
         let displayFreq = (drug.freqArr || ["0","0","0"]).join('-');
         if (drug.isSos) displayFreq = 'SOS';
         if (drug.isWeekly) displayFreq = 'Weekly';
 
-       return `<button type="button" tabindex="-1" onclick="addRecentDrug(${i})" class="shrink-0 flex flex-col justify-center px-3 py-1.5 bg-white border border-slate-200 rounded-xl hover:border-brand-400 hover:bg-brand-50 transition-all shadow-sm text-left max-w-[140px]">
+       return `<button type="button" tabindex="-1" onclick="addRecentDrug(${i})" class="flex-none flex flex-col justify-center px-3 py-1.5 bg-white border border-slate-200 rounded-xl hover:border-brand-400 hover:bg-brand-50 transition-all shadow-sm text-left" style="width:140px;min-width:140px;">
             <span class="text-[11px] font-bold text-slate-800 truncate w-full">${drug.brand}</span>
             <span class="text-[9px] font-semibold text-slate-500 truncate w-full">${displayFreq} ${drug.advice ? '· ' + drug.advice.split(',')[0] : ''}</span>
         </button>`;
