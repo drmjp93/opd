@@ -583,8 +583,6 @@
     <span>&copy; Dr. Mit Panchani 2026-2027</span>
     <span style="color: #90A4AE; font-size: 14px; line-height: 1;">•</span>
     <span>Visitor count - <span id="visitCount" style="font-weight: bold; color: #18FFFF; margin-left: 4px; letter-spacing: 1px;">...</span></span>
-    <span style="color: #90A4AE; font-size: 14px; line-height: 1;">•</span>
-    <span>Prescriptions printed - <span id="rxPrintCount" style="font-weight: bold; color: #FFD54F; margin-left: 4px; letter-spacing: 1px;">...</span></span>
 </div>
 
 
@@ -1695,10 +1693,6 @@ async function prepareAndPrint() {
         <div class="print-software-credit" style="page-break-inside:avoid; font-size: 8px; color: #555; text-align: center; margin-top: 6px;">Prescription Software developed by Dr. Mit Panchani</div>`;
         
     window.print();
-
-    // Increment prescription counter
-fetch("https://visits.drmjp93.workers.dev/?tool=rx-printed&action=increment")
-  .catch(() => {}); // Silent fail — never block printing
     
     // 🌟 THE CLEANUP FIX: Destroy the print HTML immediately after so styles can't linger
     setTimeout(() => { 
@@ -2831,17 +2825,6 @@ window.onload = loadWorkspace;
   }
 })();
 
-    (async function () {
-  const el = document.getElementById("rxPrintCount");
-  if (!el) return;
-  try {
-    const resp = await fetch("https://visits.drmjp93.workers.dev/?tool=rx-printed");
-    const j = await resp.json();
-    el.textContent = j.count ?? "0";
-  } catch (e) {
-    el.textContent = "—";
-  }
-})();
 
 </script>
 
