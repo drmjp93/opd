@@ -583,6 +583,8 @@
     <span>&copy; Dr. Mit Panchani 2026-2027</span>
     <span style="color: #90A4AE; font-size: 14px; line-height: 1;">•</span>
     <span>Visitor count - <span id="visitCount" style="font-weight: bold; color: #18FFFF; margin-left: 4px; letter-spacing: 1px;">...</span></span>
+    <span style="color: #90A4AE; font-size: 14px; line-height: 1;">•</span>
+    <span>Rx Printed - <span id="rxPrintCount" style="font-weight: bold; color: #69F0AE; margin-left: 4px; letter-spacing: 1px;">...</span></span>
 </div>
 
 
@@ -1691,7 +1693,19 @@ async function prepareAndPrint() {
             <div style="font-size:8px;font-weight:900;color:#000;margin-top:1px;">FELLOW IN 2D ECHO, PGCIH</div>
         </div> 
         <div class="print-software-credit" style="page-break-inside:avoid; font-size: 8px; color: #555; text-align: center; margin-top: 6px;">Prescription Software developed by Dr. Mit Panchani</div>`;
-        
+
+
+    // --- NEW: Trigger the Rx Counter Increment Before Printing ---
+    fetch("https://visits.drmjp93.workers.dev/?tool=opd_rx")
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.count !== undefined) {
+                const rxEl = document.getElementById("rxPrintCount");
+                if (rxEl) rxEl.textContent = data.count;
+            }
+        }).catch(e => console.error("Rx Counter error:", e));
+    // -------------------------------------------------------------
+    
     window.print();
     
     // 🌟 THE CLEANUP FIX: Destroy the print HTML immediately after so styles can't linger
@@ -2804,24 +2818,32 @@ function learnRecentDrug(id) {
 window.onload = loadWorkspace;
 
 // ========================================================
-// PAGE LOAD VISITOR COUNTER
+// PAGE LOAD COUNTERS (Visitors & Read-Only Rx)
 // ========================================================
 (async function () {
-  const el = document.getElementById("visitCount");
-  if (!el) return;
-
-  try {
-    // CHANGED: Now using 'opd-tool-visits' so it tracks this specific app separately!
-    const resp = await fetch("https://visits.drmjp93.workers.dev/?tool=opd");
-    const j = await resp.json();
-
-    if (j && j.count !== undefined) {
-      el.textContent = j.count;
-    } else {
-      el.textContent = "0";
+  // 1. Visitor Counter (Increments on load, exactly as before)
+  const visitEl = document.getElementById("visitCount");
+  if (visitEl) {
+    try {
+      const resp = await fetch("https://visits.drmjp93.workers.dev/?tool=opd");
+      const j = await resp.json();
+      visitEl.textContent = (j && j.count !== undefined) ? j.count : "0";
+    } catch (e) {
+      visitEl.textContent = "—";
     }
-  } catch (e) {
-    el.textContent = "—";
+  }
+
+  // 2. Rx Printed Counter (Read-only on load)
+  const rxEl = document.getElementById("rxPrintCount");
+  if (rxEl) {
+    try {
+      // Notice the action=read parameter here!
+      const resp = await fetch("https://visits.drmjp93.workers.dev/?tool=opd_rx&action=read");
+      const j = await resp.json();
+      rxEl.textContent = (j && j.count !== undefined) ? j.count : "0";
+    } catch (e) {
+      rxEl.textContent = "—";
+    }
   }
 })();
 
