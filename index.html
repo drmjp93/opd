@@ -2817,6 +2817,66 @@ function learnRecentDrug(id) {
 
 window.onload = loadWorkspace;
 
+    // ═══════════════════════════════════════════
+// STATS PING ENGINE  (OPD RX PAGE)
+// ═══════════════════════════════════════════
+(function() {
+  const SOURCE      = 'opd';
+  const PING_URL    = 'https://opd-api.drmjp93.workers.dev/ping';
+  const MAINT_KEY   = 'statsMaintenanceMode_opd';
+
+  // ── Maintenance toggle button ──
+  function buildMaintBtn() {
+    const existing = document.getElementById('statsMaintBtn');
+    if (existing) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'statsMaintBtn';
+    btn.title = 'Toggle Stats Maintenance Mode';
+    const isMaint = localStorage.getItem(MAINT_KEY) === 'true';
+    btn.innerHTML = isMaint ? '🔧 MAINT' : '📊 LIVE';
+    btn.style.cssText = `
+      position:fixed; bottom:36px; right:16px; z-index:99999;
+      padding:4px 10px; border-radius:6px; border:none; cursor:pointer;
+      font-size:10px; font-weight:900; letter-spacing:.5px;
+      background:${isMaint ? '#ef4444' : '#10b981'}; color:#fff;
+      box-shadow:0 2px 8px rgba(0,0,0,.25); transition:background .2s;
+    `;
+    btn.onclick = () => {
+      const current = localStorage.getItem(MAINT_KEY) === 'true';
+      localStorage.setItem(MAINT_KEY, (!current).toString());
+      btn.innerHTML = !current ? '🔧 MAINT' : '📊 LIVE';
+      btn.style.background = !current ? '#ef4444' : '#10b981';
+    };
+    document.body.appendChild(btn);
+  }
+
+  // ── Ping worker ──
+  function pingStats() {
+    if (localStorage.getItem(MAINT_KEY) === 'true') return; // maintenance mode
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+    fetch(PING_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: today, source: SOURCE })
+    }).catch(() => {}); // silent fail — never block printing
+  }
+
+  // ── Hook into the existing prepareAndPrint function ──
+  const _origPrepare = window.prepareAndPrint;
+  window.prepareAndPrint = async function() {
+    if (typeof _origPrepare === 'function') await _origPrepare.apply(this, arguments);
+    pingStats();
+  };
+
+  // Build the button once the DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', buildMaintBtn);
+  } else {
+    buildMaintBtn();
+  }
+})();
+    
 // ========================================================
 // PAGE LOAD COUNTERS (Visitors & Read-Only Rx)
 // ========================================================
