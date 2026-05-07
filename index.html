@@ -2817,7 +2817,7 @@ function learnRecentDrug(id) {
 
 window.onload = loadWorkspace;
 
-    // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
 // STATS PING ENGINE  (OPD RX PAGE)
 // ═══════════════════════════════════════════
 (function() {
@@ -2825,15 +2825,42 @@ window.onload = loadWorkspace;
   const PING_URL    = 'https://opd-api.drmjp93.workers.dev/ping';
   const MAINT_KEY   = 'statsMaintenanceMode_opd';
 
-  // ── Maintenance toggle button ──
-  function buildMaintBtn() {
-    const existing = document.getElementById('statsMaintBtn');
-    if (existing) return;
+  // ── KCO → Stats category map ──
+  // Key = substring to match in KCO label (lowercase)
+  // Value = stats cat id
+  const KCO_MAP = {
+    'dm'          : 'dm',
+    'gdm'         : 'dm',
+    'htn'         : 'cardiac',
+    'ihd'         : 'cardiac',
+    'ptca'        : 'cardiac',
+    'cabg'        : 'cardiac',
+    'hypothyroid' : 'thyroid',
+    'hyperthyroid': 'thyroid',
+    'thyroid'     : 'thyroid',
+  };
 
+  function getCheckedKCOs() {
+    // Returns array of matched stats cat ids (deduplicated)
+    const matched = new Set();
+    document.querySelectorAll('#kcoSection input[type="checkbox"]:checked').forEach(cb => {
+      const lbl = (cb.nextElementSibling?.textContent || '').toLowerCase().trim();
+      for (const [keyword, catId] of Object.entries(KCO_MAP)) {
+        if (lbl.includes(keyword)) {
+          matched.add(catId);
+          break; // one match per checkbox is enough
+        }
+      }
+    });
+    return [...matched];
+  }
+
+  function buildMaintBtn() {
+    if (document.getElementById('statsMaintBtn')) return;
+    const isMaint = localStorage.getItem(MAINT_KEY) === 'true';
     const btn = document.createElement('button');
     btn.id = 'statsMaintBtn';
     btn.title = 'Toggle Stats Maintenance Mode';
-    const isMaint = localStorage.getItem(MAINT_KEY) === 'true';
     btn.innerHTML = isMaint ? '🔧 MAINT' : '📊 LIVE';
     btn.style.cssText = `
       position:fixed; bottom:36px; right:16px; z-index:99999;
@@ -2851,25 +2878,24 @@ window.onload = loadWorkspace;
     document.body.appendChild(btn);
   }
 
-  // ── Ping worker ──
   function pingStats() {
-    if (localStorage.getItem(MAINT_KEY) === 'true') return; // maintenance mode
-    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+    if (localStorage.getItem(MAINT_KEY) === 'true') return;
+    const today = new Date().toLocaleDateString('en-CA');
+    const subcats = getCheckedKCOs(); // e.g. ['dm', 'cardiac']
+
     fetch(PING_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: today, source: SOURCE })
-    }).catch(() => {}); // silent fail — never block printing
+      body: JSON.stringify({ date: today, source: SOURCE, subcats })
+    }).catch(() => {});
   }
 
-  // ── Hook into the existing prepareAndPrint function ──
   const _origPrepare = window.prepareAndPrint;
   window.prepareAndPrint = async function() {
     if (typeof _origPrepare === 'function') await _origPrepare.apply(this, arguments);
     pingStats();
   };
 
-  // Build the button once the DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', buildMaintBtn);
   } else {
