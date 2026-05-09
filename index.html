@@ -2881,14 +2881,13 @@ window.onload = loadWorkspace;
   function pingStats() {
     if (localStorage.getItem(MAINT_KEY) === 'true') return;
     const today = new Date().toLocaleDateString('en-CA');
-    const subcats = getCheckedKCOs(); // e.g. ['dm', 'cardiac']
-
+    const subcats = getCheckedKCOs();
     fetch(PING_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Secret-Key': 'DrMJP_Secure_2026' },
       body: JSON.stringify({ date: today, source: SOURCE, subcats })
     }).catch(() => {});
-  }
+}
 
   const _origPrepare = window.prepareAndPrint;
   window.prepareAndPrint = async function() {
