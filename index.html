@@ -1668,33 +1668,300 @@ async function prepareAndPrint() {
         </style>
     `;
 
-    // Removed blue background from patient box, made border pure black
-    pDiv.innerHTML = printStyles + `
-        <div style="margin-bottom:10px;padding:8px 12px;border:1px solid #000;border-radius:6px;background:#fff;">
-            <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                <div style="font-size:13px;font-weight:900;color:#000;letter-spacing:-0.01em;">${patientLine}</div>
-                <div style="font-size:10px;font-weight:900;color:#000;">${date}</div>
-            </div>
-            ${vitalsRow}
-        </div>
-        
-        <div style="width:100%; box-sizing:border-box;">
-            ${clinicalNotesBlock}
-            
-            <div style="font-size:16px;font-weight:900;font-family:Georgia,serif;color:#000;line-height:1;margin-top:4px;margin-bottom:2px;">℞</div>
-            ${drugsHtml||(!tapers.length?'<div style="color:#000;font-size:11px;font-style:italic;margin-bottom:10px;">No medications prescribed.</div>':'')}
-            
-            ${tapersHtml}
-            ${fuBlock}
-        </div>
-        
-        <div style="text-align:right;margin-top:8px;padding-top:8px;border-top:1px solid #000;page-break-inside:avoid;">
-            <div style="font-size:13px;font-weight:900;color:#000;letter-spacing:-0.01em;">Dr. Mit Panchani</div>
-            <div style="font-size:9.5px;font-weight:900;color:#000;margin-top:2px;">MBBS, MD (Medicine)</div>
-            <div style="font-size:8px;font-weight:900;color:#000;margin-top:1px;">FELLOW IN 2D ECHO, PGCIH</div>
-        </div> 
-        <div class="print-software-credit" style="page-break-inside:avoid; font-size: 8px; color: #555; text-align: center; margin-top: 6px;">Prescription Software developed by Dr. Mit Panchani</div>`;
+   pDiv.innerHTML = `
+    <style>
+      @media print {
+        @page { size: A4; margin: 0; }
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      }
+      .slip-wrap {
+        font-family: Arial, sans-serif;
+        font-size: 10.5pt;
+        color: #000;
+        padding: 5mm 3mm 10mm 3mm;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .letterhead-spacer { height: 30mm; display: block; }
+      .slip-header {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 4px;
+      }
+      .slip-header td {
+        vertical-align: top;
+        padding: 1px 0;
+        font-size: 10.5pt;
+        color: #000;
+        line-height: 1.5;
+      }
+      .slip-header .lbl  { font-weight: bold; width: 110px; }
+      .slip-header .sep  { width: 10px; }
+      .slip-header .gap  { width: 30px; }
+      .slip-header .rlbl { font-weight: bold; width: 110px; }
+      .slip-divider {
+        border: none;
+        border-top: 1px solid #000;
+        margin: 6px 0 4px;
+      }
+      .slip-dotted {
+        border: none;
+        border-top: 1px dotted #000;
+        margin: 3px 0;
+      }
+      .rx-label {
+        font-size: 16pt;
+        font-weight: bold;
+        margin: 6px 0 2px;
+        font-family: Georgia, serif;
+        color: #000;
+      }
+      .advice-block {
+        font-size: 9pt;
+        color: #000;
+        margin-bottom: 4px;
+        padding-bottom: 4px;
+        border-bottom: 1px dotted #000;
+      }
+      .slip-rx-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9.5pt;
+        margin-top: 2px;
+        color: #000;
+      }
+      .slip-rx-table thead tr {
+        border-top: 1px dotted #000;
+        border-bottom: 1px dotted #000;
+      }
+      .slip-rx-table thead th {
+        padding: 3px 4px;
+        font-weight: bold;
+        text-align: left;
+        font-size: 9pt;
+        white-space: nowrap;
+        color: #000;
+      }
+      .slip-rx-table tbody tr {
+        border-bottom: 1px dotted #000;
+      }
+      .slip-rx-table tbody td {
+        padding: 3px 4px;
+        vertical-align: top;
+        font-size: 9.5pt;
+        color: #000;
+      }
+      .slip-rx-table .drug-name { font-weight: bold; font-size: 8pt; color: #000; }
+      .slip-rx-table .dose-cell { text-align: center; white-space: nowrap; }
+      .slip-rx-table .day-cell  { font-weight: bold; text-align: center; }
+      .slip-rx-table .cross     { color: #000; font-size: 9pt; }
+      
+      .slip-rx-table .remark-row td {
+        font-size: 7.5pt;
+        color: #000;
+        padding: 0 4px 3px 28px;
+        font-style: italic;
+        border-bottom: 1px dotted #000;
+      }
+      
+      .slip-notes {
+        font-size: 9pt;
+        margin-top: 4px;
+        color: #000;
+        line-height: 1.4;
+      }
+      .slip-notes .note-row {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 2px;
+      }
+      .slip-notes .note-lbl { font-weight: bold; min-width: 65px; flex-shrink: 0; color: #000; }
+      .taper-block {
+        margin-top: 6px;
+        border: 0.5px solid #000;
+        border-radius: 3px;
+        page-break-inside: avoid;
+        font-size: 9pt;
+        color: #000;
+      }
+      .taper-block .taper-head {
+        font-weight: bold;
+        padding: 2px 6px;
+        border-bottom: 0.5px solid #000;
+        color: #000;
+      }
+      .taper-block table { width: 100%; border-collapse: collapse; }
+      .taper-block table td { padding: 2px 6px; border-bottom: 0.5px dotted #000; color: #000; }
+      .slip-fu {
+        margin-top: 6px;
+        font-size: 9.5pt;
+        border-top: 1px dotted #000;
+        padding-top: 4px;
+        color: #000;
+      }
+      .slip-footer {
+        margin-top: 12px;
+        text-align: right;
+        border-top: 1px solid #000;
+        padding-top: 4px;
+        page-break-inside: avoid;
+        color: #000;
+      }
+      .slip-footer .doc-name { font-size: 11pt; font-weight: bold; color: #000; }
+      .slip-footer .doc-qual { font-size: 8.5pt; color: #000; line-height: 1.4; }
+      .slip-credit {
+        text-align: center;
+        font-size: 7.5pt;
+        color: #000;
+        margin-top: 8px;
+      }
+    </style>
 
+    <div class="slip-wrap">
+
+      <div class="letterhead-spacer"></div>
+
+      <table class="slip-header">
+        <tr>
+          <td class="lbl">Patient Name</td>
+          <td class="sep">:</td>
+          <td class="val"><strong>${ptName}</strong></td>
+          <td class="gap"></td>
+          <td class="rlbl">OPD Date</td>
+          <td class="sep">:</td>
+          <td class="rval">${date}</td>
+        </tr>
+        <tr>
+          <td class="lbl">Age / Sex</td>
+          <td class="sep">:</td>
+          <td class="val">${ptAge ? ptAge + ' Yrs' : '\u2014'} / ${ptSex === 'M' ? 'Male' : 'Female'}</td>
+          <td class="gap"></td>
+          <td class="rlbl">BP</td>
+          <td class="sep">:</td>
+          <td class="rval">${bp || '\u2014'} mmHg</td>
+        </tr>
+        <tr>
+          <td class="lbl">Consultant</td>
+          <td class="sep">:</td>
+          <td class="val">Dr. Mit Panchani</td>
+          <td class="gap"></td>
+          <td class="rlbl">HR</td>
+          <td class="sep">:</td>
+          <td class="rval">${pulse || '\u2014'} bpm</td>
+        </tr>
+        ${temp || spo2 ? `
+        <tr>
+          <td class="lbl"></td><td class="sep"></td><td></td>
+          <td class="gap"></td>
+          <td class="rlbl">${temp ? 'Temp' : 'SpO\u2082'}</td>
+          <td class="sep">:</td>
+          <td class="rval">${temp || spo2}</td>
+        </tr>` : ''}
+      </table>
+
+      <hr class="slip-divider">
+
+      ${complaints || kcoList || rs || cvs || pa || cns ? `<div class="slip-notes">
+        ${complaints ? `<div class="note-row"><span class="note-lbl">C/O :</span><span>${complaints.replace(/\n/g,' | ')}</span></div>` : ''}
+        ${kcoList ? `<div class="note-row"><span class="note-lbl">KCO :</span><span>${kcoList}</span></div>` : ''}
+        
+        ${[rs ? `R/S: ${rs}` : '', cvs ? `CVS: ${cvs}` : '', pa ? `P/A: ${pa}` : '', cns ? `CNS: ${cns}` : ''].filter(Boolean).length ? `
+          <div class="note-row"><span class="note-lbl">Findings :</span><span>${[rs ? `R/S: ${rs}` : '', cvs ? `CVS: ${cvs}` : '', pa ? `P/A: ${pa}` : '', cns ? `CNS: ${cns}` : ''].filter(Boolean).join(', ')}</span></div>
+        ` : ''}
+      </div>
+      <hr class="slip-dotted">` : ''}
+
+      <div class="rx-label">&#8478;</div>
+
+      ${generalAdvice ? `<div class="advice-block"><strong>Advice:</strong> ${generalAdvice.replace(/<br>/gi, ', ').replace(/\n/g, ', ')}</div>` : ''}
+
+      ${rxItems.length ? `
+      <table class="slip-rx-table">
+        <thead>
+          <tr>
+            <th style="width:24px;">No.</th>
+            <th style="width:28%;">Medicine Name</th>
+            <th style="width:26%;">Generic Name</th>
+            <th style="width:65px;text-align:center;">Morning</th>
+            <th style="width:48px;text-align:center;">Noon</th>
+            <th style="width:48px;text-align:center;">Night</th>
+            <th style="width:65px;text-align:center;">Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rxItems.map((item, i) => {
+            const f = item.freqArr || ["0","0","0"];
+
+            const fmt = v => (!v || v === '0' || v === '-')
+              ? '<span class="cross">\u2715</span>'
+              : `<span style="font-weight:bold;">${v}</span>`;
+
+            const daysDisplay = item.days || '\u2014';
+
+            const brandCell   = `<div class="drug-name">${item.brand}</div>`;
+            
+            const genericCell = `<div style="font-size:6pt;font-style:italic;color:#000;">${item.molecule}</div>`;
+
+            const subNote = [item.advice, (!item.isSos ? item.customNote : '')].filter(Boolean).join(' \u2014 ');
+
+            if (item.isSos) {
+              return `
+              <tr>
+                <td>${i+1}</td>
+                <td>${brandCell}</td>
+                <td>${genericCell}</td>
+                <td colspan="3" style="text-align:center;font-weight:bold;">SOS \u2014 ${item.customNote || 'if needed'}</td>
+                <td class="day-cell">${daysDisplay}</td>
+              </tr>
+              ${subNote ? `<tr class="remark-row"><td colspan="7">Note : ${subNote}</td></tr>` : ''}`;
+            }
+
+            if (item.isWeekly) {
+              return `
+              <tr>
+                <td>${i+1}</td>
+                <td>${brandCell}</td>
+                <td>${genericCell}</td>
+                <td colspan="3" style="text-align:center;font-weight:bold;">Weekly${item.weeklyDay ? ' (' + item.weeklyDay + ')' : ''}</td>
+                <td class="day-cell">${daysDisplay}</td>
+              </tr>
+              ${subNote ? `<tr class="remark-row"><td colspan="7">Note : ${subNote}</td></tr>` : ''}`;
+            }
+
+            return `
+            <tr>
+              <td>${i+1}</td>
+              <td>${brandCell}</td>
+              <td>${genericCell}</td>
+              <td class="dose-cell">${fmt(f[0])}</td>
+              <td class="dose-cell">${fmt(f[1])}</td>
+              <td class="dose-cell">${fmt(f[2])}</td>
+              <td class="day-cell">${daysDisplay}</td>
+            </tr>
+            ${subNote ? `<tr class="remark-row"><td colspan="7">Note : ${subNote}</td></tr>` : ''}`;
+          }).join('')}
+        </tbody>
+      </table>` : '<p style="font-size:9.5pt;font-style:italic;color:#000;">No medications prescribed.</p>'}
+
+      ${tapers.length ? tapers.map(t => `
+        <div class="taper-block">
+          <div class="taper-head">${t.drug} \u2014 Tapering Schedule</div>
+          <table>
+            ${t.steps.map((s, idx) => `<tr><td style="width:50px">Step ${idx+1}</td><td style="font-weight:bold">${s.dose}</td><td>(${s.freq})</td><td style="font-weight:bold">\u00d7 ${s.days} Days</td></tr>`).join('')}
+            <tr><td colspan="4" style="text-align:center;font-weight:bold;font-size:8pt;letter-spacing:1px;color:#000;">\u2014 STOP \u2014</td></tr>
+          </table>
+        </div>`).join('') : ''}
+
+      ${fuString ? `<div class="slip-fu">${fuString}</div>` : ''}
+
+      <div class="slip-footer">
+        <div class="doc-name">Dr. Mit Panchani</div>
+        <div class="doc-qual">MBBS, MD (Medicine)<br>Fellow in 2D Echo \u00b7 PGCIH</div>
+      </div>
+
+      <div class="slip-credit">Prescription software developed by Dr. Mit Panchani</div>
+
+    </div>`;
 
     // --- NEW: Trigger the Rx Counter Increment Before Printing ---
     fetch("https://visits.drmjp93.workers.dev/?tool=opd_rx")
