@@ -1742,12 +1742,10 @@ async function prepareAndPrint() {
         white-space: nowrap;
         color: #000;
       }
-      .slip-rx-table tbody tr {
-        border-bottom: 1px dotted #000;
-      }
+      /* Removed global row borders to manually control them in JS */
       .slip-rx-table tbody td {
         padding: 3px 4px;
-        vertical-align: top;
+        vertical-align: middle;
         font-size: 9.5pt;
         color: #000;
       }
@@ -1757,11 +1755,10 @@ async function prepareAndPrint() {
       .slip-rx-table .cross     { color: #000; font-size: 9pt; }
       
       .slip-rx-table .remark-row td {
-        font-size: 7.5pt;
         color: #000;
-        padding: 0 4px 3px 28px;
         font-style: italic;
-        border-bottom: 1px dotted #000;
+        padding-top: 0px !important;
+        padding-bottom: 4px !important;
       }
       
       .slip-notes {
@@ -1796,19 +1793,39 @@ async function prepareAndPrint() {
         margin-top: 6px;
         font-size: 9.5pt;
         border-top: 1px dotted #000;
+        border-bottom: 1px dotted #000; /* Added bottom line */
         padding-top: 4px;
+        padding-bottom: 4px; /* Added spacing for the bottom line */
         color: #000;
       }
+      
+      /* Redesigned Signature Block */
       .slip-footer {
-        margin-top: 12px;
+        margin-top: 16px;
         text-align: right;
         border-top: 1px solid #000;
-        padding-top: 4px;
+        padding-top: 8px;
         page-break-inside: avoid;
         color: #000;
       }
-      .slip-footer .doc-name { font-size: 11pt; font-weight: bold; color: #000; }
-      .slip-footer .doc-qual { font-size: 8.5pt; color: #000; line-height: 1.4; }
+      .slip-footer .doc-name { 
+        font-size: 15pt; 
+        font-weight: 900; 
+        font-family: Georgia, serif; 
+        color: #000; 
+        margin-bottom: 3px; 
+      }
+      .slip-footer .doc-qual { 
+        font-size: 9.5pt; 
+        font-weight: bold; 
+        color: #000; 
+        margin-bottom: 1px; 
+      }
+      .slip-footer .doc-subqual { 
+        font-size: 8.5pt; 
+        color: #000; 
+      }
+      
       .slip-credit {
         text-align: center;
         font-size: 7.5pt;
@@ -1834,7 +1851,7 @@ async function prepareAndPrint() {
         <tr>
           <td class="lbl">Age / Sex</td>
           <td class="sep">:</td>
-          <td class="val">${ptAge ? ptAge + ' Yrs' : '\u2014'} / ${ptSex === 'M' ? 'Male' : 'Female'}</td>
+          <td class="val">${ptAge ? ptAge + ' Yrs' : '\u2014'} / ${ptSex}</td>
           <td class="gap"></td>
           <td class="rlbl">BP</td>
           <td class="sep">:</td>
@@ -1843,7 +1860,7 @@ async function prepareAndPrint() {
         <tr>
           <td class="lbl">Consultant</td>
           <td class="sep">:</td>
-          <td class="val">Dr. Mit Panchani</td>
+          <td class="val">Dr. Mit Panchani, MD</td>
           <td class="gap"></td>
           <td class="rlbl">HR</td>
           <td class="sep">:</td>
@@ -1899,46 +1916,44 @@ async function prepareAndPrint() {
             const daysDisplay = item.days || '\u2014';
 
             const brandCell   = `<div class="drug-name">${item.brand}</div>`;
-            
             const genericCell = `<div style="font-size:6pt;font-style:italic;color:#000;">${item.molecule}</div>`;
-
             const subNote = [item.advice, (!item.isSos ? item.customNote : '')].filter(Boolean).join(' \u2014 ');
 
             if (item.isSos) {
               return `
-              <tr>
-                <td>${i+1}</td>
-                <td>${brandCell}</td>
-                <td>${genericCell}</td>
-                <td colspan="3" style="text-align:center;font-weight:bold;">SOS \u2014 ${item.customNote || 'if needed'}</td>
-                <td class="day-cell">${daysDisplay}</td>
+              <tr style="${subNote ? '' : 'border-bottom: 1px dotted #000;'}">
+                <td style="${subNote ? 'padding-bottom: 0;' : ''}">${i+1}</td>
+                <td style="${subNote ? 'padding-bottom: 0;' : ''}">${brandCell}</td>
+                <td style="${subNote ? 'padding-bottom: 0;' : ''}">${genericCell}</td>
+                <td colspan="3" style="text-align:center;font-weight:bold; ${subNote ? 'padding-bottom: 0;' : ''}">SOS \u2014 ${item.customNote || 'if needed'}</td>
+                <td class="day-cell" style="${subNote ? 'padding-bottom: 0;' : ''}">${daysDisplay}</td>
               </tr>
-              ${subNote ? `<tr class="remark-row"><td colspan="7">Note : ${subNote}</td></tr>` : ''}`;
+              ${subNote ? `<tr class="remark-row" style="border-bottom: 1px dotted #000;"><td colspan="3"></td><td colspan="3" style="text-align:center; font-size:6.5pt; font-weight:bold;">↳ ${subNote}</td><td></td></tr>` : ''}`;
             }
 
             if (item.isWeekly) {
               return `
-              <tr>
-                <td>${i+1}</td>
-                <td>${brandCell}</td>
-                <td>${genericCell}</td>
-                <td colspan="3" style="text-align:center;font-weight:bold;">Weekly${item.weeklyDay ? ' (' + item.weeklyDay + ')' : ''}</td>
-                <td class="day-cell">${daysDisplay}</td>
+              <tr style="${subNote ? '' : 'border-bottom: 1px dotted #000;'}">
+                <td style="${subNote ? 'padding-bottom: 0;' : ''}">${i+1}</td>
+                <td style="${subNote ? 'padding-bottom: 0;' : ''}">${brandCell}</td>
+                <td style="${subNote ? 'padding-bottom: 0;' : ''}">${genericCell}</td>
+                <td colspan="3" style="text-align:center;font-weight:bold; ${subNote ? 'padding-bottom: 0;' : ''}">Weekly${item.weeklyDay ? ' (' + item.weeklyDay + ')' : ''}</td>
+                <td class="day-cell" style="${subNote ? 'padding-bottom: 0;' : ''}">${daysDisplay}</td>
               </tr>
-              ${subNote ? `<tr class="remark-row"><td colspan="7">Note : ${subNote}</td></tr>` : ''}`;
+              ${subNote ? `<tr class="remark-row" style="border-bottom: 1px dotted #000;"><td colspan="3"></td><td colspan="3" style="text-align:center; font-size:6.5pt; font-weight:bold;">↳ ${subNote}</td><td></td></tr>` : ''}`;
             }
 
             return `
-            <tr>
-              <td>${i+1}</td>
-              <td>${brandCell}</td>
-              <td>${genericCell}</td>
-              <td class="dose-cell">${fmt(f[0])}</td>
-              <td class="dose-cell">${fmt(f[1])}</td>
-              <td class="dose-cell">${fmt(f[2])}</td>
-              <td class="day-cell">${daysDisplay}</td>
+            <tr style="${subNote ? '' : 'border-bottom: 1px dotted #000;'}">
+              <td style="${subNote ? 'padding-bottom: 0;' : ''}">${i+1}</td>
+              <td style="${subNote ? 'padding-bottom: 0;' : ''}">${brandCell}</td>
+              <td style="${subNote ? 'padding-bottom: 0;' : ''}">${genericCell}</td>
+              <td class="dose-cell" style="${subNote ? 'padding-bottom: 0;' : ''}">${fmt(f[0])}</td>
+              <td class="dose-cell" style="${subNote ? 'padding-bottom: 0;' : ''}">${fmt(f[1])}</td>
+              <td class="dose-cell" style="${subNote ? 'padding-bottom: 0;' : ''}">${fmt(f[2])}</td>
+              <td class="day-cell" style="${subNote ? 'padding-bottom: 0;' : ''}">${daysDisplay}</td>
             </tr>
-            ${subNote ? `<tr class="remark-row"><td colspan="7">Note : ${subNote}</td></tr>` : ''}`;
+            ${subNote ? `<tr class="remark-row" style="border-bottom: 1px dotted #000;"><td colspan="3"></td><td colspan="3" style="text-align:center; font-size:6.5pt; font-weight:bold;">↳ ${subNote}</td><td></td></tr>` : ''}`;
           }).join('')}
         </tbody>
       </table>` : '<p style="font-size:9.5pt;font-style:italic;color:#000;">No medications prescribed.</p>'}
@@ -1954,12 +1969,29 @@ async function prepareAndPrint() {
 
       ${fuString ? `<div class="slip-fu">${fuString}</div>` : ''}
 
-      <div class="slip-footer">
-        <div class="doc-name">Dr. Mit Panchani</div>
-        <div class="doc-qual">MBBS, MD (Medicine)<br>Fellow in 2D Echo \u00b7 PGCIH</div>
+      <div style="margin-top: 12px;">
+        <div style="font-size: 8.5pt; font-weight: 900; color: #000; text-transform: uppercase; letter-spacing: 1px;">Notes:</div>
+        <div style="height: 35px;"></div> 
       </div>
 
-      <div class="slip-credit">Prescription software developed by Dr. Mit Panchani</div>
+      </div>
+
+    <div class="slip-footer" style="margin-top: 1px; border-top: none; text-align: right; font-family: 'Inter', Arial, sans-serif;">
+        
+        <div style="height: 0px;"></div>
+        
+        <div style="font-size: 14pt; font-weight: 900; color: #000; letter-spacing: 0.5px; margin-bottom: 4px;">Dr. Mit Panchani</div>
+        <div style="font-size: 8.5pt; font-weight: 700; color: #000; margin-bottom: 2px;">MBBS, MD (GENERAL MEDICINE) | PGCIH</div>
+        <div style="font-size: 8pt; font-weight: 700; color: #000; margin-bottom: 2px;">FELLOW IN 2D ECHOCARDIOGRAPHY | REG NO: G33361</div>
+    
+
+      </div>
+
+      <div class="slip-credit" style="margin-top: 15px; padding-top: 8px;">
+        Prescription software developed by Dr. Mit Panchani
+      </div>
+
+      
 
     </div>`;
 
