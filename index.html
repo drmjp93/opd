@@ -1529,11 +1529,12 @@ async function prepareAndPrint() {
         processSmartAdvice();
     }
     // ----------------------------------------------------------------------
-    
+
     const nameCheck = document.getElementById('ptName');
     if (nameCheck && nameCheck.value.trim() !== '') {
         await saveToArchive();
     }
+
     const pDiv = document.getElementById('print-layout');
     const ptName = document.getElementById('ptName').value || '—';
     const ptAge  = document.getElementById('ptAge').value;
