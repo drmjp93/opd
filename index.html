@@ -1518,6 +1518,18 @@ function clearWorkspace(skipConfirm = false) {
 // ══════════════════════════════════════════
 async function prepareAndPrint() {
     
+    // --- NEW SAFETY CATCH: Auto-submit any pending text before printing ---
+    if (document.getElementById('quickEntryInput') && document.getElementById('quickEntryInput').value.trim() !== '') {
+        executeQuickFill();
+    }
+    if (document.getElementById('complaintsSmartInput') && document.getElementById('complaintsSmartInput').value.trim() !== '') {
+        processSmartComplaints();
+    }
+    if (document.getElementById('adviceSmartInput') && document.getElementById('adviceSmartInput').value.trim() !== '') {
+        processSmartAdvice();
+    }
+    // ----------------------------------------------------------------------
+    
     const nameCheck = document.getElementById('ptName');
     if (nameCheck && nameCheck.value.trim() !== '') {
         await saveToArchive();
