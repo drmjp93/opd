@@ -1486,10 +1486,10 @@ function loadWorkspace() {
 }
 
 function initDefaults() {
-    document.getElementById("date").value = new Date().toISOString().slice(0,10);
-    document.getElementById("ptRS").value  = "BSBE/Clear";
-    document.getElementById("ptCVS").value = "S1,S2+; No murmur";
-    document.getElementById("ptSpo2").value= "98% with RA";
+     document.getElementById("date").value = new Date().toISOString().slice(0,10);
+    // document.getElementById("ptRS").value  = "BSBE/Clear";
+    // document.getElementById("ptCVS").value = "S1,S2+; No murmur";
+    // document.getElementById("ptSpo2").value= "98% with RA";
     ["ptTemp","ptPA","ptCNS"].forEach(id => document.getElementById(id).value = "");
 }
 
