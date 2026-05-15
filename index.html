@@ -732,28 +732,42 @@ function renderResults(list) {
         return;
     }
     rd.classList.remove("hidden");
+
+    // Grab the search term to determine if we searched for a brand or molecule
+    const queryLower = srchInput.value.toLowerCase().trim();
+
     list.forEach(d => {
         const item = document.createElement("div");
         item.className = "search-item p-3 hover:bg-brand-50 cursor-pointer flex justify-between items-center transition-colors";
-        item.innerHTML = `<div><div class="font-bold text-sm text-slate-900">${d["FIRST BRAND"]}</div><div class="text-[10px] text-slate-500 font-bold mt-0.5"><i>(${d.Active_Content})</i></div></div><div class="text-[9px] bg-slate-100 text-slate-600 px-2 py-1 rounded font-bold uppercase tracking-wider text-right">Max:<br>${d.Max_Dose_Adult || 'N/A'}</div>`;
+
+        // --- DYNAMIC TITLE FLIP LOGIC ---
+        const b1 = d["FIRST BRAND"];
+        const b2 = d["SECOND BRAND"];
+        let prominentBrand = null;
+        
+        if (b1 && b1.toLowerCase().includes(queryLower)) prominentBrand = b1;
+        else if (b2 && b2.toLowerCase().includes(queryLower)) prominentBrand = b2;
+
+        const mainTitle = prominentBrand ? prominentBrand : d.Active_Content;
+        const subTitle = prominentBrand ? `(${d.Active_Content})` : (b1 || 'Generic');
+
+        item.innerHTML = `<div><div class="font-bold text-sm text-slate-900">${mainTitle}</div><div class="text-[10px] text-slate-500 font-bold mt-0.5"><i>${subTitle}</i></div></div><div class="text-[9px] bg-slate-100 text-slate-600 px-2 py-1 rounded font-bold uppercase tracking-wider text-right">Max:<br>${d.Max_Dose_Adult || 'N/A'}</div>`;
+        
         item.onclick = () => {
-            addDrug(d);
+            // Pass the specific brand they searched for into addDrug
+            addDrug(d, prominentBrand); 
             srchInput.value = "";
             rd.classList.add("hidden");
             srchInput.focus();
 
-
-            
             setTimeout(() => {
-    const lastItem = rxItems[rxItems.length - 1];
-    const sigEl = document.getElementById(`sig-${lastItem.id}`);
-    if (sigEl) {
-        sigEl.focus();
-        sigEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-}, 50);
-
-            
+                const lastItem = rxItems[rxItems.length - 1];
+                const sigEl = document.getElementById(`sig-${lastItem.id}`);
+                if (sigEl) {
+                    sigEl.focus();
+                    sigEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 50);
         };
         rd.appendChild(item);
     });
@@ -840,7 +854,8 @@ function setGlobalDays(val) {
     autoSyncFollowUpDays();
 }
 
-function addDrug(d) {
+// Note the new selectedBrand parameter!
+function addDrug(d, selectedBrand = null) {
     const days = normalizeDays(parseInt(document.getElementById("globalDays").value) || 5);
     
     // 1. SMART CLASSIFICATION: Read the name and molecule
@@ -867,9 +882,12 @@ function addDrug(d) {
         initialAdvice = "Subcutaneous";
     }
 
+    // Determine which brand to actually prescribe
+    const prescribedBrand = selectedBrand ? selectedBrand : (d["FIRST BRAND"] || "Generic");
+
     rxItems.push({
         id: Date.now() + Math.floor(Math.random() * 1000),
-        brand: d["FIRST BRAND"],
+        brand: prescribedBrand, // <--- Saves the exact brand you clicked!
         molecule: d.Active_Content,
         maxRaw: d.Max_Dose_Adult || 'Not specified',
         strength: extractDose(d.Active_Content),
@@ -882,8 +900,8 @@ function addDrug(d) {
         isSos: false,
         isWeekly: false,
         weeklyDay: '',
-        isDevice: isDevice,   // <--- Saving flag to memory
-        isInsulin: isInsulin  // <--- Saving flag to memory
+        isDevice: isDevice,   
+        isInsulin: isInsulin  
     });
     renderRx();
     autoSyncFollowUpDays();
