@@ -3264,6 +3264,14 @@ window.onload = loadWorkspace;
 })();
 
 
+document.addEventListener('keydown', function(e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'p') {
+        e.preventDefault();
+        prepareAndPrint();
+    }
+});
+
+
 </script>
 
 <div id="historyModal" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
