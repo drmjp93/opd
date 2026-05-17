@@ -43,6 +43,9 @@
         .inline-search-input:focus { border-color: #4f46e5; border-style: solid; outline: none; box-shadow: 0 4px 20px -2px rgba(79,70,229,0.15); }
         .inline-search-icon { position: absolute; left: 14px; top: 14px; color: #94a3b8; }
 
+        #complaintsSmartInput {
+                                    transition: height 0.25s ease-in-out;
+                                }
     /* ── DRUG CARD ── */
     .rx-card {
         background: #fff;
@@ -280,15 +283,14 @@
         <div id="quickEntryChips" class="px-4 py-1.5 bg-slate-50/50 flex-wrap gap-1.5 empty:hidden flex flex-1 items-center"></div>
     </div>
 
-    <div class="w-[40%] flex flex-col gap-2 h-full">
+    <div class="w-[40%] flex flex-col gap-2 h-full" style="position:relative; z-index:1;">
         
-        <div class="glass-card border-l-4 border-l-amber-500 shadow-sm flex items-stretch overflow-hidden transition-all shrink-0" style="min-height:42px;">
+        <div class="glass-card border-l-4 border-l-amber-500 shadow-sm flex items-stretch transition-all shrink-0" style="min-height:42px; overflow:visible;">
 
             <div class="flex items-center pl-3 pr-2">
                 <span class="text-amber-500 font-bold text-sm">📝</span>
             </div>
-                <textarea id="complaintsSmartInput" rows="1" placeholder="TYPE COMPLAINTS HERE..." autocomplete="off" class="premium-input !border-none !bg-transparent !py-2 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none resize-none overflow-hidden" style="text-transform:uppercase; line-height:1.5;" oninput="this.value=this.value.toUpperCase(); this.style.height='auto'; this.style.height=this.scrollHeight+'px';"></textarea>
-            <button id="complaintsSmartBtn" class="bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 px-4 text-xs font-bold transition-all shrink-0 border-l border-amber-100 uppercase">Add C/O</button>
+            <textarea id="complaintsSmartInput" rows="1" placeholder="TYPE COMPLAINTS HERE..." autocomplete="off" class="premium-input !border-none !bg-transparent !py-2 !px-1 !text-sm !font-semibold flex-1 focus:!ring-0 shadow-none !rounded-none resize-none" style="text-transform:uppercase; line-height:1.5; height:36px; transition:height 0.25s ease-in-out; overflow:hidden;" oninput="this.value=this.value.toUpperCase(); this.style.height='36px'; requestAnimationFrame(() => { this.style.height = this.scrollHeight + 'px'; });"></textarea>            <button id="complaintsSmartBtn" class="bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 px-4 text-xs font-bold transition-all shrink-0 border-l border-amber-100 uppercase">Add C/O</button>
         </div>
 
         <div class="glass-card border-l-4 border-l-teal-500 shadow-sm flex items-stretch overflow-hidden transition-all h-[42px] shrink-0">
@@ -401,13 +403,13 @@
 
         <div class="flex items-center gap-4 mb-4 relative z-50">
     
-    <div class="relative group">
+    <div class="relative" id="kco-dropdown">
         <div class="cursor-pointer bg-white text-slate-600 px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-widest border border-slate-200 hover:border-brand-300 hover:text-brand-600 transition-colors shadow-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             Known Case
         </div>
         
-        <div class="absolute top-full left-0 pt-2 hidden group-hover:block w-[500px]">
+        <div id="kco-panel" class="absolute top-full left-0 pt-2 w-[500px]" style="display:none; z-index:50;">
             <div class="bg-white p-4 rounded-xl shadow-2xl border border-slate-200 cursor-auto">
                 <div id="kcoSection" class="flex flex-wrap gap-2">
                     <label class="check-pill"><input type="checkbox"><span>DM</span></label>
@@ -430,13 +432,13 @@
         </div>
     </div>
 
-    <div class="relative group">
-        <div class="cursor-pointer bg-white text-slate-600 px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-widest border border-slate-200 hover:border-brand-300 hover:text-brand-600 transition-colors shadow-sm flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Advice & Instructions
-        </div>
+    <div class="relative" id="advice-dropdown">
+    <div class="cursor-pointer bg-white text-slate-600 px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-widest border border-slate-200 hover:border-brand-300 hover:text-brand-600 transition-colors shadow-sm flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Advice & Instructions
+    </div>
         
-        <div class="absolute top-full left-0 pt-2 hidden group-hover:block w-[600px]">
+        <div id="advice-panel" class="absolute top-full left-0 pt-2 w-[600px]" style="display:none; z-index:50;">
             <div id="advice-card" class="bg-white p-4 rounded-xl shadow-2xl border border-slate-200 cursor-auto flex flex-col gap-3">
                 
                 <div class="space-y-3 mb-2">
@@ -1519,6 +1521,10 @@ function clearWorkspace(skipConfirm = false) {
     
     rxItems = []; tapers = []; currentTaperSteps = [];
     document.querySelectorAll('input[type="text"],input[type="number"],textarea').forEach(i=>i.value='');
+
+    const coSmartBox = document.getElementById('complaintsSmartInput');
+    if (coSmartBox) coSmartBox.style.height = '36px';
+    
     document.querySelectorAll('input[type="checkbox"]').forEach(i=>i.checked=false);
     document.getElementById('fuSmartChips').innerHTML = '';
     document.getElementById('fuHiddenBoxes').innerHTML = '';
@@ -2211,25 +2217,24 @@ const coBtn = document.getElementById('complaintsSmartBtn');
 
 function processSmartComplaints() {
     if (!coInput) return;
-    const val = coInput.value.trim().toUpperCase();
+    const val = coInput.value.trim();
     if (!val) return;
 
     const mainCoBox = document.getElementById('complaints');
     if (mainCoBox) {
-        // If there's already text, append to a new line. Otherwise, just insert it.
         mainCoBox.value = mainCoBox.value ? mainCoBox.value + '\n' + val : val;
-        
-        // Save the workspace so you don't lose it
         if (typeof saveWorkspace === 'function') saveWorkspace();
         updatePtSummary();
     }
 
-    // Flash visual success feedback
     const originalPh = coInput.placeholder;
     coInput.value = '';
+    // Reset height back to collapsed
+    coInput.style.height = '36px';
     coInput.placeholder = '✅ Added to Clinical Note!';
     setTimeout(() => { coInput.placeholder = originalPh; }, 1500);
 }
+
 
 if (coInput && coBtn) {
     coInput.addEventListener('keydown', (e) => {
@@ -2455,6 +2460,8 @@ function getSortableTime(dateStr) {
 }
 
 async function searchArchive() {
+    document.getElementById('kco-panel').style.display = 'none';
+    document.getElementById('advice-panel').style.display = 'none';
     currentArchiveFocus = -1; 
     const searchInput = document.getElementById('archiveSearch');
     const queryRaw = searchInput.value.toUpperCase().trim();
@@ -3273,6 +3280,22 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+// Manual hover control for KCO and Advice dropdowns
+['kco', 'advice'].forEach(name => {
+    const wrapper = document.getElementById(`${name}-dropdown`);
+    const panel = document.getElementById(`${name}-panel`);
+    if (!wrapper || !panel) return;
+
+    wrapper.addEventListener('mouseenter', () => {
+        // Only show if search is NOT active
+        if (document.getElementById('searchResults').style.display !== 'block') {
+            panel.style.display = 'block';
+        }
+    });
+    wrapper.addEventListener('mouseleave', () => {
+        panel.style.display = 'none';
+    });
+});
 
 </script>
 
