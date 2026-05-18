@@ -812,14 +812,55 @@ function renderTaperBuilder() {
 }
 
 function saveTaperProtocol() {
-    const drug = document.getElementById('tDrug').value.trim();
+    const drugInput = document.getElementById('tDrug');
+    const drug = drugInput.value.trim();
+    
     if (!drug) return alert("Enter Drug Name.");
     if (!currentTaperSteps.length) return alert("Add at least one step.");
+    
     tapers.push({ id: Date.now(), drug, steps: [...currentTaperSteps] });
-    document.getElementById('tDrug').value = '';
+    
+    // --- NEW FIX: Auto-remove the drug from the main list to prevent duplication ---
+    const sourceId = drugInput.dataset.sourceId;
+    if (sourceId) {
+        // If it came from a drug card button, delete by exact ID
+        rxItems = rxItems.filter(item => item.id != sourceId);
+        delete drugInput.dataset.sourceId; // Clear memory
+    } else {
+        // Fallback: if you typed it manually, delete by matching name
+        rxItems = rxItems.filter(item => item.brand !== drug);
+    }
+    
+    renderRx(); // Refresh the UI to instantly hide the old duplicate card
+    autoSyncFollowUpDays();
+    // -------------------------------------------------------------------------------
+    
+    drugInput.value = '';
     currentTaperSteps = [];
     renderTaperBuilder();
     renderActiveTapers();
+}
+
+// ══════════════════════════════════════════
+// SMART TAPER BRIDGE
+// ══════════════════════════════════════════
+function startSmartTaper(brandName, sourceId) {
+    const taperBody = document.getElementById('taperBody');
+    if (taperBody.classList.contains('hidden')) {
+        taperBody.classList.remove('hidden');
+    }
+    
+    const drugInput = document.getElementById('tDrug');
+    drugInput.value = brandName;
+    
+    // Secretly store the ID of the drug we are tapering
+    if (sourceId) drugInput.dataset.sourceId = sourceId; 
+    
+    currentTaperSteps = [];
+    renderTaperBuilder();
+    
+    taperBody.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => document.getElementById('tDose').focus(), 300);
 }
 
 function deleteTaperProtocol(id) { tapers = tapers.filter(t => t.id !== id); renderActiveTapers(); }
@@ -957,16 +998,28 @@ function renderRx() {
 
         const card = document.createElement('div');
         card.className = `rx-card`;
+        
+        // --- NEW: Escape quotes in brand name to prevent HTML injection breaks ---
+        const escapedBrand = item.brand.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
         card.innerHTML = `
             <div class="rx-sidebar" onclick="removeDrug(${item.id})" title="Remove">
                 <div class="rx-sidebar-icon"><span></span><span></span><span></span></div>
             </div>
             <div class="rx-main">
                 <div class="rx-header" style="display:flex;justify-content:space-between;">
-                    <div style="display:flex;gap:10px;">
+                    <div style="display:flex;gap:10px; align-items: flex-start;">
                         <div class="rx-num">${idx + 1}</div>
                         <div class="rx-names">
-                            <div class="rx-brand">${item.brand}</div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <div class="rx-brand">${item.brand}</div>
+                                
+                                <button type="button" tabindex="-1" onclick="startSmartTaper('${escapedBrand}', ${item.id})" class="px-1.5 py-0.5 bg-rose-50 text-rose-600 rounded text-[9px] font-bold border border-rose-200 hover:bg-rose-600 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-1 shadow-sm shrink-0" title="Build Taper for ${item.brand}">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                    Taper
+                                </button>
+                                
+                            </div>
                             <div class="rx-generic">${item.molecule}</div>
                         </div>
                     </div>
