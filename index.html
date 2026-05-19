@@ -3327,11 +3327,14 @@ window.onload = loadWorkspace;
 
 
 document.addEventListener('keydown', function(e) {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'p') {
+    if ((e.metaKey || e.ctrlKey) && (e.key.toLowerCase() === 'p')) {
         e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
         prepareAndPrint();
+        return false;
     }
-});
+}, true);
 
 // Manual hover control for KCO and Advice dropdowns
 ['kco', 'advice'].forEach(name => {
