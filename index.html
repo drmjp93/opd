@@ -1766,7 +1766,31 @@ async function prepareAndPrint() {
     let fuString='';
     if (printTimeLabel && invList) fuString = `Follow-up with <b>${invList}</b> in <b>${printTimeLabel}</b>`;
     else if (invList) fuString = `Follow-up with <b>${invList}</b>`;
-    else if (printTimeLabel) fuString = `Follow-up in <b>${printTimeLabel}</b>`;
+    else if (printTimeLabel) fuString = `Follow-up in <b>${printTimeLabel}</b>`;b>`;
+    
+    
+        // --- SMART FOLLOW-UP EXACT DATE CALCULATOR ---
+    let fuString = '';
+    let parsedFuDays = parseInt(fuDays, 10);
+    let printDateLabel = '';
+
+    if (!isNaN(parsedFuDays) && parsedFuDays > 0) {
+        // 1. Get the prescription date (fallback to today if empty)
+        let baseDateStr = document.getElementById('date').value;
+        let baseDate = baseDateStr ? new Date(baseDateStr) : new Date();
+        
+        // 2. Add the total follow-up days to that date
+        baseDate.setDate(baseDate.getDate() + parsedFuDays);
+        
+        // 3. Format it beautifully (e.g., "25 May 2026")
+        printDateLabel = baseDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    // 4. Construct the final print string
+    if (printDateLabel && invList) fuString = `Follow-up with <b>${invList}</b> on <b>${printDateLabel}</b>`;
+    else if (invList) fuString = `Follow-up with <b>${invList}</b>`;
+    else if (printDateLabel) fuString = `Follow-up on <b>${printDateLabel}</b>`;
+    
     
     // Removed yellow background, changed to pure black border
     const fuBlock = fuString ? `
