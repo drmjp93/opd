@@ -1763,11 +1763,26 @@ async function prepareAndPrint() {
         if (unit === 'y') printTimeLabel = num + (num === 1 ? ' Year' : ' Years');
     }
 
-    let fuString='';
+        let fuString='';
     if (printTimeLabel && invList) fuString = `Follow-up with <b>${invList}</b> in <b>${printTimeLabel}</b>`;
     else if (invList) fuString = `Follow-up with <b>${invList}</b>`;
     else if (printTimeLabel) fuString = `Follow-up in <b>${printTimeLabel}</b>`;
-    
+
+    // --- NEW: AUTO-CALCULATE AND APPEND EXACT DATE ---
+    let parsedDays = parseInt(fuDays, 10);
+    if (!isNaN(parsedDays) && parsedDays > 0 && printTimeLabel) {
+        let baseDateStr = document.getElementById('date').value;
+        let baseDate = baseDateStr ? new Date(baseDateStr) : new Date();
+        
+        // Add days to the base date
+        baseDate.setDate(baseDate.getDate() + parsedDays);
+        let exactDate = baseDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        
+        // If we have a follow up string, add the exact date on a new line below it
+        if (fuString) {
+            fuString += `<br><span style="font-size: 8.5pt; color: #475569;">( Expected Date: <b>${exactDate}</b> )</span>`;
+        }
+    }
     // Removed yellow background, changed to pure black border
     const fuBlock = fuString ? `
         <div style="margin-top:8px;background:#fff;border:1px solid #000;border-radius:4px;padding:4px 8px;">
