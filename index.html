@@ -628,6 +628,10 @@
             <div class="flex items-center gap-1">
                 <label class="w-10">Urine</label>
                 <input type="text" id="lab-urine" class="border rounded px-1 w-20" placeholder="Normal">
+
+                <label>Others</label>
+                <input type="text" id="lab-others" placeholder="e.g. LDH 180, Na 138" />    
+            
             </div>
         </div>
 
@@ -1740,6 +1744,7 @@ async function prepareAndPrint() {
                     hba1c: { label: 'HbA1c',   unit: '%' },
                     tsh:   { label: 'TSH',     unit: 'mIU/L' },
                     urine: { label: 'Urine R/E', unit: '' },
+                    others: { label: 'Others', unit: '' },
                 };
 
                 // Skip the whole block if no visits have any investigation data
@@ -2661,7 +2666,8 @@ async function saveToArchive() {
             sgpt:  (document.getElementById('lab-sgpt')  || {}).value || '',
             hba1c: (document.getElementById('lab-hba1c') || {}).value || '',
             tsh:   (document.getElementById('lab-tsh')   || {}).value || '',
-            urine: (document.getElementById('lab-urine') || {}).value || ''
+            urine: (document.getElementById('lab-urine') || {}).value || '',
+            others: (document.getElementById('lab-others') || {}).value || ''
         }
     };
 
@@ -2982,7 +2988,7 @@ function loadVisitFromArchive(idx) {
     // Complaints intentionally skipped so they stay blank!
 
     // Restore investigations (clear fields first, then populate from last visit)
-    const invFields = { hb:'lab-hb', tc:'lab-tc', plt:'lab-plt', rbs:'lab-rbs', creat:'lab-creat', sgpt:'lab-sgpt', hba1c:'lab-hba1c', tsh:'lab-tsh', urine:'lab-urine' };
+    const invFields = { hb:'lab-hb', tc:'lab-tc', plt:'lab-plt', rbs:'lab-rbs', creat:'lab-creat', sgpt:'lab-sgpt', hba1c:'lab-hba1c', tsh:'lab-tsh', urine:'lab-urine', others: 'lab-others' };
     Object.entries(invFields).forEach(([key, id]) => {
         const el = document.getElementById(id);
         if (el) el.value = (latestVisit.investigations && latestVisit.investigations[key]) ? latestVisit.investigations[key] : '';
@@ -3257,7 +3263,7 @@ async function loadSpecificVisit(patientName, visitIndex) {
 
         // Close Modal and Dropdown, then Update visual card
         // Restore investigations
-        const invFields2 = { hb:'lab-hb', tc:'lab-tc', plt:'lab-plt', rbs:'lab-rbs', creat:'lab-creat', sgpt:'lab-sgpt', hba1c:'lab-hba1c', tsh:'lab-tsh', urine:'lab-urine' };
+        const invFields2 = { hb:'lab-hb', tc:'lab-tc', plt:'lab-plt', rbs:'lab-rbs', creat:'lab-creat', sgpt:'lab-sgpt', hba1c:'lab-hba1c', tsh:'lab-tsh', urine:'lab-urine', others: 'lab-others' };
         Object.entries(invFields2).forEach(([key, id]) => {
             const el = document.getElementById(id);
             if (el) el.value = (latestVisit.investigations && latestVisit.investigations[key]) ? latestVisit.investigations[key] : '';
