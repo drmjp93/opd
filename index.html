@@ -2958,8 +2958,7 @@ function loadVisitFromArchive(idx) {
     if (!window.tempMatchedVisits || !window.tempMatchedVisits[idx]) return;
     const latestVisit = window.tempMatchedVisits[idx].details;
 
-    if (latestVisit.date && document.getElementById('date')) document.getElementById('date').value = latestVisit.date;
-    if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
+    document.getElementById('date').value = new Date().toISOString().slice(0, 10);    if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
     if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
     if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = latestVisit.age;
     //if (latestVisit.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = latestVisit.bp;
@@ -3235,8 +3234,7 @@ async function loadSpecificVisit(patientName, visitIndex) {
         const latestVisit = p.visits[visitIndex].details;
         
         // Paste into HTML
-        if (latestVisit.date && document.getElementById('date')) document.getElementById('date').value = latestVisit.date;
-        if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
+        document.getElementById('date').value = new Date().toISOString().slice(0, 10);        if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
         if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
         if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = latestVisit.age;
         //if (latestVisit.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = latestVisit.bp;
