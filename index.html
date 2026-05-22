@@ -441,7 +441,7 @@
                     <div><label class="input-label">BP</label><input type="text" id="bpInput" placeholder="120/80" class="premium-input !px-1 text-center"></div>
                     <div><label class="input-label">HR</label><input type="number" id="ptPulse" placeholder="72" class="premium-input !px-1 text-center"></div>
                     <div><label class="input-label">Temp</label><input type="text" id="ptTemp" placeholder="98.6 F" class="premium-input !px-1 text-center"></div>
-                    <div><label class="input-label">SpO2</label><input type="text" id="ptSpo2" value="98% with RA" class="premium-input !px-1 text-center"></div>
+                    <div><label class="input-label">SpO2</label><input type="text" id="ptSpo2" value="" class="premium-input !px-1 text-center"></div>
                 </div>
                 <div class="grid grid-cols-4 gap-2">
                     <div><label class="input-label">R/S</label><input type="text" id="ptRS" class="premium-input !px-1 text-center"></div>
@@ -1434,7 +1434,7 @@ const qSeq = [
 
 function parseQuickEntry(str) {
     let raw = str.trim();
-    let data = { name:[], age:'', sex:'', bp:'', hr:'', rs:'', cvs:'', cns:'', pa:'', temp:'', kco:[], co:'' };
+    let data = { name:[], age:'', sex:'', bp:'', hr:'', rs:'', cvs:'', cns:'', pa:'', temp:'', spo2:'', kco:[], co:'' };
 
     const coMatch = raw.match(/c\/o-(.+)/i);
     if (coMatch) { data.co = coMatch[1].trim(); raw = raw.replace(coMatch[0], ''); }
@@ -1459,6 +1459,7 @@ function parseQuickEntry(str) {
         else if (tLow.startsWith('pa-'))  { const v=t.substring(3).replace(/-/g,' '); data.pa=(v==='n')?'Soft, NT':v; }
         else if (tLow.startsWith('cns-')) { const v=t.substring(4).replace(/-/g,' '); data.cns=(v==='n')?'Conscious, Oriented':v; }
         else if (tLow.startsWith('t-'))   { const v=t.substring(2).replace(/-/g,' '); data.temp=(v==='n')?'Afebrile':v; }
+        else if (/%/.test(t)) { data.spo2 = t; }
         else if (tLow.startsWith('kco-')) { 
             const customKcos = tLow.substring(4).split(',').filter(k=>k.trim()!=='');
             data.kco = data.kco.concat(customKcos);
@@ -1510,6 +1511,7 @@ function executeQuickFill() {
     if (data.bp)   document.getElementById('bpInput').value = data.bp;
     if (data.hr)   document.getElementById('ptPulse').value = data.hr;
     if (data.temp) document.getElementById('ptTemp').value = data.temp;
+    if (data.spo2) document.getElementById('ptSpo2').value = data.spo2;
     if (data.rs)   document.getElementById('ptRS').value = data.rs;
     if (data.cvs)  document.getElementById('ptCVS').value = data.cvs;
     if (data.cns)  document.getElementById('ptCNS').value = data.cns;
@@ -2191,13 +2193,21 @@ async function prepareAndPrint() {
           <td class="sep">:</td>
           <td class="rval">${pulse || '\u2014'} bpm</td>
         </tr>
-        ${temp || spo2 ? `
+        ${temp ? `
         <tr>
           <td class="lbl"></td><td class="sep"></td><td></td>
           <td class="gap"></td>
-          <td class="rlbl">${temp ? 'Temp' : 'SpO\u2082'}</td>
+          <td class="rlbl">Temp</td>
           <td class="sep">:</td>
-          <td class="rval">${temp || spo2}</td>
+          <td class="rval">${temp}</td>
+        </tr>` : ''}
+        ${spo2 ? `
+        <tr>
+          <td class="lbl"></td><td class="sep"></td><td></td>
+          <td class="gap"></td>
+          <td class="rlbl">SpO\u2082</td>
+          <td class="sep">:</td>
+          <td class="rval">${spo2}</td>
         </tr>` : ''}
       </table>
 
