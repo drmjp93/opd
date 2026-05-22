@@ -2634,6 +2634,11 @@ async function saveToArchive() {
     if (btn) btn.innerText = "⏳";
 
     const ptName = nameBox.value.trim().toUpperCase();
+    // Don't save if no meaningful data entered
+    const hasRx = typeof rxItems !== 'undefined' && rxItems.length > 0;
+    const hasComplaints = (document.getElementById('complaints').value || '').trim().length > 0;
+    if (!hasRx && !hasComplaints) return;
+    
     const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
     const kcoData = kcoCheckboxes.map(cb => cb.checked);
 
