@@ -2628,8 +2628,8 @@ async function saveToArchive() {
     const ptName = nameBox.value.trim().toUpperCase();
     
     // Don't save if no meaningful data entered
-    const hasBP = (document.getElementById('bp') || {}).value?.trim();
-    const hasPulse = (document.getElementById('pulse') || {}).value?.trim();
+    const hasBP = (document.getElementById('bpInput') || {}).value?.trim();
+    const hasPulse = (document.getElementById('ptPulse') || {}).value?.trim();
     if (!hasBP && !hasPulse) return;
     
     const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
