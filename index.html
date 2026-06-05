@@ -2756,6 +2756,7 @@ async function saveToArchive() {
 
     tx.oncomplete = () => {
         if(btn) { btn.innerText = "✓"; setTimeout(() => btn.innerText = "💾", 2000); }
+        updateTotalCasesCount(); // <-- Added this to instantly update the UI after saving
     };
 }
 
@@ -3550,7 +3551,10 @@ function learnRecentDrug(id) {
     renderRecentDrugs();
 }
 
-window.onload = loadWorkspace;
+window.onload = function() {
+    loadWorkspace();
+    updateTotalCasesCount(); // <-- Added this to run on startup
+};
 
 // ═══════════════════════════════════════════
 // STATS PING ENGINE  (OPD RX PAGE)
