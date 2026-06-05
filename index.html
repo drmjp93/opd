@@ -679,6 +679,12 @@
                 </div>
             </div>
 
+                <div style="font-size: 0.9em; color: #555; padding: 5px;">
+                        <strong>Total Stored Cases:</strong> <span id="caseCountDisplay">0</span>
+                </div>
+
+                
+
     
 
 </main>
@@ -3688,6 +3694,49 @@ document.addEventListener('keydown', function(e) {
         panel.style.display = 'none';
     });
 });
+
+
+
+function updateTotalCasesCount() {
+    // 1. Open your specific IndexedDB database
+    const request = indexedDB.open("OPD_Local_EMR");
+
+    request.onsuccess = function(event) {
+        const db = event.target.result;
+        
+        // Ensure the store exists before trying to open a transaction
+        if (db.objectStoreNames.contains("patients")) {
+            // 2. Open a read-only transaction to your 'patients' store
+            const transaction = db.transaction(["patients"], "readonly");
+            const objectStore = transaction.objectStore("patients");
+
+            // 3. Call the highly efficient .count() method
+            const countRequest = objectStore.count();
+
+            countRequest.onsuccess = function() {
+                // 4. Update the number on the screen
+                const displayElement = document.getElementById("caseCountDisplay");
+                if (displayElement) {
+                    displayElement.innerText = countRequest.result;
+                }
+            };
+            
+            countRequest.onerror = function() {
+                console.error("Could not retrieve case count from OPD_Local_EMR.");
+            };
+        } else {
+             console.warn("The 'patients' object store does not exist yet.");
+        }
+    };
+    
+    request.onerror = function(event) {
+         console.error("Error opening OPD_Local_EMR database for counting:", event.target.error);
+    }
+}
+
+
+
+    
 
 </script>
 
