@@ -3706,6 +3706,18 @@ document.addEventListener('keydown', function(e) {
         return false;
     }
 
+    // Escape → Close Archive Search dropdown
+    if (e.key === 'Escape') {
+        const resultsDiv = document.getElementById('searchResults');
+        const archiveInput = document.getElementById('archiveSearch');
+        if (resultsDiv && resultsDiv.style.display === 'block') {
+            e.preventDefault();
+            resultsDiv.style.display = 'none';
+            archiveInput.value = '';
+            archiveInput.blur();
+        }
+    }
+
 }, true);
 
 // Manual hover control for KCO and Advice dropdowns
