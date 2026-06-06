@@ -3673,7 +3673,7 @@ window.onload = function() {
 
 
 document.addEventListener('keydown', function(e) {
-    
+
     // Ctrl+P → Print Rx
     if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'p') {
         e.preventDefault();
@@ -3683,7 +3683,7 @@ document.addEventListener('keydown', function(e) {
         return false;
     }
 
-   // Alt+S → Focus Archive Search
+    // Alt+S → Focus Archive Search
     if (e.altKey && e.key.toLowerCase() === 's') {
         e.preventDefault();
         e.stopPropagation();
@@ -3695,7 +3695,7 @@ document.addEventListener('keydown', function(e) {
             searchArchive();
         }
         return false;
-    } }
+    }
 
     // Alt+D → Clear Workspace
     if (e.altKey && e.key.toLowerCase() === 'd') {
