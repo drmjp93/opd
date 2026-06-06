@@ -3673,13 +3673,39 @@ window.onload = function() {
 
 
 document.addEventListener('keydown', function(e) {
-    if ((e.metaKey || e.ctrlKey) && (e.key.toLowerCase() === 'p')) {
+    
+    // Ctrl+P → Print Rx
+    if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'p') {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
         prepareAndPrint();
         return false;
     }
+
+    // Alt+Space → Focus Archive Search
+    if (e.altKey && e.key === ' ') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        const archiveInput = document.getElementById('archiveSearch');
+        if (archiveInput) {
+            archiveInput.focus();
+            archiveInput.select();
+            searchArchive();
+        }
+        return false;
+    }
+
+    // Alt+D → Clear Workspace
+    if (e.altKey && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        clearWorkspace();
+        return false;
+    }
+
 }, true);
 
 // Manual hover control for KCO and Advice dropdowns
