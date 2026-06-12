@@ -361,7 +361,7 @@
         <!-- RBS -->
         <div class="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 min-w-[52px] hover:border-amber-300 hover:bg-amber-50/40 focus-within:border-amber-400 transition-all">
             <span class="text-[8px] font-black text-amber-600 uppercase tracking-widest leading-none mb-1">RBS</span>
-            <input type="text" id="lab-rbs" class="bg-transparent border-none outline-none w-full text-[12px] font-bold text-slate-800 text-center placeholder:text-slate-300" placeholder="—">
+            <input type="text" id="lab-rbs" class="bg-transparent border-none outline-none w-full text-[12px] font-bold text-slate-800 text-center placeholder:text-slate-300" placeholder="—" oninput="this.value=this.value.toUpperCase()">
             <span class="text-[7px] text-slate-400 font-medium leading-none mt-0.5">mg/dL</span>
         </div>
 
@@ -398,7 +398,7 @@
         <!-- Urine -->
         <div class="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 min-w-[58px] hover:border-sky-300 hover:bg-sky-50/40 focus-within:border-sky-400 transition-all">
             <span class="text-[8px] font-black text-sky-500 uppercase tracking-widest leading-none mb-1">Urine</span>
-            <input type="text" id="lab-urine" class="bg-transparent border-none outline-none w-full text-[12px] font-bold text-slate-800 text-center placeholder:text-slate-300" placeholder="NAD">
+            <input type="text" id="lab-urine" class="bg-transparent border-none outline-none w-full text-[12px] font-bold text-slate-800 text-center placeholder:text-slate-300" placeholder="NAD" oninput="this.value=this.value.toUpperCase()">
             <span class="text-[7px] text-slate-400 font-medium leading-none mt-0.5">R/E</span>
         </div>
 
@@ -408,7 +408,7 @@
         <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 flex-1 min-w-[140px] hover:border-slate-300 focus-within:border-slate-400 transition-all">
             <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest shrink-0">Others</span>
             <div class="w-px h-4 bg-slate-300 shrink-0"></div>
-            <input type="text" id="lab-others" class="bg-transparent border-none outline-none flex-1 text-[12px] font-semibold text-slate-700 placeholder:text-slate-300" placeholder="e.g. LDH 180, Na 138">
+            <input type="text" id="lab-others" class="bg-transparent border-none outline-none flex-1 text-[12px] font-semibold text-slate-700 placeholder:text-slate-300" placeholder="e.g. LDH 180, Na 138" oninput="this.value=this.value.toUpperCase()">
         </div>
 
     </div>
@@ -582,7 +582,7 @@
                     </div>
                 </div>
 
-                <textarea id="generalAdvice" class="premium-input w-full h-16 resize-none" placeholder="Type general advice here..."></textarea>
+                <textarea id="generalAdvice" class="premium-input w-full h-16 resize-none" placeholder="Type general advice here..." style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></textarea>
             </div>
         </div>
     </div>
