@@ -2352,11 +2352,12 @@ async function prepareAndPrint() {
     
     window.print();
     
-    // 🌟 THE CLEANUP FIX: Destroy the print HTML immediately after so styles can't linger
-    setTimeout(() => { 
+    // 🌟 THE CLEANUP FIX: Wait for the browser to ACTUALLY finish the print dialog
+    window.onafterprint = function() {
         pDiv.innerHTML = ''; 
         clearWorkspace(true); 
-    }, 500);
+        window.onafterprint = null; 
+    };
 }
 // ========================================================
 // LIVE PATIENT SUMMARY ENGINE
@@ -2706,6 +2707,7 @@ async function saveToArchive() {
         complaints: document.getElementById('complaints') ? document.getElementById('complaints').value : '', // <--- ADD THIS LINE
         kco: kcoData,
         rxItems: JSON.parse(JSON.stringify(rxItems)),
+        tapers: JSON.parse(JSON.stringify(tapers)), // <--- ADDED THIS LINE
         generalAdvice: document.getElementById('generalAdvice') ? document.getElementById('generalAdvice').value : '',
         fuDays: document.getElementById('fuDays') ? document.getElementById('fuDays').value : '',
         fuSmartInput: document.getElementById('fuSmartInput') ? document.getElementById('fuSmartInput').value : '',
@@ -2922,15 +2924,12 @@ function renderSearchResults(matchedVisits, kcoLabels, resultsDiv, isRecent = fa
                 
                 <div class="flex items-center gap-3 shrink-0">
                     <span class="text-[11px] text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-md shadow-sm font-bold tracking-wider uppercase">LATEST: ${displayDate}</span>
-                    <button onclick="event.stopPropagation(); editVisitRx(${idx})" class="bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 border border-amber-300 hover:border-amber-500 px-3 py-1.5 rounded-lg shadow-sm text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 z-10">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.293-6.293a1 1 0 011.414 0l2.586 2.586a1 1 0 010 1.414L13 17H9v-4z"/></svg>
-                        Edit Rx
-                    </button>
                     <button onclick="event.stopPropagation(); openHistoryModal('${match.name}')" class="bg-white hover:bg-brand-50 hover:text-brand-700 text-slate-600 border border-slate-200 hover:border-brand-300 px-3 py-1.5 rounded-lg shadow-sm text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 z-10">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         History
                     </button>
                 </div>
+            </div>
         `}).join('');
         
         resultsDiv.innerHTML = headerHtml + listHtml;
@@ -2942,45 +2941,6 @@ function renderSearchResults(matchedVisits, kcoLabels, resultsDiv, isRecent = fa
     }
 }
 
-
-
-
-// Edit a past visit's Rx and resave it to that same visit date
-function editVisitRx(idx) {
-    if (!window.tempMatchedVisits || !window.tempMatchedVisits[idx]) return;
-    const match = window.tempMatchedVisits[idx];
-    const visit = match.details;
-
-    // Load all fields including the ORIGINAL date (not today)
-    if (visit.date && document.getElementById('date')) document.getElementById('date').value = visit.date;
-    if (visit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = visit.sex;
-    if (visit.name && document.getElementById('ptName')) document.getElementById('ptName').value = visit.name;
-    if (visit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = visit.age;
-    if (visit.kco) {
-        const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
-        kcoCheckboxes.forEach((cb, i) => { if (visit.kco[i] !== undefined) cb.checked = visit.kco[i]; });
-    }
-    if (visit.rxItems) { rxItems = JSON.parse(JSON.stringify(visit.rxItems)); renderRx(); }
-    if (visit.generalAdvice !== undefined && document.getElementById('generalAdvice')) document.getElementById('generalAdvice').value = visit.generalAdvice;
-    if (visit.fuDays !== undefined && document.getElementById('fuDays')) document.getElementById('fuDays').value = visit.fuDays;
-    if (visit.fuSmartInput !== undefined && document.getElementById('fuSmartInput')) {
-        document.getElementById('fuSmartInput').value = visit.fuSmartInput;
-        document.getElementById('fuSmartInput').dispatchEvent(new Event('input'));
-    }
-    if (visit.complaints !== undefined && document.getElementById('complaints')) document.getElementById('complaints').value = visit.complaints;
-
-    document.getElementById('searchResults').style.display = 'none';
-    document.getElementById('archiveSearch').value = '';
-    updatePtSummary();
-
-    alert(`Editing visit from ${visit.date || 'unknown date'} for ${visit.name}.\nMake changes, then press 💾 Save — it will overwrite this same date's entry.`);
-
-    const qBox = document.getElementById('quickEntryInput');
-    if (qBox) qBox.focus();
-}
-
-    
-    
 // ========================================================
 // ARCHIVE KEYBOARD NAVIGATION ENGINE
 // ========================================================
@@ -3167,11 +3127,6 @@ function processImport(event) {
     reader.readAsText(file);
 }
 
-
-
-
-
-    
 // ========================================================
 // PATIENT HISTORY TIMELINE ENGINE
 // ========================================================
@@ -3233,8 +3188,11 @@ async function openHistoryModal(patientName) {
                             </span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="loadSpecificVisit('${p.name}', ${origIndex})" class="bg-slate-900 hover:bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
+                            <button onclick="loadSpecificVisit('${p.name}', ${origIndex})" class="bg-slate-900 hover:bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm" title="Load for a NEW visit today">
                                 📂 Load Record
+                            </button>
+                            <button onclick="editSpecificVisit('${p.name}', ${origIndex})" class="bg-amber-50 hover:bg-amber-500 text-amber-700 hover:text-white border border-amber-300 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm" title="Fix a mistake in this past visit">
+                                ✏️ Edit Past
                             </button>
                             <button onclick="deleteSpecificVisit('${p.name}', ${origIndex})" class="bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
                                 🗑️ Delete
@@ -3322,7 +3280,10 @@ async function deleteSpecificVisit(patientName, visitIndex) {
     };
 }
 
-// Exactly the same logic as loadVisitFromArchive, but it loads a specific index and safely ignores complaints!
+
+// ========================================================
+// 1. LOAD SPECIFIC VISIT FOR FOLLOW-UP (New Visit Today)
+// ========================================================
 async function loadSpecificVisit(patientName, visitIndex) {
     const db = await openDB();
     const tx = db.transaction("patients", "readonly");
@@ -3335,25 +3296,22 @@ async function loadSpecificVisit(patientName, visitIndex) {
 
         const latestVisit = p.visits[visitIndex].details;
         
-        // Paste into HTML
-        document.getElementById('date').value = new Date().toISOString().slice(0, 10);        if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
+        // Set date to TODAY for a fresh follow-up entry
+        document.getElementById('date').value = new Date().toISOString().slice(0, 10);        
+        
+        if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
         if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
         if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = latestVisit.age;
-        //if (latestVisit.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = latestVisit.bp;
-        //if (latestVisit.pulse && document.getElementById('ptPulse')) document.getElementById('ptPulse').value = latestVisit.pulse;
-        //if (latestVisit.temp && document.getElementById('ptTemp')) document.getElementById('ptTemp').value = latestVisit.temp;
-        //if (latestVisit.spo2 && document.getElementById('ptSpo2')) document.getElementById('ptSpo2').value = latestVisit.spo2;
-        //if (latestVisit.rs && document.getElementById('ptRS')) document.getElementById('ptRS').value = latestVisit.rs;
-        //if (latestVisit.cvs && document.getElementById('ptCVS')) document.getElementById('ptCVS').value = latestVisit.cvs;
-        //if (latestVisit.pa && document.getElementById('ptPA')) document.getElementById('ptPA').value = latestVisit.pa;
-        //if (latestVisit.cns && document.getElementById('ptCNS')) document.getElementById('ptCNS').value = latestVisit.cns;
+
+        // Vitals, Complaints, and Labs are intentionally left blank here for the new visit!
 
         if (latestVisit.kco) {
             const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
             kcoCheckboxes.forEach((cb, i) => { if(latestVisit.kco[i] !== undefined) cb.checked = latestVisit.kco[i]; });
         }
         
-        if (latestVisit.rxItems) { rxItems = latestVisit.rxItems; renderRx(); }
+        if (latestVisit.rxItems) { rxItems = JSON.parse(JSON.stringify(latestVisit.rxItems)); renderRx(); }
+        if (latestVisit.tapers) { tapers = JSON.parse(JSON.stringify(latestVisit.tapers)); renderActiveTapers(); } else { tapers = []; renderActiveTapers(); }
         if (latestVisit.generalAdvice !== undefined && document.getElementById('generalAdvice')) document.getElementById('generalAdvice').value = latestVisit.generalAdvice;
         if (latestVisit.fuDays !== undefined && document.getElementById('fuDays')) document.getElementById('fuDays').value = latestVisit.fuDays;
         if (latestVisit.fuSmartInput !== undefined && document.getElementById('fuSmartInput')) {
@@ -3361,23 +3319,84 @@ async function loadSpecificVisit(patientName, visitIndex) {
             document.getElementById('fuSmartInput').dispatchEvent(new Event('input'));
         }
 
-        // Close Modal and Dropdown, then Update visual card
-        // Restore investigations
-        //const invFields2 = { hb:'lab-hb', tc:'lab-tc', plt:'lab-plt', rbs:'lab-rbs', creat:'lab-creat', sgpt:'lab-sgpt', hba1c:'lab-hba1c', tsh:'lab-tsh', urine:'lab-urine', others: 'lab-others' };
-        //Object.entries(invFields2).forEach(([key, id]) => {
-            //const el = document.getElementById(id);
-            //if (el) el.value = (latestVisit.investigations && latestVisit.investigations[key]) ? latestVisit.investigations[key] : '';
-       //});
-
         closeHistoryModal();
         document.getElementById('searchResults').style.display = 'none';
         document.getElementById('archiveSearch').value = "";
         updatePtSummary();
 
-        // --- NEW: Jump cursor directly to Demographics (Quick Entry) box ---
         const qBox = document.getElementById('quickEntryInput');
         if (qBox) qBox.focus();
+    }
+}
 
+
+// ========================================================
+// EDIT SPECIFIC PAST VISIT (Full Data Restoration)
+// ========================================================
+async function editSpecificVisit(patientName, visitIndex) {
+    const db = await openDB();
+    const tx = db.transaction("patients", "readonly");
+    const store = tx.objectStore("patients");
+    const req = store.get(patientName);
+
+    req.onsuccess = () => {
+        const p = req.result;
+        if (!p || !p.visits[visitIndex]) return;
+
+        const visitToEdit = p.visits[visitIndex];
+        const data = visitToEdit.details;
+        
+        // 1. Set Date to the PAST date so saveToArchive overwrites it
+        if (data.date && document.getElementById('date')) {
+            document.getElementById('date').value = data.date;
+        } else if (visitToEdit.searchDate) {
+            document.getElementById('date').value = visitToEdit.searchDate;
+        }
+
+        const setVal = (id, val) => { if(document.getElementById(id) && val !== undefined) document.getElementById(id).value = val; };
+        
+        // Load Everything
+        setVal('ptSex', data.sex);
+        setVal('ptName', data.name);
+        setVal('ptAge', data.age);
+        setVal('bpInput', data.bp);
+        setVal('ptPulse', data.pulse);
+        setVal('ptTemp', data.temp);
+        setVal('ptSpo2', data.spo2);
+        setVal('ptRS', data.rs);
+        setVal('ptCVS', data.cvs);
+        setVal('ptPA', data.pa);
+        setVal('ptCNS', data.cns);
+        setVal('complaints', data.complaints);
+
+        if (data.kco) {
+            const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
+            kcoCheckboxes.forEach((cb, i) => { if(data.kco[i] !== undefined) cb.checked = data.kco[i]; });
+        }
+        
+        if (data.rxItems) { rxItems = JSON.parse(JSON.stringify(data.rxItems)); renderRx(); }
+        if (data.tapers) { tapers = JSON.parse(JSON.stringify(data.tapers)); renderActiveTapers(); } else { tapers = []; renderActiveTapers(); }
+        setVal('generalAdvice', data.generalAdvice);
+        setVal('fuDays', data.fuDays);
+        if (data.fuSmartInput !== undefined && document.getElementById('fuSmartInput')) {
+            document.getElementById('fuSmartInput').value = data.fuSmartInput;
+            document.getElementById('fuSmartInput').dispatchEvent(new Event('input'));
+        }
+
+        const invFields = { hb:'lab-hb', tc:'lab-tc', plt:'lab-plt', rbs:'lab-rbs', creat:'lab-creat', sgpt:'lab-sgpt', hba1c:'lab-hba1c', tsh:'lab-tsh', urine:'lab-urine', others: 'lab-others' };
+        Object.entries(invFields).forEach(([key, id]) => {
+            const el = document.getElementById(id);
+            if (el) el.value = (data.investigations && data.investigations[key]) ? data.investigations[key] : '';
+        });
+
+        // Cleanup UI instantly without alerts
+        closeHistoryModal();
+        document.getElementById('searchResults').style.display = 'none';
+        document.getElementById('archiveSearch').value = "";
+        updatePtSummary();
+
+        const cBox = document.getElementById('quickEntryInput');
+        if (cBox) cBox.focus();
     }
 }
 
