@@ -2922,12 +2922,15 @@ function renderSearchResults(matchedVisits, kcoLabels, resultsDiv, isRecent = fa
                 
                 <div class="flex items-center gap-3 shrink-0">
                     <span class="text-[11px] text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-md shadow-sm font-bold tracking-wider uppercase">LATEST: ${displayDate}</span>
+                    <button onclick="event.stopPropagation(); editVisitRx(${idx})" class="bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-700 border border-amber-300 hover:border-amber-500 px-3 py-1.5 rounded-lg shadow-sm text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 z-10">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.293-6.293a1 1 0 011.414 0l2.586 2.586a1 1 0 010 1.414L13 17H9v-4z"/></svg>
+                        Edit Rx
+                    </button>
                     <button onclick="event.stopPropagation(); openHistoryModal('${match.name}')" class="bg-white hover:bg-brand-50 hover:text-brand-700 text-slate-600 border border-slate-200 hover:border-brand-300 px-3 py-1.5 rounded-lg shadow-sm text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 z-10">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         History
                     </button>
                 </div>
-            </div>
         `}).join('');
         
         resultsDiv.innerHTML = headerHtml + listHtml;
@@ -2939,6 +2942,45 @@ function renderSearchResults(matchedVisits, kcoLabels, resultsDiv, isRecent = fa
     }
 }
 
+
+
+
+// Edit a past visit's Rx and resave it to that same visit date
+function editVisitRx(idx) {
+    if (!window.tempMatchedVisits || !window.tempMatchedVisits[idx]) return;
+    const match = window.tempMatchedVisits[idx];
+    const visit = match.details;
+
+    // Load all fields including the ORIGINAL date (not today)
+    if (visit.date && document.getElementById('date')) document.getElementById('date').value = visit.date;
+    if (visit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = visit.sex;
+    if (visit.name && document.getElementById('ptName')) document.getElementById('ptName').value = visit.name;
+    if (visit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = visit.age;
+    if (visit.kco) {
+        const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
+        kcoCheckboxes.forEach((cb, i) => { if (visit.kco[i] !== undefined) cb.checked = visit.kco[i]; });
+    }
+    if (visit.rxItems) { rxItems = JSON.parse(JSON.stringify(visit.rxItems)); renderRx(); }
+    if (visit.generalAdvice !== undefined && document.getElementById('generalAdvice')) document.getElementById('generalAdvice').value = visit.generalAdvice;
+    if (visit.fuDays !== undefined && document.getElementById('fuDays')) document.getElementById('fuDays').value = visit.fuDays;
+    if (visit.fuSmartInput !== undefined && document.getElementById('fuSmartInput')) {
+        document.getElementById('fuSmartInput').value = visit.fuSmartInput;
+        document.getElementById('fuSmartInput').dispatchEvent(new Event('input'));
+    }
+    if (visit.complaints !== undefined && document.getElementById('complaints')) document.getElementById('complaints').value = visit.complaints;
+
+    document.getElementById('searchResults').style.display = 'none';
+    document.getElementById('archiveSearch').value = '';
+    updatePtSummary();
+
+    alert(`Editing visit from ${visit.date || 'unknown date'} for ${visit.name}.\nMake changes, then press 💾 Save — it will overwrite this same date's entry.`);
+
+    const qBox = document.getElementById('quickEntryInput');
+    if (qBox) qBox.focus();
+}
+
+    
+    
 // ========================================================
 // ARCHIVE KEYBOARD NAVIGATION ENGINE
 // ========================================================
@@ -3125,6 +3167,11 @@ function processImport(event) {
     reader.readAsText(file);
 }
 
+
+
+
+
+    
 // ========================================================
 // PATIENT HISTORY TIMELINE ENGINE
 // ========================================================
