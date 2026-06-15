@@ -1878,7 +1878,7 @@ async function prepareAndPrint() {
     // Converted clinical notes text to pure black
     let clinicalNotesArr = [];
     if (complaints) clinicalNotesArr.push(`<tr><td style="width:45px;vertical-align:top;font-weight:900;color:#000;padding-bottom:2px;">C/O:</td><td style="padding-bottom:2px;color:#000;">${complaints}</td></tr>`);
-    if (kcoList) clinicalNotesArr.push(`<tr><td style="width:45px;vertical-align:top;font-weight:900;color:#000;padding-bottom:2px;">KCO:</td><td style="padding-bottom:2px;color:#000;">${kcoList}</td></tr>`);
+    if (kcoList) clinicalNotesArr.push(`<tr><td style="width:45px;vertical-align:top;font-weight:900;color:#000;padding-bottom:2px;">KCO:</td><td style="padding-bottom:2px;color:#000;font-weight:900;font-size:11.5px;text-transform:uppercase;">${kcoList}</td></tr>`);
     if (generalAdvice) clinicalNotesArr.push(`<tr><td style="width:45px;vertical-align:top;font-weight:900;color:#000;padding-bottom:2px;">Advice:</td><td style="padding-bottom:2px;color:#000;">${generalAdvice}</td></tr>`);
     
     const clinicalNotesBlock = clinicalNotesArr.length 
