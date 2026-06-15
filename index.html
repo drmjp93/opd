@@ -2221,7 +2221,7 @@ async function prepareAndPrint() {
 
       ${complaints || kcoList || rs || cvs || pa || cns ? `<div class="slip-notes">
         ${complaints ? `<div class="note-row"><span class="note-lbl">C/O :</span><span>${complaints.replace(/\n/g,' | ')}</span></div>` : ''}
-        ${kcoList ? `<div class="note-row"><span class="note-lbl style="font-weight:900;font-size:11pt;text-transform:uppercase;">KCO :</span><span style="font-weight:900;font-size:11pt;text-transform:uppercase;">${kcoList}</span></div>` : ''}
+        ${kcoList ? `<div class="note-row"><span class="note-lbl style="font-weight:900;font-size:11pt !important;text-transform:uppercase;">KCO :</span><span style="font-weight:900;font-size:11pt;text-transform:uppercase;">${kcoList}</span></div>` : ''}
         
         ${[rs ? `R/S: ${rs}` : '', cvs ? `CVS: ${cvs}` : '', pa ? `P/A: ${pa}` : '', cns ? `CNS: ${cns}` : ''].filter(Boolean).length ? `
           <div class="note-row"><span class="note-lbl">Findings :</span><span>${[rs ? `R/S: ${rs}` : '', cvs ? `CVS: ${cvs}` : '', pa ? `P/A: ${pa}` : '', cns ? `CNS: ${cns}` : ''].filter(Boolean).join(', ')}</span></div>
