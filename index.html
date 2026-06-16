@@ -3221,6 +3221,38 @@ async function openHistoryModal(patientName) {
             const kcoHtml = kcoStr ? `<div class="text-[9px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 inline-block self-start mt-1 shadow-sm">KCO: ${kcoStr}</div>` : '';
             
             let rxHtml = '<span class="text-slate-300 italic">--</span>';
+
+            // --- NEW CODE: Extract Investigations for the History Card ---
+            let invHtml = '';
+            if (d.investigations) {
+                const invMap = {
+                    'Hb': d.investigations.hb,
+                    'TC': d.investigations.tc,
+                    'Plt': d.investigations.plt,
+                    'RBS': d.investigations.rbs,
+                    'FBS': d.investigations.fbs,
+                    'PPBS': d.investigations.ppbs,
+                    'HbA1c': d.investigations.hba1c,
+                    'Cr': d.investigations.creat,
+                    'SGPT': d.investigations.sgpt,
+                    'TSH': d.investigations.tsh,
+                    'Urine': d.investigations.urine,
+                    'Others': d.investigations.others
+                };
+                
+                // Filter out empty values
+                const validInvs = Object.entries(invMap).filter(([k, v]) => v && String(v).trim() !== '');
+                
+                if (validInvs.length > 0) {
+                    invHtml = validInvs.map(([k, v]) => 
+                        `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-1 rounded-md text-[10px] font-bold tracking-wide shadow-sm">
+                            <span class="text-emerald-900">${k}:</span> ${v}
+                        </span>`
+                    ).join(' ');
+                }
+            }
+            // --- END NEW CODE ---
+
             if (d.rxItems && d.rxItems.length > 0) {
                 rxHtml = d.rxItems.map(rx => `<span class="inline-block bg-blue-50 text-blue-700 border border-blue-100 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">${rx.brand}</span>`).join(' ');
             }
@@ -3273,8 +3305,15 @@ async function openHistoryModal(patientName) {
                             <span class="text-[9px] font-black text-blue-500 uppercase tracking-widest mb-2">Prescribed Formulation Portfolio</span>
                             <div class="flex flex-wrap gap-1.5 align-content-start">${rxHtml}</div>
                         </div>
-                        
                     </div>
+
+                    ${invHtml ? `
+                    <div class="w-full border-t border-slate-100 pt-3 mt-1 pl-1">
+                        <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-2 block">Lab Reports & Investigations</span>
+                        <div class="flex flex-wrap gap-2">${invHtml}</div>
+                    </div>
+                    ` : ''}
+
                 </div>
             `;
         }).join('');
