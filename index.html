@@ -2402,14 +2402,23 @@ async function prepareAndPrint() {
     // -------------------------------------------------------------
     
     window.print();
-    
-    // 🌟 THE CLEANUP FIX: Wait for the browser to ACTUALLY finish the print dialog
-    window.onafterprint = function() {
-        pDiv.innerHTML = ''; 
-        clearWorkspace(true); 
-        window.onafterprint = null; 
-    };
+
+// 🌟 THE CLEANUP FIX: Wait for the browser to ACTUALLY finish the print dialog
+let _cleanupDone = false;
+const _doCleanup = function() {
+    if (_cleanupDone) return; // Guard against double-execution (afterprint + fallback timer both firing)
+    _cleanupDone = true;
+    pDiv.innerHTML = ''; 
+    clearWorkspace(true); 
+    window.onafterprint = null; 
+};
+window.onafterprint = _doCleanup;
+// 🌟 FALLBACK SAFETY NET: Some browsers fail to fire 'afterprint' reliably
+// (especially right after async work like saveToArchive()/IndexedDB calls).
+// If afterprint hasn't fired within 2s, force the cleanup anyway.
+setTimeout(_doCleanup, 2000);
 }
+    
 // ========================================================
 // LIVE PATIENT SUMMARY ENGINE
 // ========================================================
