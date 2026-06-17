@@ -4024,12 +4024,40 @@ function renderPatientsTable() {
         const vitals = [latestVisit.bp ? `BP: ${latestVisit.bp}` : '', latestVisit.pulse ? `HR: ${latestVisit.pulse}` : ''].filter(Boolean).join(' | ') || '--';
 
         // --- 📈 Determine if they have Serial Lab Reports ---
-        const hasLabs = p.visits.filter(v => v.details && v.details.investigations && Object.values(v.details.investigations).some(val => val && /\d/.test(val))).length > 1;
+        const hasLabs = p.visits.filter(v => v.details && v.details.investigations && Object.values(v.details.investigations).some(val => val && /\d/.test(val))).length >= 1;
         const safeName = p.name.replace(/'/g, "\\'");
+
+        // --- Build Latest Lab Report badges (same keys as history modal) ---
+
+            let latestInvHtml = '<span class="text-slate-300">--</span>';
+            if (latestVisit.investigations) {
+                const invMap = {
+                    'Hb': latestVisit.investigations.hb,
+                    'TC': latestVisit.investigations.tc,
+                    'Plt': latestVisit.investigations.plt,
+                    'RBS': latestVisit.investigations.rbs,
+                    'FBS': latestVisit.investigations.fbs,
+                    'PPBS': latestVisit.investigations.ppbs,
+                    'HbA1c': latestVisit.investigations.hba1c,
+                    'Cr': latestVisit.investigations.creat,
+                    'SGPT': latestVisit.investigations.sgpt,
+                    'TSH': latestVisit.investigations.tsh,
+                    'Urine': latestVisit.investigations.urine,
+                    'Others': latestVisit.investigations.others
+                };
+                const validInvs = Object.entries(invMap).filter(([k, v]) => v && String(v).trim() !== '');
+                if (validInvs.length > 0) {
+                    latestInvHtml = validInvs.map(([k, v]) =>
+                        `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide">
+                            <span class="text-emerald-900">${k}:</span> ${v}
+                        </span>`
+                    ).join(' ');
+                }
+            }
 
         return `
             <tr class="hover:bg-slate-50 transition-colors group border-l-4 border-transparent hover:border-indigo-500">
-                <td class="py-3 px-4 text-[11px] font-bold text-slate-400">${index + 1}</td>
+                <td class="py-3 px-4 text-[11px]">${dateBadge}</td>
                 <td class="py-3 px-4">
                     <div class="text-[13px] font-black text-slate-800 uppercase tracking-wide cursor-pointer hover:text-indigo-600" onclick="document.getElementById('patientsTableModal').classList.add('hidden'); openHistoryModal('${safeName}')">${p.name}</div>
                 </td>
@@ -4037,10 +4065,13 @@ function renderPatientsTable() {
                 <td class="py-3 px-4">${kcoBadge}</td>
                 <td class="py-3 px-4 text-[11px] font-black text-slate-600">${p.visits.length}</td>
                 <td class="py-3 px-4 text-[11px] font-bold text-slate-500">${vitals}</td>
-                <td class="py-3 px-4 text-[10px] font-bold text-slate-500">
-                    <span class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 cursor-pointer hover:bg-indigo-500 hover:text-white transition-colors" onclick="document.getElementById('patientsTableModal').classList.add('hidden'); openHistoryModal('${safeName}')">📂 Open Chart</span>
-                    ${hasLabs ? `<span class="px-2 py-1 bg-amber-50 text-amber-700 rounded-md border border-amber-200 cursor-pointer hover:bg-amber-500 hover:text-white transition-colors ml-1" onclick="showPatientTrend('${safeName}')">📈 Trend</span>` : ''}
+                <td class="py-3 px-4 text-[10px]">
+                    <div class="flex flex-wrap gap-1 max-w-[220px]">${latestInvHtml}</div>
                 </td>
+                 <td class="py-3 px-4 text-[10px] font-bold text-slate-500">
+                    ${hasLabs ? `<span class="px-2 py-1 bg-amber-50 text-amber-700 rounded-md border border-amber-200 cursor-pointer hover:bg-amber-500 hover:text-white transition-colors" onclick="showPatientTrend('${safeName}')">📈 View Reports</span>` : '<span class="text-slate-300">--</span>'}
+                </td>
+               
             </tr>
         `;
     }).join('');
@@ -4190,7 +4221,9 @@ function showPatientTrend(patientName) {
                         <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">KCO (Known Case)</th>
                         <th onclick="sortDb('visits')" class="py-3 px-4 text-[10px] font-black text-slate-500 hover:text-indigo-600 uppercase tracking-widest border-b border-slate-200">Visits ↕</th>
                         <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">Latest Vitals</th>
-                        <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">Actions</th>
+                        <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">Reports</th>
+                        <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">Latest Reports</th>
+                        
                     </tr>
                 </thead>
                 <tbody id="patientsTableBody" class="divide-y divide-slate-100"></tbody>
