@@ -540,6 +540,7 @@
         <div class="flex items-center gap-4 mb-4 relative z-50">
     
     <div class="relative" id="kco-dropdown">
+        <input type="hidden" id="customKCO" value="">
         <div class="cursor-pointer bg-white text-slate-600 px-4 py-2 rounded-lg font-bold text-[11px] uppercase tracking-widest border border-slate-200 hover:border-brand-300 hover:text-brand-600 transition-colors shadow-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             Known Case
@@ -1564,6 +1565,12 @@ function executeQuickFill() {
             }
         });
     }
+
+            const allLabels = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]')).map(c=>c.nextElementSibling.textContent.toLowerCase().trim());
+            const unmatched = data.kco.filter(k => !allLabels.some(lbl => lbl===k || lbl.startsWith(k) || lbl.includes(` ${k}`) || lbl.includes(`${k} `) || lbl.includes(`/${k}`)));
+            if (unmatched.length) document.getElementById('customKCO').value = unmatched.join(', ').toUpperCase();
+
+
     qCard.classList.remove('border-l-indigo-500');
     qCard.classList.add('border-l-emerald-500','bg-emerald-50/30');
     qStatus.classList.remove('hidden');
@@ -1754,6 +1761,10 @@ function clearWorkspace(skipConfirm = false) {
     rxItems = []; tapers = []; currentTaperSteps = [];
     document.querySelectorAll('input[type="text"],input[type="number"],textarea').forEach(i=>i.value='');
 
+    // --- NEW: CLEAR THE HIDDEN KCO FIELD ---
+    if (document.getElementById('customKCO')) document.getElementById('customKCO').value = '';
+    // ---------------------------------------
+
     const coSmartBox = document.getElementById('complaintsSmartInput');
     if (coSmartBox) coSmartBox.style.height = '36px';
     
@@ -1921,11 +1932,13 @@ async function prepareAndPrint() {
         : '';
 
     const patientLine = `${ptName}${ptAge?` &nbsp;·&nbsp; ${ptAge} Yrs`:''}${ptSex?` &nbsp;·&nbsp; ${ptSex}`:''}`;
-    const kcoList = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]:checked')).map(c=>c.nextElementSibling.textContent).join(', ');
+    const customKCOtxt = (document.getElementById('customKCO')?.value || '').trim();
+    const kcoList = [Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]:checked')).map(c=>c.nextElementSibling.textContent).join(', '), customKCOtxt].filter(Boolean).join(', '); 
     const complaints = document.getElementById('complaints').value.replace(/\n/g,'<br>');
     const invList = Array.from(document.querySelectorAll('#fuHiddenBoxes input[type="checkbox"]:checked')).map((c,i,a)=>a[i].nextElementSibling?.textContent||'').filter(Boolean).join(', ');
     const fuDays = document.getElementById('fuDays').value;
     const generalAdvice = document.getElementById('generalAdvice').value.replace(/\n/g,'<br>');
+    
 
     // Converted clinical notes text to pure black
     let clinicalNotesArr = [];
