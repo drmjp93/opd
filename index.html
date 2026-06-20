@@ -1210,6 +1210,9 @@ function renderRx() {
         cont.appendChild(card);
         const sigEl = card.querySelector(`#sig-${item.id}`);
         sigEl.addEventListener('input', function () {
+            const cursorPos = this.selectionStart;
+            this.value = this.value.toUpperCase();
+            this.setSelectionRange(cursorPos, cursorPos);
             parseSmartSig(item.id, this.value);
             updateCardDisplay(item.id);
         });
