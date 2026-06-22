@@ -403,6 +403,13 @@
             <span class="text-[7px] text-slate-400 font-medium leading-none mt-0.5">mg/dL</span>
         </div>
 
+        <!-- eGFR (auto) -->
+            <div id="egfrCard" class="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 min-w-[52px] hidden">
+                <span class="text-[8px] font-black text-rose-600 uppercase tracking-widest leading-none mb-1">eGFR</span>
+                <span id="egfrValue" class="text-[12px] font-bold text-slate-800 text-center">—</span>
+                <span class="text-[7px] text-slate-400 font-medium leading-none mt-0.5">mL/min</span>
+            </div>
+
         <!-- SGPT -->
         <div class="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 min-w-[52px] hover:border-yellow-300 hover:bg-yellow-50/40 focus-within:border-yellow-400 transition-all">
             <span class="text-[8px] font-black text-yellow-600 uppercase tracking-widest leading-none mb-1">SGPT</span>
@@ -1727,6 +1734,7 @@ function loadWorkspace() {
                 s('lab-rbs', i.rbs); s('lab-fbs', i.fbs); s('lab-ppbs', i.ppbs); s('lab-creat', i.creat); s('lab-sgpt', i.sgpt);
                 s('lab-hba1c', i.hba1c); s('lab-tsh', i.tsh); s('lab-urine', i.urine);
                 s('lab-others', i.others);
+                updateEGFR();
             }
             if (d.rxItems) rxItems = d.rxItems;
             if (d.tapers)  tapers  = d.tapers;
@@ -1763,7 +1771,8 @@ function clearWorkspace(skipConfirm = false) {
     
     rxItems = []; tapers = []; currentTaperSteps = [];
     document.querySelectorAll('input[type="text"],input[type="number"],textarea').forEach(i=>i.value='');
-
+    updateEGFR();
+    
     // --- NEW: CLEAR THE HIDDEN KCO FIELD ---
     if (document.getElementById('customKCO')) document.getElementById('customKCO').value = '';
     // ---------------------------------------
@@ -2435,6 +2444,35 @@ window.onafterprint = _doCleanup;
 setTimeout(_doCleanup, 2000);
 }
     
+// ========================================================
+// EGFR 
+// ========================================================
+
+
+function updateEGFR() {
+    const cr = parseFloat(document.getElementById('lab-creat').value);
+    const age = parseFloat(document.getElementById('ptAge').value);
+    const sex = document.getElementById('ptSex').value;
+    const card = document.getElementById('egfrCard');
+    const out = document.getElementById('egfrValue');
+    if (!cr || cr <= 0 || !age || age <= 0) { card.classList.add('hidden'); return; }
+    const isFemale = sex === 'F';
+    const k = isFemale ? 0.7 : 0.9;
+    const a = isFemale ? -0.241 : -0.302;
+    const minCr = Math.min(cr / k, 1);
+    const maxCr = Math.max(cr / k, 1);
+    let egfr = 142 * Math.pow(minCr, a) * Math.pow(maxCr, -1.200) * Math.pow(0.9938, age);
+    if (isFemale) egfr *= 1.012;
+    egfr = Math.round(egfr);
+    out.textContent = egfr;
+    out.className = 'text-[12px] font-bold text-center ' + (egfr < 60 ? 'text-rose-600' : 'text-emerald-600');
+    card.classList.remove('hidden');
+}
+document.getElementById('lab-creat').addEventListener('input', updateEGFR);
+document.getElementById('ptAge').addEventListener('input', updateEGFR);
+document.getElementById('ptSex').addEventListener('change', updateEGFR);
+
+
 // ========================================================
 // LIVE PATIENT SUMMARY ENGINE
 // ========================================================
@@ -3494,11 +3532,12 @@ async function editSpecificVisit(patientName, visitIndex) {
             document.getElementById('fuSmartInput').dispatchEvent(new Event('input'));
         }
 
-        const invFields = { hb:'lab-hb', tc:'lab-tc', plt:'lab-plt', rbs:'lab-rbs', fbs:'lab-fbs', ppbs:'lab-ppbs', creat:'lab-creat', sgpt:'lab-sgpt', hba1c:'lab-hba1c', tsh:'lab-tsh', urine:'lab-urine', others: 'lab-others' };
+       const invFields = { hb:'lab-hb', tc:'lab-tc', plt:'lab-plt', rbs:'lab-rbs', fbs:'lab-fbs', ppbs:'lab-ppbs', creat:'lab-creat', sgpt:'lab-sgpt', hba1c:'lab-hba1c', tsh:'lab-tsh', urine:'lab-urine', others: 'lab-others' };
         Object.entries(invFields).forEach(([key, id]) => {
             const el = document.getElementById(id);
             if (el) el.value = (data.investigations && data.investigations[key]) ? data.investigations[key] : '';
         });
+        updateEGFR();
 
         // Cleanup UI instantly without alerts
         closeHistoryModal();
