@@ -194,8 +194,10 @@
 <div id="print-layout"></div>
 
 <div id="screen-layout" class="p-4 lg:p-6 min-h-screen" style="display:none;">
-
-
+<div id="bannerRow" class="fixed top-2 left-1/2 -translate-x-1/2 z-[9998] flex gap-3 no-print">
+<div id="readyBanner" class="bg-emerald-500 text-white text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300">BP & HR Entered</div>
+<div id="pregnantBanner" class="bg-pink-500 text-white text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300">Pregnant — MOA: <span id="pregnantMoaVal"></span></div>
+</div>
     <header class="max-w-[1600px] mx-auto flex justify-between items-center sticky top-0 z-40 bg-[#f8fafc] py-2 px-4 border-b border-slate-200 mb-3 shadow-sm no-print gap-4">
     
     <div class="flex items-center gap-3 shrink-0">
@@ -2529,13 +2531,24 @@ function updatePtSummary() {
             coEl.classList.add('hidden');
         }
 
+        const readyBanner = document.getElementById('readyBanner');
+    if (readyBanner) {
+        readyBanner.style.opacity = (bp !== '--/--' && hr !== '--') ? '1' : '0';
+    }
+    const moaVal = document.getElementById('ptMOA') ? document.getElementById('ptMOA').value.trim() : '';
+    const pregBanner = document.getElementById('pregnantBanner');
+    if (pregBanner) {
+        pregBanner.style.opacity = moaVal ? '1' : '0';
+        document.getElementById('pregnantMoaVal').innerText = moaVal;
+    }
+
     } else {
         strip.classList.add('hidden');
     }
 }
 
 // Attach listeners so the card updates instantly as you type ANYTHING
-['ptName', 'ptAge', 'ptSex', 'bpInput', 'ptPulse', 'ptTemp', 'ptSpo2', 'complaints'].forEach(id => {
+['ptName', 'ptAge', 'ptSex', 'bpInput', 'ptPulse', 'ptTemp', 'ptSpo2', 'complaints', 'ptMOA'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
         el.addEventListener('input', updatePtSummary);
