@@ -4320,7 +4320,22 @@ function showPatientTrend(patientName) {
     </div>
 </div>
 
+<div id="calWidget" style="position:fixed;bottom:20px;right:20px;width:110px;font-family:sans-serif;border-radius:10px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:9999;">
+  <div style="background:#e8262f;color:#fff;text-align:center;font-weight:700;padding:6px 0;font-size:14px;" id="calDay"></div>
+  <div style="background:#fff;color:#1c2536;text-align:center;font-weight:900;font-size:42px;padding:10px 0;" id="calDate"></div>
+</div>
 
+<script>
+  const days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+  function updateCal(){
+    const now = new Date();
+    document.getElementById("calDay").innerText = days[now.getDay()];
+    document.getElementById("calDate").innerText = now.getDate();
+  }
+  updateCal();
+  setInterval(updateCal, 60000);
+</script>
+        
 
         
 </body>
