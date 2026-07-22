@@ -202,13 +202,11 @@
     <header class="max-w-[1600px] mx-auto flex justify-between items-center sticky top-0 z-40 bg-[#f8fafc] py-2 px-4 border-b border-slate-200 mb-3 shadow-sm no-print gap-4">
     
     <div class="flex items-center gap-3 shrink-0">
-        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white shadow-md">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-        </div>
-        <div>
-            <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-none">OPD Rx Tool</h1>
-        </div>
+    <div style="display:flex;align-items:baseline;gap:8px;line-height:1;">
+        <span id="calDay" style="font-size:50px;font-weight:900;color:#e8262f;letter-spacing:1px;"></span>
+        <span id="calDate" style="font-size:50px;font-weight:900;color:#1c2536;"></span>
     </div>
+</div>
 
     <div class="flex-1 max-w-4xl relative group mx-2 flex items-center z-50">
         <div class="relative w-full">
@@ -217,7 +215,12 @@
             
             <div id="searchResults" class="fixed top-[70px] left-1/2 -translate-x-1/2 w-[96vw] max-w-[1500px] bg-white border-2 border-slate-200 shadow-2xl rounded-xl hidden max-h-[60vh] overflow-y-auto z-[9999] divide-y divide-slate-100"></div>
         </div>
-        <button type="button" onclick="saveToArchive()" id="btn-archive" class="ml-3 shrink-0 bg-slate-800 hover:bg-brand-600 text-white w-10 h-10 rounded-full shadow-md flex items-center justify-center transition-all text-lg hover:scale-105" title="Save to Local EMR">💾</button>
+        <div class="ml-3 shrink-0 flex items-center bg-slate-800 p-1 rounded-xl shadow-sm">
+    <button type="button" onclick="saveToArchive()" id="btn-archive" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-slate-700 rounded-lg transition-colors text-white" title="Save to Local EMR">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zM17 21v-8H7v8M7 3v5h8"/></svg>
+        <span class="text-[8px] font-black uppercase mt-0.5 tracking-tighter">Save</span>
+    </button>
+</div>
     </div>
 
     <div class="flex items-center gap-3 shrink-0 no-print">
@@ -245,24 +248,16 @@
             </button>
         </div>
 
-        <div class="flex items-center bg-blue-50/50 p-1 rounded-xl border border-blue-200 shadow-sm">
-            <button onclick="saveToCloudClipboard()" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-blue-100 rounded-lg transition-colors" title="Send to Fitness">
-                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                <span class="text-[8px] font-black text-blue-700 uppercase mt-0.5 tracking-tighter">To Fit</span>
-            </button>
-            <button onclick="loadFromCloudClipboard()" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-blue-100 rounded-lg transition-colors border-l border-blue-200/50" title="Fetch from Fitness">
-                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                <span class="text-[8px] font-black text-blue-700 uppercase mt-0.5 tracking-tighter">From Fit</span>
+        <div class="flex items-center bg-rose-50/50 p-1 rounded-xl border border-rose-200 shadow-sm">
+            <button onclick="clearWorkspace()" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-rose-100 rounded-lg transition-colors" title="Clear Workspace">
+                <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                <span class="text-[8px] font-black text-rose-700 uppercase mt-0.5 tracking-tighter">Reset</span>
             </button>
         </div>
 
-        <button onclick="clearWorkspace()" class="flex flex-col items-center justify-center w-12 h-10 text-rose-500 hover:bg-rose-50 rounded-xl border border-slate-200 ml-1 transition-all" title="Clear Workspace">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            <span class="text-[8px] font-black uppercase mt-0.5 tracking-tighter">Reset</span>
-        </button>
-
-        <button onclick="openDietHandout(this)" class="flex flex-col items-center justify-center w-12 h-10 text-emerald-600 hover:bg-emerald-50 rounded-xl border border-slate-200 ml-1 transition-all" title="Print Diet Card">
-                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+        <div class="flex items-center bg-emerald-50/50 p-1 rounded-xl border border-emerald-200 shadow-sm">
+            <button onclick="openDietHandout(this)" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-emerald-100 rounded-lg transition-colors" title="Print Diet Card">
+                <svg class="w-4 h-4 text-emerald-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="32" cy="32" r="20"/>
                     <line x1="12" y1="15" x2="12" y2="35"/>
                     <line x1="12" y1="15" x2="9" y2="15"/>
@@ -270,19 +265,20 @@
                     <line x1="52" y1="15" x2="52" y2="45"/>
                     <path d="M48 15 c0 0 0 10 4 10 s 4 -10 4 -10"/>
                 </svg>
-                <span class="text-[8px] font-black uppercase mt-0.5 tracking-tighter">Diet</span>
+                <span class="text-[8px] font-black text-emerald-700 uppercase mt-0.5 tracking-tighter">Diet</span>
             </button>
+            <button onclick="openPatientsTable()" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-emerald-100 rounded-lg transition-colors border-l border-emerald-200/50" title="View All Patients">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <span class="text-[8px] font-black text-emerald-700 uppercase mt-0.5 tracking-tighter">Table</span>
+            </button>
+        </div>
 
-            <button onclick="openPatientsTable()" class="flex flex-col items-center justify-center w-12 h-10 text-indigo-600 hover:bg-indigo-50 rounded-xl border border-slate-200 ml-1 transition-all" title="View All Patients">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-            <span class="text-[8px] font-black uppercase mt-0.5 tracking-tighter">Table</span>
-        </button>
-
-        <button onclick="prepareAndPrint()" class="flex items-center gap-2 bg-slate-900 hover:bg-black text-white px-4 h-10 rounded-xl font-bold shadow-lg transition-all active:scale-95 ml-1">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-            <span class="text-xs uppercase tracking-widest hidden xl:block">Print Rx</span>
-        </button>
-    </div>
+        <div class="flex items-center bg-slate-800 p-1 rounded-xl shadow-sm ml-1">
+            <button onclick="prepareAndPrint()" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-slate-700 rounded-lg transition-colors" title="Print Rx">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <span class="text-[8px] font-black text-white uppercase mt-0.5 tracking-tighter">Print</span>
+            </button>
+        </div>
 </header>
 
 
@@ -1542,7 +1538,7 @@ function parseQuickEntry(str) {
 function renderQuickChips(data) {
     let nextFound = false;
     qChips.innerHTML = qSeq.map(item => {
-        const val = (item.key==='kco'&&data.kco.length) ? data.kco.join(', ') : data[item.key];
+        const val = item.key==='kco' ? (data.kco.length ? data.kco.join(', ') : '') : data[item.key];
         if (val) return `<span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg border bg-emerald-100 text-emerald-700 border-emerald-300 shadow-sm">✓ ${item.label}: <span class="text-emerald-900">${val}</span></span>`;
         if (!nextFound) { nextFound=true; return `<span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg border bg-indigo-50 text-indigo-600 border-indigo-300 animate-pulse shadow-sm">${item.label}</span>`; }
         return `<span class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg border bg-slate-100 text-slate-400 border-slate-200">${item.label}</span>`;
@@ -1820,7 +1816,7 @@ async function prepareAndPrint() {
 
     const nameCheck = document.getElementById('ptName');
     if (nameCheck && nameCheck.value.trim() !== '') {
-        await saveToArchive();
+        await saveToArchive(false);
     }
 
     // ── INVESTIGATION HISTORY FOR PRINT ──────────────────────────────────────
@@ -2799,12 +2795,12 @@ function openDB() {
 }
 
 // 1. Save Patient Data
-async function saveToArchive() {
+async function saveToArchive(autoClear = true) {
     const nameBox = document.getElementById('ptName');
     if (!nameBox || !nameBox.value.trim()) return; // Fails silently if no name
 
     const btn = document.getElementById('btn-archive');
-    if (btn) btn.innerText = "⏳";
+    if (btn) btn.innerHTML = '<span class="text-sm">⏳</span>';
 
     const ptName = nameBox.value.trim().toUpperCase();
     
@@ -2886,8 +2882,13 @@ async function saveToArchive() {
 
 
     tx.oncomplete = () => {
-        if(btn) { btn.innerText = "✓"; setTimeout(() => btn.innerText = "💾", 2000); }
+        if(btn) {
+    const original = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zM17 21v-8H7v8M7 3v5h8"/></svg><span class="text-[8px] font-black uppercase mt-0.5 tracking-tighter">Save</span>`;
+    btn.innerHTML = '<span class="text-sm">✓</span>';
+    setTimeout(() => btn.innerHTML = original, 2000);
+}
         updateTotalCasesCount(); // <-- Added this to instantly update the UI after saving
+        if (autoClear) clearWorkspace(true);
     };
 }
 
@@ -4322,14 +4323,7 @@ function showPatientTrend(patientName) {
     </div>
 </div>
 
-<div id="calWidget" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:110px;font-family:sans-serif;border-radius:10px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:9999;">
 
-
-  <div style="background:#e8262f;color:#fff;text-align:center;font-weight:700;padding:3px 0;font-size:24px;" id="calDay"></div>
-
-  
-  <div style="background:#fff;color:#1c2536;text-align:center;font-weight:900;font-size:50px;padding:5px 0;" id="calDate"></div>
-</div>
 
 <script>
   const days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
