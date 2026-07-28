@@ -4208,6 +4208,10 @@ function renderPatientsTable() {
         const vDateMs = getSortableTime(p.visits[p.visits.length - 1].searchDate);
         const vDateLabel = p.visits[p.visits.length - 1].date.split(',')[0];
         
+        // --- 🌟 THE FIX: Calculate their current age on the fly ---
+        const currentAge = getSmartAge(latestVisit.age, p.visits[p.visits.length - 1].date);
+        // ----------------------------------------------------------
+
         // --- 🎨 Color Code Logic ---
         const daysAgo = Math.floor((now - vDateMs) / (1000 * 60 * 60 * 24));
         let dateBadge = `<span class="px-2 py-1 rounded bg-slate-100 text-slate-600 border border-slate-200">${vDateLabel}</span>`;
@@ -4225,32 +4229,31 @@ function renderPatientsTable() {
         const safeName = p.name.replace(/'/g, "\\'");
 
         // --- Build Latest Lab Report badges (same keys as history modal) ---
-
-            let latestInvHtml = '<span class="text-slate-300">--</span>';
-            if (latestVisit.investigations) {
-                const invMap = {
-                    'Hb': latestVisit.investigations.hb,
-                    'TC': latestVisit.investigations.tc,
-                    'Plt': latestVisit.investigations.plt,
-                    'RBS': latestVisit.investigations.rbs,
-                    'FBS': latestVisit.investigations.fbs,
-                    'PPBS': latestVisit.investigations.ppbs,
-                    'HbA1c': latestVisit.investigations.hba1c,
-                    'Cr': latestVisit.investigations.creat,
-                    'SGPT': latestVisit.investigations.sgpt,
-                    'TSH': latestVisit.investigations.tsh,
-                    'Urine': latestVisit.investigations.urine,
-                    'Others': latestVisit.investigations.others
-                };
-                const validInvs = Object.entries(invMap).filter(([k, v]) => v && String(v).trim() !== '');
-                if (validInvs.length > 0) {
-                    latestInvHtml = validInvs.map(([k, v]) =>
-                        `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide">
-                            <span class="text-emerald-900">${k}:</span> ${v}
-                        </span>`
-                    ).join(' ');
-                }
+        let latestInvHtml = '<span class="text-slate-300">--</span>';
+        if (latestVisit.investigations) {
+            const invMap = {
+                'Hb': latestVisit.investigations.hb,
+                'TC': latestVisit.investigations.tc,
+                'Plt': latestVisit.investigations.plt,
+                'RBS': latestVisit.investigations.rbs,
+                'FBS': latestVisit.investigations.fbs,
+                'PPBS': latestVisit.investigations.ppbs,
+                'HbA1c': latestVisit.investigations.hba1c,
+                'Cr': latestVisit.investigations.creat,
+                'SGPT': latestVisit.investigations.sgpt,
+                'TSH': latestVisit.investigations.tsh,
+                'Urine': latestVisit.investigations.urine,
+                'Others': latestVisit.investigations.others
+            };
+            const validInvs = Object.entries(invMap).filter(([k, v]) => v && String(v).trim() !== '');
+            if (validInvs.length > 0) {
+                latestInvHtml = validInvs.map(([k, v]) =>
+                    `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide">
+                        <span class="text-emerald-900">${k}:</span> ${v}
+                    </span>`
+                ).join(' ');
             }
+        }
 
         return `
             <tr class="hover:bg-slate-50 transition-colors group border-l-4 border-transparent hover:border-indigo-500">
@@ -4258,7 +4261,8 @@ function renderPatientsTable() {
                 <td class="py-3 px-4">
                     <div class="text-[13px] font-black text-slate-800 uppercase tracking-wide cursor-pointer hover:text-indigo-600" onclick="document.getElementById('patientsTableModal').classList.add('hidden'); openHistoryModal('${safeName}')">${p.name}</div>
                 </td>
-                <td class="py-3 px-4 text-[11px] font-bold text-slate-600">${latestVisit.age || '--'} / ${latestVisit.sex || '-'}</td>
+                <!-- 🔥 USE THE CALCULATED 'currentAge' HERE INSTEAD OF latestVisit.age -->
+                <td class="py-3 px-4 text-[11px] font-bold text-slate-600">${currentAge || '--'} / ${latestVisit.sex || '-'}</td>
                 <td class="py-3 px-4">${kcoBadge}</td>
                 <td class="py-3 px-4 text-[11px] font-black text-slate-600">${p.visits.length}</td>
                 <td class="py-3 px-4 text-[11px] font-bold text-slate-500">${vitals}</td>
@@ -4268,7 +4272,6 @@ function renderPatientsTable() {
                  <td class="py-3 px-4 text-[10px] font-bold text-slate-500">
                     ${hasLabs ? `<span class="px-2 py-1 bg-amber-50 text-amber-700 rounded-md border border-amber-200 cursor-pointer hover:bg-amber-500 hover:text-white transition-colors" onclick="showPatientTrend('${safeName}')">📈 View Reports</span>` : '<span class="text-slate-300">--</span>'}
                 </td>
-               
             </tr>
         `;
     }).join('');
