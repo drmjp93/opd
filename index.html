@@ -197,7 +197,7 @@
 <div id="screen-layout" class="p-4 lg:p-6 min-h-screen" style="display:none;">
 <div id="bannerRow" class="fixed top-2 left-1/2 -translate-x-1/2 z-[9998] flex gap-3 no-print">
 <div id="readyBanner" class="bg-emerald-500 text-white text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300">BP & HR Entered</div>
-<div id="pregnantBanner" class="bg-pink-500 text-white text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300">Pregnant — MOA: <span id="pregnantMoaVal"></span></div>
+<div id="pregnantBanner" onclick="clearMOA()" title="Tap to clear MOA (e.g. after abortion)" class="bg-pink-500 text-white text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full shadow-lg opacity-0 transition-opacity duration-300 cursor-pointer">Pregnant — MOA: <span id="pregnantMoaVal"></span></div>
 </div>
     <header class="max-w-[1600px] mx-auto flex justify-between items-center sticky top-0 z-40 bg-[#f8fafc] py-2 px-4 border-b border-slate-200 mb-3 shadow-sm no-print gap-4">
     
@@ -1920,7 +1920,7 @@ async function prepareAndPrint() {
     const ptName = document.getElementById('ptName').value || '—';
     const ptAge  = document.getElementById('ptAge').value;
     const ptSex  = document.getElementById('ptSex').value === 'M' ? 'Male' : 'Female';
-    const ptMOA = document.getElementById('ptMOA')?.value || '';
+    const ptMOA = (document.getElementById('ptMOA')?.value || '').replace(/(\d)([A-Za-z])/, '$1 $2');
     const date   = document.getElementById('date').value
         ? new Date(document.getElementById('date').value).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
         : '—';
@@ -2481,6 +2481,12 @@ document.getElementById('ptSex').addEventListener('change', updateEGFR);
 // LIVE PATIENT SUMMARY ENGINE
 // ========================================================
 
+function clearMOA() {
+    if (!confirm('Clear MOA for this patient (e.g. abortion/no longer pregnant)?')) return;
+    const moaBox = document.getElementById('ptMOA');
+    if (moaBox) moaBox.value = '';
+    updatePtSummary();
+}
 
 function updatePtSummary() {
     const name = document.getElementById('ptName').value.trim();
@@ -2918,6 +2924,26 @@ function getSortableTime(dateStr) {
     return isNaN(parsedDate) ? 0 : parsedDate.getTime();
 }
 
+function getSmartMOA(oldMoaStr, oldDateStr) {
+    if (!oldMoaStr || !oldDateStr) return '';
+    const numMatch = oldMoaStr.match(/(\d+(\.\d+)?)/);
+    if (!numMatch) return oldMoaStr;
+    const oldVal = parseFloat(numMatch[1]);
+    const suffix = oldMoaStr.replace(numMatch[1], '').trim() || 'M';
+
+    const oldDate = new Date(oldDateStr);
+    const todayVal = document.getElementById('date') ? document.getElementById('date').value : '';
+    const today = todayVal ? new Date(todayVal) : new Date();
+    if (isNaN(oldDate) || isNaN(today)) return oldMoaStr;
+
+    const diffDays = (today - oldDate) / (1000 * 60 * 60 * 24);
+    let newVal = Math.round((oldVal + diffDays / 30) * 2) / 2;
+    if (newVal > 9) return '';           // auto-remove beyond 9 months
+    if (newVal < oldVal) newVal = oldVal; // never go backwards
+
+    return (newVal % 1 === 0 ? newVal : newVal.toFixed(1)) + suffix;
+}
+
 async function searchArchive() {
     document.getElementById('kco-panel').style.display = 'none';
     document.getElementById('advice-panel').style.display = 'none';
@@ -3146,7 +3172,7 @@ function loadVisitFromArchive(idx) {
     document.getElementById('date').value = new Date().toISOString().slice(0, 10);    if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
     if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
     if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = latestVisit.age;
-    if (latestVisit.moa && document.getElementById('ptMOA')) document.getElementById('ptMOA').value = latestVisit.moa;
+    if (latestVisit.moa && document.getElementById('ptMOA')) document.getElementById('ptMOA').value = getSmartMOA(latestVisit.moa, latestVisit.date);
     //if (latestVisit.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = latestVisit.bp;
     //if (latestVisit.pulse && document.getElementById('ptPulse')) document.getElementById('ptPulse').value = latestVisit.pulse;
     //if (latestVisit.temp && document.getElementById('ptTemp')) document.getElementById('ptTemp').value = latestVisit.temp;
@@ -3473,6 +3499,7 @@ async function loadSpecificVisit(patientName, visitIndex) {
         if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
         if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
         if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = latestVisit.age;
+        if (latestVisit.moa && document.getElementById('ptMOA')) document.getElementById('ptMOA').value = getSmartMOA(latestVisit.moa, latestVisit.date);
 
         // Vitals, Complaints, and Labs are intentionally left blank here for the new visit!
 
