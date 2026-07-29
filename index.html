@@ -221,7 +221,15 @@
     </div>
 
     <div class="flex items-center gap-3 shrink-0 no-print">
-        
+
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-sm">
+            <button type="button" onclick="toggleBackupTools()" id="btn-toggle-tools" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-slate-200 rounded-lg transition-colors" title="Show Backup Tools">
+                <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </button>
+        </div>
+
+        <div id="backupToolsPanel" class="flex items-center gap-3 overflow-hidden max-w-0 opacity-0 transition-all duration-300 ease-in-out">
+
         <div class="flex items-center bg-amber-50/50 p-1 rounded-xl border border-amber-200 shadow-sm">
             <button onclick="exportDatabase()" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-amber-100 rounded-lg transition-colors group" title="Save to PC">
                 <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
@@ -243,6 +251,7 @@
                 <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 13l3 3m0 0l3-3m-3 3V10"/></svg>
                 <span class="text-[8px] font-black text-purple-700 uppercase mt-0.5 tracking-tighter">Restore</span>
             </button>
+        </div>
         </div>
 
         <div class="flex items-center bg-rose-50/50 p-1 rounded-xl border border-rose-200 shadow-sm">
@@ -304,7 +313,7 @@
 
     <div class="w-[40%] flex flex-col gap-2 h-full" style="position:relative; z-index:1;">
         
-        <div class="glass-card border-l-4 border-l-amber-500 shadow-sm flex items-stretch transition-all shrink-0" style="min-height:42px; overflow:visible;">
+        <div class="glass-card border-l-4 border-l-amber-500 shadow-sm flex items-stretch transition-all shrink-0 overflow-hidden" style="min-height:42px;">
 
             <div class="flex items-center pl-3 pr-2">
                 <span class="text-amber-500 font-bold text-sm">📝</span>
@@ -445,7 +454,7 @@
 
       </div>
     
-    <button onclick="showPatientTrend(document.getElementById('ptName').value.trim().toUpperCase())" class="px-2 py-1 bg-amber-50 text-amber-700 rounded-md border border-amber-200 hover:bg-amber-500 hover:text-white transition-colors text-xs font-bold">📈 Trends</button>
+    
 
 <!-- end lab aND ivx -->
 
@@ -502,7 +511,8 @@
 
 <div class="lg:col-span-9 flex flex-col h-[calc(100vh-100px)]">
                 
-                <div class="glass-card mb-4 px-4 py-2.5 flex flex-wrap items-center justify-between gap-4 hidden border-l-4 border-l-emerald-500 shrink-0 transition-all duration-300" id="ptSummaryStrip">
+                <div class="glass-card mb-4 px-4 py-2.5 flex flex-wrap items-center justify-between gap-4 hidden shrink-0 transition-all duration-300" id="ptSummaryStrip">
+                    <button type="button" onclick="showPatientTrend(document.getElementById('ptName').value.trim().toUpperCase())" title="View Lab Trends" class="self-stretch shrink-0 -my-2.5 -ml-4 px-4 flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-black uppercase tracking-wide rounded-l-2xl transition-colors">📈&nbsp;Trends</button>
     <div class="flex items-center gap-3 flex-1 min-w-0">
         <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-[15px] shadow-inner shrink-0" id="sumInitials">PT</div>
         <div class="flex flex-col min-w-0 flex-1">
@@ -522,7 +532,7 @@
         <div class="flex items-center gap-1.5" title="SpO2"><span class="text-sky-500 font-black">O₂</span> <span id="sumSpo2">--</span></div>
     </div>
     <button type="button" id="sumMOA" onclick="clearMOA()" title="Tap to clear MOA (e.g. after abortion)" class="self-stretch shrink-0 -my-2.5 -mr-4 px-4 flex items-center gap-1.5 bg-pink-500 hover:bg-pink-600 text-white text-sm font-black uppercase tracking-wide rounded-r-2xl transition-colors" style="display:none;">
-    MOA:&nbsp;<span id="sumMOAVal"></span>
+    <span id="sumMOAVal"></span>
 </button>
 </div>
 
@@ -2548,7 +2558,7 @@ function updatePtSummary() {
         }
 
         
-    const moaVal = document.getElementById('ptMOA') ? document.getElementById('ptMOA').value.trim() : '';
+    const moaVal = document.getElementById('ptMOA') ? document.getElementById('ptMOA').value.trim().replace(/(\d)([A-Za-z])/, '$1 $2') : '';
     const sumMOA = document.getElementById('sumMOA');
     if (sumMOA) {
         sumMOA.style.display = moaVal ? 'flex' : 'none';
@@ -3248,6 +3258,25 @@ document.addEventListener('click', function(event) {
     }
 });
 
+let backupToolsTimer;
+function toggleBackupTools(){
+    const panel = document.getElementById('backupToolsPanel');
+    const isOpen = panel.classList.contains('opacity-100');
+    clearTimeout(backupToolsTimer);
+
+    panel.classList.toggle('max-w-0');
+    panel.classList.toggle('opacity-0');
+    panel.classList.toggle('max-w-[700px]');
+    panel.classList.toggle('opacity-100');
+
+    if (!isOpen) {
+        backupToolsTimer = setTimeout(() => {
+            panel.classList.add('max-w-0', 'opacity-0');
+            panel.classList.remove('max-w-[700px]', 'opacity-100');
+        }, 5000);
+    }
+}
+
 // 4. Backup Export Engine
 async function exportDatabase() {
     const db = await openDB();
@@ -3321,6 +3350,7 @@ async function openHistoryModal(patientName) {
 
     request.onsuccess = () => {
         const p = request.result;
+        window.currentHistoryPatientName = p.name;
         if (!p) return;
 
         // Set Header Info
@@ -3456,6 +3486,43 @@ async function openHistoryModal(patientName) {
 
 function closeHistoryModal() {
     document.getElementById('historyModal').classList.add('hidden');
+}
+
+async function renamePatientFromHistory() {
+    const oldName = window.currentHistoryPatientName;
+    if (!oldName) return;
+    const newNameRaw = prompt("Enter new patient name:", oldName);
+    if (!newNameRaw) return;
+    const newName = newNameRaw.trim().toUpperCase();
+    if (!newName || newName === oldName) return;
+
+    const db = await openDB();
+    const tx = db.transaction("patients", "readwrite");
+    const store = tx.objectStore("patients");
+    const req = store.get(oldName);
+
+    req.onsuccess = () => {
+        const p = req.result;
+        if (!p) return;
+        const existsReq = store.get(newName);
+        existsReq.onsuccess = () => {
+            if (existsReq.result) {
+                alert("A patient with that name already exists.");
+                return;
+            }
+            p.name = newName;
+            store.delete(oldName);
+            store.put(p);
+            tx.oncomplete = () => {
+                window.currentHistoryPatientName = newName;
+                document.getElementById('historyModalTitle').innerText = newName;
+                document.getElementById('histInitials').innerText = newName.substring(0, 2).toUpperCase();
+                if (document.getElementById('ptName').value.trim().toUpperCase() === oldName) {
+                    document.getElementById('ptName').value = newName;
+                }
+            };
+        };
+    };
 }
 
 // ══════════════════════════════════════════
@@ -4153,7 +4220,7 @@ async function openPatientsTable() {
         if (dbMasterData.length === 0) return alert("No patients found in the local database.");
         
         document.getElementById('dbSearchInput').value = '';
-        sortDb('date'); // Automatically sorts by newest date and renders
+        dbSortCol = 'date'; dbSortAsc = false; renderPatientsTable(); // Newest visit first, default
         document.getElementById('patientsTableModal').classList.remove('hidden');
     };
 }
@@ -4220,7 +4287,7 @@ function renderPatientsTable() {
         if (latestVisit.kco) kcoStr = latestVisit.kco.map((c, i) => c ? kcoMasterLabels[i] : null).filter(Boolean).join(', ');
         const kcoBadge = kcoStr ? `<span class="px-2 py-0.5 bg-rose-50 border border-rose-100 text-rose-600 rounded text-[9px] font-bold tracking-wider">${kcoStr}</span>` : '--';
 
-        const vitals = [latestVisit.bp ? `BP: ${latestVisit.bp}` : '', latestVisit.pulse ? `HR: ${latestVisit.pulse}` : ''].filter(Boolean).join(' | ') || '--';
+        const moaDisplay = getSmartMOA(latestVisit.moa, p.visits[p.visits.length - 1].date);
 
         // --- 📈 Determine if they have Serial Lab Reports ---
         const hasLabs = p.visits.filter(v => v.details && v.details.investigations && Object.values(v.details.investigations).some(val => val && /\d/.test(val))).length >= 1;
@@ -4257,13 +4324,13 @@ function renderPatientsTable() {
             <tr class="hover:bg-slate-50 transition-colors group border-l-4 border-transparent hover:border-indigo-500">
                 <td class="py-3 px-4 text-[11px]">${dateBadge}</td>
                 <td class="py-3 px-4">
-                    <div class="text-[13px] font-black text-slate-800 uppercase tracking-wide cursor-pointer hover:text-indigo-600" onclick="document.getElementById('patientsTableModal').classList.add('hidden'); openHistoryModal('${safeName}')">${p.name}</div>
+                    <div class="text-[13px] font-black text-slate-800 uppercase tracking-wide cursor-pointer hover:text-indigo-600" onclick="document.getElementById('patientsTableModal').classList.add('hidden'); openHistoryModal('${safeName}')">${p.name} <span class="text-slate-400 font-bold normal-case text-[11px]">(${currentAge || '--'}/${latestVisit.sex || '-'})</span></div>
                 </td>
-                <!-- 🔥 USE THE CALCULATED 'currentAge' HERE INSTEAD OF latestVisit.age -->
-                <td class="py-3 px-4 text-[11px] font-bold text-slate-600">${currentAge || '--'} / ${latestVisit.sex || '-'}</td>
+                
                 <td class="py-3 px-4">${kcoBadge}</td>
+                <td class="py-3 px-4 text-[10px] font-black">${moaDisplay ? `<span class="px-2 py-0.5 bg-pink-50 border border-pink-200 text-pink-600 rounded text-[9px] font-bold tracking-wider">${moaDisplay}</span>` : '<span class="text-slate-300">--</span>'}</td>
                 <td class="py-3 px-4 text-[11px] font-black text-slate-600">${p.visits.length}</td>
-                <td class="py-3 px-4 text-[11px] font-bold text-slate-500">${vitals}</td>
+                
                 <td class="py-3 px-4 text-[10px]">
                     <div class="flex flex-wrap gap-1 max-w-[220px]">${latestInvHtml}</div>
                 </td>
@@ -4374,6 +4441,7 @@ function showPatientTrend(patientName) {
                     <h2 class="text-xl font-black text-slate-800 tracking-tight" id="historyModalTitle">Patient Name</h2>
                     <p class="text-xs font-bold text-slate-500 mt-0.5 uppercase tracking-widest" id="historyModalSub">-- YRS / M</p>
                 </div>
+                <button onclick="renamePatientFromHistory()" title="Edit Name" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-brand-100 text-slate-400 hover:text-brand-600 transition-colors">✏️</button>
             </div>
             <button onclick="closeHistoryModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-100 hover:text-rose-600 text-slate-400 transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -4445,10 +4513,11 @@ function showPatientTrend(patientName) {
                     <tr>
                         <th onclick="sortDb('date')" class="py-3 px-4 text-[10px] font-black text-slate-500 hover:text-indigo-600 uppercase tracking-widest border-b border-slate-200">Last Visit ↕</th>
                         <th onclick="sortDb('name')" class="py-3 px-4 text-[10px] font-black text-slate-500 hover:text-indigo-600 uppercase tracking-widest border-b border-slate-200">Patient Name ↕</th>
-                        <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">Age/Sex</th>
                         <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">KCO (Known Case)</th>
+
+                        <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">MOA</th>
                         <th onclick="sortDb('visits')" class="py-3 px-4 text-[10px] font-black text-slate-500 hover:text-indigo-600 uppercase tracking-widest border-b border-slate-200">Visits ↕</th>
-                        <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">Latest Vitals</th>
+                        
                         <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">Reports</th>
                         <th class="py-3 px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-200">Latest Reports</th>
                         
