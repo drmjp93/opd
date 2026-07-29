@@ -520,6 +520,7 @@
                 <h3 class="text-[14px] font-bold text-slate-800 leading-tight whitespace-nowrap" id="sumName">Name</h3>
                 <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-slate-100 px-1.5 py-0.5 rounded whitespace-nowrap" id="sumAgeSex">Age / Sex</span>
                 <span class="text-[9px] font-bold text-rose-600 uppercase tracking-wider bg-rose-50 border border-rose-100 px-1.5 py-0.5 rounded hidden whitespace-nowrap" id="sumKCO">KCO: --</span>
+                <span class="text-[9px] font-bold text-white uppercase tracking-wider bg-rose-600 px-1.5 py-0.5 rounded hidden whitespace-nowrap" id="sumOverdue">Overdue</span>
             </div>
             <p class="text-[11px] font-medium text-slate-500 mt-0.5 italic truncate hidden w-full pr-4" id="sumCO">C/O: --</p>
         </div>
@@ -2510,6 +2511,20 @@ function clearMOA() {
     updatePtSummary();
 }
 
+let currentOverdueLabel = '';
+
+function calcOverdueLabel(fuDays, visitDateStr) {
+    const fu = parseInt(fuDays, 10);
+    if (!fu || !visitDateStr) return '';
+    const dueDate = new Date(visitDateStr);
+    dueDate.setDate(dueDate.getDate() + fu);
+    const diffDays = Math.floor((new Date() - dueDate) / 86400000);
+    if (diffDays <= 0) return '';
+    if (diffDays < 30) return `${diffDays} day${diffDays > 1 ? 's' : ''} overdue`;
+    const months = Math.floor(diffDays / 30);
+    return `${months} month${months > 1 ? 's' : ''} overdue`;
+}
+
 function updatePtSummary() {
     const name = document.getElementById('ptName').value.trim();
     const age = document.getElementById('ptAge').value || '--';
@@ -2548,6 +2563,12 @@ function updatePtSummary() {
             kcoEl.classList.add('hidden');
         }
 
+        const overdueEl = document.getElementById('sumOverdue');
+        if (overdueEl) {
+            if (currentOverdueLabel) { overdueEl.innerText = currentOverdueLabel; overdueEl.classList.remove('hidden'); }
+            else overdueEl.classList.add('hidden');
+        }
+
         // Toggle Complaints visibility
         const coEl = document.getElementById('sumCO');
         if (complaints) {
@@ -2579,6 +2600,8 @@ function updatePtSummary() {
         el.addEventListener('change', updatePtSummary);
     }
 });
+
+document.getElementById('ptName')?.addEventListener('input', () => { currentOverdueLabel = ''; });
 
 // Attach listeners to every KCO checkbox so the card updates when clicked
 
@@ -3258,6 +3281,7 @@ document.addEventListener('click', function(event) {
     }
 });
 
+
 let backupToolsTimer;
 function toggleBackupTools(){
     const panel = document.getElementById('backupToolsPanel');
@@ -3276,6 +3300,7 @@ function toggleBackupTools(){
         }, 5000);
     }
 }
+
 
 // 4. Backup Export Engine
 async function exportDatabase() {
@@ -3588,6 +3613,7 @@ async function loadSpecificVisit(patientName, visitIndex) {
         if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
         if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = getSmartAge(latestVisit.age, latestVisit.date);
         if (document.getElementById('ptMOA')) document.getElementById('ptMOA').value = latestVisit.moa ? getSmartMOA(latestVisit.moa, latestVisit.date) : '';
+        currentOverdueLabel = calcOverdueLabel(latestVisit.fuDays, latestVisit.date);
 
         // Vitals, Complaints, and Labs are intentionally left blank here for the new visit!
 
