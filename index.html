@@ -195,10 +195,7 @@
 <div id="print-layout"></div>
 
 <div id="screen-layout" class="p-4 lg:p-6 min-h-screen" style="display:none;">
-<div id="bannerRow" class="fixed top-2 left-1/2 -translate-x-1/2 z-[9998] flex gap-3 no-print">
-<div id="readyBanner" class="bg-emerald-500 text-white text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity duration-300">BP & HR Entered</div>
-<div id="pregnantBanner" onclick="clearMOA()" title="Tap to clear MOA (e.g. after abortion)" class="bg-pink-500 text-white text-xs font-black uppercase tracking-widest px-5 py-2 rounded-full shadow-lg opacity-0 transition-opacity duration-300 cursor-pointer">Pregnant — MOA: <span id="pregnantMoaVal"></span></div>
-</div>
+
     <header class="max-w-[1600px] mx-auto flex justify-between items-center sticky top-0 z-40 bg-[#f8fafc] py-2 px-4 border-b border-slate-200 mb-3 shadow-sm no-print gap-4">
     
     <div class="flex items-center gap-3 shrink-0">
@@ -524,6 +521,9 @@
         <div class="flex items-center gap-1.5" title="Temperature"><span class="text-orange-500 font-black">Temp</span> <span id="sumTemp">--</span></div>
         <div class="flex items-center gap-1.5" title="SpO2"><span class="text-sky-500 font-black">O₂</span> <span id="sumSpo2">--</span></div>
     </div>
+    <button type="button" id="sumMOA" onclick="clearMOA()" title="Tap to clear MOA (e.g. after abortion)" class="self-stretch shrink-0 -my-2.5 -mr-4 px-4 flex items-center gap-1.5 bg-pink-500 hover:bg-pink-600 text-white text-sm font-black uppercase tracking-wide rounded-r-2xl transition-colors" style="display:none;">
+    MOA:&nbsp;<span id="sumMOAVal"></span>
+</button>
 </div>
 
 
@@ -2547,21 +2547,17 @@ function updatePtSummary() {
             coEl.classList.add('hidden');
         }
 
-        const readyBanner = document.getElementById('readyBanner');
-    if (readyBanner) {
-        readyBanner.style.opacity = (bp !== '--/--' && hr !== '--') ? '1' : '0';
-    }
+        
     const moaVal = document.getElementById('ptMOA') ? document.getElementById('ptMOA').value.trim() : '';
-    const pregBanner = document.getElementById('pregnantBanner');
-    if (pregBanner) {
-        pregBanner.style.opacity = moaVal ? '1' : '0';
-        document.getElementById('pregnantMoaVal').innerText = moaVal;
+    const sumMOA = document.getElementById('sumMOA');
+    if (sumMOA) {
+        sumMOA.style.display = moaVal ? 'flex' : 'none';
+        document.getElementById('sumMOAVal').innerText = moaVal;
     }
 
     } else {
         strip.classList.add('hidden');
-        document.getElementById('readyBanner').style.opacity = '0';
-        document.getElementById('pregnantBanner').style.opacity = '0';
+        document.getElementById('sumMOA').style.display = 'none';
     }
 }
 
@@ -2817,15 +2813,17 @@ async function saveToArchive(autoClear = true) {
     const nameBox = document.getElementById('ptName');
     if (!nameBox || !nameBox.value.trim()) return; // Fails silently if no name
 
+    const bpCheck = (document.getElementById('bpInput') || {}).value?.trim();
+    const hrCheck = (document.getElementById('ptPulse') || {}).value?.trim();
+    if (!bpCheck || !hrCheck) {
+        alert('⚠ BP and HR must be entered before saving.');
+        return;
+    }
+
     const btn = document.getElementById('btn-archive');
     if (btn) btn.innerHTML = '<span class="text-sm">⏳</span>';
 
     const ptName = nameBox.value.trim().toUpperCase();
-    
-    // Don't save if no meaningful data entered
-    const hasBP = (document.getElementById('bpInput') || {}).value?.trim();
-    const hasPulse = (document.getElementById('ptPulse') || {}).value?.trim();
-    if (!hasBP && !hasPulse) return;
     
     const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
     const kcoData = kcoCheckboxes.map(cb => cb.checked);
@@ -3195,7 +3193,7 @@ function loadVisitFromArchive(idx) {
     document.getElementById('date').value = new Date().toISOString().slice(0, 10);    if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
     if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
     if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = getSmartAge(latestVisit.age, latestVisit.date);
-    if (latestVisit.moa && document.getElementById('ptMOA')) document.getElementById('ptMOA').value = getSmartMOA(latestVisit.moa, latestVisit.date);
+    if (document.getElementById('ptMOA')) document.getElementById('ptMOA').value = latestVisit.moa ? getSmartMOA(latestVisit.moa, latestVisit.date) : '';
     //if (latestVisit.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = latestVisit.bp;
     //if (latestVisit.pulse && document.getElementById('ptPulse')) document.getElementById('ptPulse').value = latestVisit.pulse;
     //if (latestVisit.temp && document.getElementById('ptTemp')) document.getElementById('ptTemp').value = latestVisit.temp;
@@ -3522,7 +3520,7 @@ async function loadSpecificVisit(patientName, visitIndex) {
         if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
         if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
         if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = getSmartAge(latestVisit.age, latestVisit.date);
-        if (latestVisit.moa && document.getElementById('ptMOA')) document.getElementById('ptMOA').value = getSmartMOA(latestVisit.moa, latestVisit.date);
+        if (document.getElementById('ptMOA')) document.getElementById('ptMOA').value = latestVisit.moa ? getSmartMOA(latestVisit.moa, latestVisit.date) : '';
 
         // Vitals, Complaints, and Labs are intentionally left blank here for the new visit!
 
