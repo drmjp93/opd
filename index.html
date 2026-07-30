@@ -207,7 +207,7 @@
 
     <div class="flex-1 max-w-4xl relative group mx-2 flex items-center z-50">
         <div class="relative w-full">
-            <input type="text" id="archiveSearch" onfocus="searchArchive()" oninput="searchArchive()" placeholder="Search by Name, Date, or Year (e.g. 'Rahul 2026')..." class="w-full py-2.5 pl-11 pr-4 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-brand-500 rounded-full text-[13px] font-bold text-slate-800 uppercase tracking-wide outline-none transition-all shadow-sm focus:shadow-md placeholder:text-slate-400 placeholder:normal-case placeholder:font-medium">
+            <input type="text" id="archiveSearch" onfocus="searchArchive()" oninput="searchArchive()" placeholder="Search Name, Initials, Age, Gender, Complaint, Medicine, Report..." class="w-full py-2.5 pl-11 pr-4 bg-white border-2 border-slate-200 hover:border-slate-300 focus:border-brand-500 rounded-full text-[13px] font-bold text-slate-800 uppercase tracking-wide outline-none transition-all shadow-sm focus:shadow-md placeholder:text-slate-400 placeholder:normal-case placeholder:font-medium">
             <svg class="w-5 h-5 text-slate-400 absolute left-4 top-[11px] group-focus-within:text-brand-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             
             <div id="searchResults" class="fixed top-[70px] left-1/2 -translate-x-1/2 w-[96vw] max-w-[1500px] bg-white border-2 border-slate-200 shadow-2xl rounded-xl hidden max-h-[60vh] overflow-y-auto z-[9999] divide-y divide-slate-100"></div>
@@ -310,6 +310,7 @@
         </div>
         <div id="quickEntryChips" class="px-4 py-1.5 bg-slate-50/50 flex-wrap gap-1.5 empty:hidden flex flex-1 items-center"></div>
     </div>
+    <div id="quickNameSuggest" class="fixed hidden z-[9999] bg-white border border-slate-200 rounded-lg shadow-lg max-h-64 overflow-y-auto"></div>
 
     <div class="w-[40%] flex flex-col gap-2 h-full" style="position:relative; z-index:1;">
         
@@ -1618,19 +1619,138 @@ function executeQuickFill() {
     saveWorkspace();
 }
 
-qInput.addEventListener('input',  () => renderQuickChips(parseQuickEntry(qInput.value)));
-qInput.addEventListener('keydown', e => { 
-    if (e.key === 'Enter' || e.key === 'Tab') { 
-        e.preventDefault(); 
-        executeQuickFill(); // Automatically saves demographics
+qInput.addEventListener('input', () => {
+    renderQuickChips(parseQuickEntry(qInput.value));
+    const val = qInput.value;
+    clearTimeout(quickSuggestTimeout);
+    if (/^[A-Za-z\s]+$/.test(val.trim()) && val.trim().length >= 2) {
+        quickSuggestTimeout = setTimeout(() => updateQuickNameSuggestions(val), 150);
+    } else {
+        quickSuggestMatches = [];
+        document.getElementById('quickNameSuggest').classList.add('hidden');
+    }
+});
+
+qInput.addEventListener('keydown', e => {
+    const box = document.getElementById('quickNameSuggest');
+    const isOpen = !box.classList.contains('hidden') && quickSuggestMatches.length > 0;
+
+    if (isOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+        e.preventDefault();
+        quickSuggestIndex += (e.key === 'ArrowDown' ? 1 : -1);
+        if (quickSuggestIndex < 0) quickSuggestIndex = quickSuggestMatches.length - 1;
+        if (quickSuggestIndex >= quickSuggestMatches.length) quickSuggestIndex = 0;
+        renderQuickSuggestDropdown();
+        return;
+    }
+
+    if (isOpen && e.key === 'Enter') {
+        e.preventDefault();
+        selectQuickSuggestion(quickSuggestIndex >= 0 ? quickSuggestIndex : 0);
+        return;
+    }
+
+    if (isOpen && e.key === 'Escape') {
+        box.classList.add('hidden');
+        return;
+    }
+
+    if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault();
+        executeQuickFill();
         if (e.key === 'Tab') {
-            // Jumps to the Complaints box
             const coBox = document.getElementById('complaintsSmartInput');
             if (coBox) coBox.focus();
         }
     }
 });
 qBtn.addEventListener('click', executeQuickFill);
+let quickSuggestTimeout = null;
+let quickSuggestIndex = -1;
+let quickSuggestMatches = [];
+
+function positionQuickSuggest() {
+    const box = document.getElementById('quickNameSuggest');
+    const rect = qInput.getBoundingClientRect();
+    box.style.left = rect.left + 'px';
+    box.style.top = (rect.bottom + 4) + 'px';
+    box.style.width = rect.width + 'px';
+}
+
+function renderQuickSuggestDropdown() {
+    const box = document.getElementById('quickNameSuggest');
+    if (quickSuggestMatches.length === 0) { box.classList.add('hidden'); return; }
+
+    box.innerHTML = quickSuggestMatches.map((m, i) => {
+        const age = m.details.age ? `${m.details.age}y` : '';
+        const sex = m.details.sex || '';
+        const active = i === quickSuggestIndex ? 'bg-indigo-50' : '';
+        return `<div data-idx="${i}" class="quick-suggest-item px-4 py-2 cursor-pointer hover:bg-indigo-50 flex items-center justify-between ${active}">
+                    <span class="font-bold text-sm text-slate-800">${m.name}</span>
+                    <span class="text-[10px] text-slate-500 font-bold uppercase">${age} ${sex}</span>
+                </div>`;
+    }).join('');
+
+    positionQuickSuggest();
+    box.classList.remove('hidden');
+
+    box.querySelectorAll('.quick-suggest-item').forEach(el => {
+        el.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            selectQuickSuggestion(parseInt(el.dataset.idx));
+        });
+    });
+}
+
+async function updateQuickNameSuggestions(query) {
+    if (!query || query.trim().length < 2) {
+        quickSuggestMatches = [];
+        document.getElementById('quickNameSuggest').classList.add('hidden');
+        return;
+    }
+    const q = query.trim().toUpperCase();
+    const db = await openDB();
+    const tx = db.transaction("patients", "readonly");
+    const store = tx.objectStore("patients");
+    const req = store.getAll();
+
+    req.onsuccess = () => {
+        const all = req.result || [];
+        const matches = all
+            .filter(p => (p.name || '').toUpperCase().includes(q))
+            .sort((a, b) => {
+                const an = a.name.toUpperCase(), bn = b.name.toUpperCase();
+                const aStarts = an.startsWith(q) ? 0 : 1;
+                const bStarts = bn.startsWith(q) ? 0 : 1;
+                return aStarts - bStarts;
+            })
+            .slice(0, 6)
+            .map(p => {
+                const lastVisit = p.visits[p.visits.length - 1];
+                return { name: p.name, visitDate: lastVisit.date, details: lastVisit.details, totalVisits: p.visits.length };
+            });
+
+        quickSuggestMatches = matches;
+        quickSuggestIndex = -1;
+        renderQuickSuggestDropdown();
+    };
+}
+
+function selectQuickSuggestion(idx) {
+    if (!quickSuggestMatches[idx]) return;
+    window.tempMatchedVisits = quickSuggestMatches;
+    loadVisitFromArchive(idx);
+    quickSuggestMatches = [];
+    document.getElementById('quickNameSuggest').classList.add('hidden');
+    qInput.value = '';
+    qInput.focus();
+}
+
+document.addEventListener('click', (e) => {
+    if (e.target.id !== 'quickEntryInput' && !e.target.closest('#quickNameSuggest')) {
+        document.getElementById('quickNameSuggest').classList.add('hidden');
+    }
+});
 renderQuickChips(parseQuickEntry(''));
 
 // Sync details cards open/close
@@ -2444,9 +2564,10 @@ async function prepareAndPrint() {
 
       </div>
 
-      <div class="slip-credit" style="margin-top: 15px; padding-top: 8px; color: rgba(128, 128, 128, 0.6);">
-  Prescription software developed by Dr. Mit Panchani
-</div>
+     <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 15px; padding-top: 8px;">
+        <div style="font-size: 7pt; font-weight: 700; color: rgba(128,128,128,0.7); text-align: left;">RX: ${window.lastRxCode || ''}</div>
+        <div class="slip-credit" style="color: rgba(128, 128, 128, 0.6); margin: 0; padding: 0;">Prescription software developed by Dr. Mit Panchani</div>
+      </div>
 
 <div style="font-size: 8pt; font-weight: 700; color: rgba(128, 128, 128, 0.9); margin-bottom: 2px; text-align: center">EX-CONSULTANT: CIVIL HOSPITAL, GANDHINAGAR | AMBA HEALTH CENTRE & HOSPITAL (AHCH), ADALAJ, TRIMANDIR SANKUL, GANDHINAGAR</div>
 
@@ -2853,6 +2974,17 @@ function openDB() {
     });
 }
 
+    function generateRxChecksum(name, dateStr) {
+    let sum = 0;
+    const seedStr = (name || '') + (dateStr || '');
+    for (let i = 0; i < seedStr.length; i++) sum = (sum * 31 + seedStr.charCodeAt(i)) >>> 0;
+    return sum.toString(36).toUpperCase().padStart(4, '0').slice(-4);
+}
+
+    function generateRxSeed() {
+        return Math.random().toString(36).substring(2, 6).toUpperCase().padEnd(4, '0');
+}
+
 // 1. Save Patient Data
 async function saveToArchive(autoClear = true) {
     const nameBox = document.getElementById('ptName');
@@ -2918,29 +3050,58 @@ async function saveToArchive(autoClear = true) {
     const tx = db.transaction("patients", "readwrite");
     const store = tx.objectStore("patients");
 
-    const existingReq = store.get(ptName);
-    existingReq.onsuccess = () => {
-        let record = existingReq.result;
-        if (record) {
-            // --- DEDUP FIX: Update today's entry instead of appending a duplicate ---
-            const todayDateStr = currentData.date; // e.g. "2026-04-15"
-            const todayIdx = record.visits.findIndex(v => v.searchDate === todayDateStr);
-            if (todayIdx !== -1) {
-                // Overwrite the existing same-date entry in place
-                record.visits[todayIdx] = { date: timestamp, searchDate: searchDateStr, details: currentData };
-            } else {
-                record.visits.push({ date: timestamp, searchDate: searchDateStr, details: currentData });
-                // Visit cap — keep last 50
-                if (record.visits.length > 50) record.visits.shift();
-            }
-            // -----------------------------------------------------------------------
-            record.lastUpdate = timestamp;
-        } else {
-            record = { name: ptName, lastUpdate: timestamp, visits: [{ date: timestamp, searchDate: searchDateStr, details: currentData }] };
-        }
-        store.put(record);
-    };
+    const record = await new Promise((resolve) => {
+        const existingReq = store.get(ptName);
+        existingReq.onsuccess = () => resolve(existingReq.result);
+        existingReq.onerror = () => resolve(null);
+    });
 
+    const checksum = generateRxChecksum(ptName, currentData.date);
+    let finalRecord = record;
+
+    if (finalRecord) {
+        const todayDateStr = currentData.date;
+        const todayIdx = finalRecord.visits.findIndex(v => v.searchDate === todayDateStr);
+
+        if (todayIdx !== -1) {
+            // Reprint / edit on same date — reuse seed, bump version, keep history
+            const prevDetails = finalRecord.visits[todayIdx].details || {};
+            const seed = prevDetails.rxSeed || generateRxSeed();
+            const version = (prevDetails.rxVersion || 1) + 1;
+            const history = Array.isArray(prevDetails.rxCodeHistory) ? [...prevDetails.rxCodeHistory] : [];
+            if (prevDetails.rxCode) history.push(prevDetails.rxCode);
+
+            currentData.rxSeed = seed;
+            currentData.rxVersion = version;
+            currentData.rxCode = `${checksum}-${seed}-V${version}`;
+            currentData.rxCodeHistory = history;
+
+            finalRecord.visits[todayIdx] = { date: timestamp, searchDate: searchDateStr, details: currentData };
+        } else {
+            // First save for this date
+            const seed = generateRxSeed();
+            currentData.rxSeed = seed;
+            currentData.rxVersion = 1;
+            currentData.rxCode = `${checksum}-${seed}-V1`;
+            currentData.rxCodeHistory = [];
+
+            finalRecord.visits.push({ date: timestamp, searchDate: searchDateStr, details: currentData });
+            if (finalRecord.visits.length > 50) finalRecord.visits.shift();
+        }
+        finalRecord.lastUpdate = timestamp;
+    } else {
+        // Brand new patient
+        const seed = generateRxSeed();
+        currentData.rxSeed = seed;
+        currentData.rxVersion = 1;
+        currentData.rxCode = `${checksum}-${seed}-V1`;
+        currentData.rxCodeHistory = [];
+
+        finalRecord = { name: ptName, lastUpdate: timestamp, visits: [{ date: timestamp, searchDate: searchDateStr, details: currentData }] };
+    }
+
+    window.lastRxCode = currentData.rxCode;
+    store.put(finalRecord);
 
     tx.oncomplete = () => {
         if(btn) {
@@ -3081,8 +3242,25 @@ async function searchArchive() {
 
                 for (let i = p.visits.length - 1; i >= 0; i--) {
                     const v = p.visits[i];
+                    const d = v.details || {};
+
+                    // Build a single searchable blob per visit
+                    const age = (d.age || "").toString();
+                    const sex = (d.sex || "").toString();
+                    const kcoStr = Array.isArray(d.kco) ? d.kco.map((c,idx)=>c?kcoLabels[idx]:null).filter(Boolean).join(" ") : "";
+                    const complaintsStr = d.complaints || "";
+                    const medsStr = (d.rxItems||[]).map(r => `${r.brand||''} ${r.molecule||''}`).join(" ");
+                    const invObj = d.investigations || {};
+                    const invStr = Object.entries(invObj).map(([k,val]) => `${k} ${val}`).join(" ");
+
+                    const blob = `${patientName} ${v.date||''} ${v.searchDate||''} ${age} ${sex} ${kcoStr} ${complaintsStr} ${medsStr} ${invStr} ${d.rxCode||''} ${(d.rxCodeHistory||[]).join(' ')}`.toUpperCase();
+
+                    // initials match: e.g. "R K" -> first letters of each name word
+                    const nameInitials = patientName.split(/\s+/).map(w=>w[0]).join("");
+
                     const isMatch = queryTerms.every(term => {
-                        return patientName.includes(term) || (v.date || "").includes(term) || (v.searchDate || "").includes(term);
+                        if (term === "M" || term === "F") return sex.toUpperCase() === term;
+                        return blob.includes(term) || nameInitials.includes(term);
                     });
 
                     if (isMatch) { bestVisitMatch = v; break; }
@@ -3418,6 +3596,8 @@ async function openHistoryModal(patientName) {
                 kcoStr = d.kco.map((isChecked, idx) => isChecked ? kcoLabels[idx] : null).filter(Boolean).join(', ');
             }
             const kcoHtml = kcoStr ? `<div class="text-[9px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 inline-block self-start mt-1 shadow-sm">KCO: ${kcoStr}</div>` : '';
+
+            const rxCodeBadge = d.rxCode ? `<span class="inline-flex items-center gap-1 text-[10px] font-black text-slate-500 bg-white border border-slate-200 px-2 py-1 rounded-md tracking-wider" title="${(d.rxCodeHistory||[]).length ? 'Prior versions: ' + d.rxCodeHistory.join(', ') : 'Original print'}">🔖 ${d.rxCode}</span>` : '';
             
             let rxHtml = '<span class="text-slate-300 italic">--</span>';
 
@@ -3464,6 +3644,7 @@ async function openHistoryModal(patientName) {
                             <span class="inline-flex items-center gap-1.5 text-xs font-black text-indigo-700 bg-indigo-50 border border-indigo-200/50 px-3 py-1 rounded-md tracking-wider">
                                 📅 VISITATION DATE: ${v.date.split(',')[0]}
                             </span>
+                            ${rxCodeBadge}
                         </div>
                         <div class="flex items-center gap-2">
                             <button onclick="loadSpecificVisit('${p.name}', ${origIndex})" class="bg-slate-900 hover:bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-sm" title="Load for a NEW visit today">
@@ -4277,17 +4458,40 @@ function renderPatientsTable() {
     const filterTxt = document.getElementById('dbSearchInput').value.toLowerCase().trim();
     const now = Date.now();
 
+    const dbTerms = filterTxt.split(/\s+/).filter(Boolean);
+
     let filtered = dbMasterData.filter(p => {
         if (!filterTxt) return true;
         const latest = p.visits[p.visits.length - 1].details;
-        const meds = (latest.rxItems || []).map(r => r.brand).join(' ').toLowerCase();
-        
+
+        const meds = (latest.rxItems || []).map(r => `${r.brand||''} ${r.molecule||''}`).join(' ').toLowerCase();
+
         let kcoStr = '';
         if (latest.kco) {
             kcoStr = latest.kco.map((c, i) => c ? kcoMasterLabels[i] : '').join(' ').toLowerCase();
         }
 
-        return p.name.toLowerCase().includes(filterTxt) || meds.includes(filterTxt) || kcoStr.includes(filterTxt);
+        const age = (latest.age || '').toString().toLowerCase();
+        const sex = (latest.sex || '').toString().toLowerCase();
+        const complaints = (latest.complaints || '').toLowerCase();
+
+        const invObj = latest.investigations || {};
+        const invStr = Object.entries(invObj).map(([k, val]) => `${k} ${val}`).join(' ').toLowerCase();
+
+        const nameLower = p.name.toLowerCase();
+        const nameInitials = nameLower.split(/\s+/).map(w => w[0]).join('');
+
+        const allCodesStr = p.visits.map(v => {
+            const vd = v.details || {};
+            return `${vd.rxCode || ''} ${(vd.rxCodeHistory || []).join(' ')}`;
+        }).join(' ').toLowerCase();
+
+        const blob = `${nameLower} ${meds} ${kcoStr} ${age} ${sex} ${complaints} ${invStr} ${(latest.rxCode||'').toLowerCase()} ${(latest.rxCodeHistory||[]).join(' ').toLowerCase()} ${allCodesStr}`;
+
+        return dbTerms.every(term => {
+            if (term === 'm' || term === 'f') return sex === term;
+            return blob.includes(term) || nameInitials.includes(term);
+        });
     });
 
     filtered.sort((a, b) => {
