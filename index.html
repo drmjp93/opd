@@ -4313,7 +4313,7 @@ document.addEventListener('keydown', function(e) {
 
 function updateTotalCasesCount() {
     // 1. Open your specific IndexedDB database
-    const request = indexedDB.open("OPD_Local_EMR");
+    const request = indexedDB.open("OPD_Local_EMR", DB_VERSION);
 
     request.onsuccess = function(event) {
         const db = event.target.result;
