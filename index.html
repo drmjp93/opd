@@ -239,7 +239,7 @@
                 <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 <span class="text-[8px] font-black text-amber-700 uppercase mt-0.5 tracking-tighter">Import</span>
             </button>
-            <input type="file" id="importFile" accept=".json" class="hidden" onchange="processImport(event)">
+            <input type="file" id="importFile" accept=".json" class="opacity-0 absolute -z-10 w-0 h-0" onchange="processImport(event)">
         </div>
 
         <div class="flex items-center bg-purple-50/50 p-1 rounded-xl border border-purple-200 shadow-sm">
@@ -4311,12 +4311,10 @@ document.addEventListener('keydown', function(e) {
 
 
 
-function updateTotalCasesCount() {
-    // 1. Open your specific IndexedDB database using the variable!
-    const request = indexedDB.open(DB_NAME);
-
-    request.onsuccess = function(event) {
-        const db = event.target.result;
+async function updateTotalCasesCount() {
+    try {
+        // Use your central helper to guarantee the DB structure is built!
+        const db = await openDB();
         
         // Ensure the store exists before trying to open a transaction
         if (db.objectStoreNames.contains("patients")) {
@@ -4341,10 +4339,8 @@ function updateTotalCasesCount() {
         } else {
              console.warn("The 'patients' object store does not exist yet.");
         }
-    };
-    
-    request.onerror = function(event) {
-         console.error("Error opening " + DB_NAME + " database for counting:", event.target.error);
+    } catch (error) {
+         console.error("Error opening " + DB_NAME + " database for counting:", error);
     }
 }
 
