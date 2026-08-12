@@ -4312,8 +4312,8 @@ document.addEventListener('keydown', function(e) {
 
 
 function updateTotalCasesCount() {
-    // 1. Open your specific IndexedDB database
-    const request = indexedDB.open("OPD_Local_EMR", DB_VERSION);
+    // 1. Open your specific IndexedDB database using the variable!
+    const request = indexedDB.open(DB_NAME);
 
     request.onsuccess = function(event) {
         const db = event.target.result;
@@ -4336,7 +4336,7 @@ function updateTotalCasesCount() {
             };
             
             countRequest.onerror = function() {
-                console.error("Could not retrieve case count from OPD_Local_EMR.");
+                console.error("Could not retrieve case count from " + DB_NAME);
             };
         } else {
              console.warn("The 'patients' object store does not exist yet.");
@@ -4344,7 +4344,7 @@ function updateTotalCasesCount() {
     };
     
     request.onerror = function(event) {
-         console.error("Error opening OPD_Local_EMR database for counting:", event.target.error);
+         console.error("Error opening " + DB_NAME + " database for counting:", event.target.error);
     }
 }
 
