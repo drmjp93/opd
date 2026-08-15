@@ -3316,7 +3316,7 @@ function renderSearchResults(matchedVisits, kcoLabels, resultsDiv, isRecent = fa
             const displayDate = formatTimeAmPm(match.visitDate);
 
             return `
-            <div onclick="loadVisitFromArchive(${idx})" class="archive-item p-4 hover:bg-indigo-50 hover:border-indigo-500 cursor-pointer transition-colors flex justify-between items-center text-left group gap-6 border-l-4 border-transparent">
+            <div onclick="loadVisitFromArchive(${idx})" class="archive-item p-4 hover:bg-indigo-200 hover:border-indigo-700 cursor-pointer transition-colors flex justify-between items-center text-left group gap-6 border-l-4 border-transparent">
                 <div class="flex items-center gap-4 flex-1 overflow-hidden">
                     <strong class="text-slate-800 text-[14px] group-hover:text-brand-600 transition-colors uppercase tracking-wide whitespace-nowrap min-w-[200px]">${match.name}</strong> 
                     ${visitBadge}
@@ -3404,7 +3404,7 @@ function activateArchiveItem(items) {
     
     // 3. Add the highlight to the focused item (Blue background + Left border)
     items[currentArchiveFocus].classList.remove("border-transparent");
-    items[currentArchiveFocus].classList.add("bg-indigo-50", "border-indigo-500");
+    items[currentArchiveFocus].classList.add("bg-indigo-200", "border-indigo-700");
     
     // 4. Smoothly scroll the dropdown list so the item is always in view
     items[currentArchiveFocus].scrollIntoView({ block: "nearest", behavior: "smooth" });
