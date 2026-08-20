@@ -762,6 +762,11 @@
     <span>Visitor count - <span id="visitCount" style="font-weight: bold; color: #18FFFF; margin-left: 4px; letter-spacing: 1px;">...</span></span>
     <span style="color: #90A4AE; font-size: 14px; line-height: 1;">•</span>
     <span>Rx Printed - <span id="rxPrintCount" style="font-weight: bold; color: #69F0AE; margin-left: 4px; letter-spacing: 1px;">...</span></span>
+
+
+    <span style="color: #90A4AE; font-size: 14px; line-height: 1; margin-left:auto;">•</span>
+    <span id="syncCounterDisplay" style="font-weight:bold; letter-spacing:1px; color:#69F0AE;">☁️ ... | 💻 ...</span>
+    
 </div>
 
 
@@ -3918,6 +3923,11 @@ const CLOUD_CONFIG = {
 };
 
 async function syncToCloud() {
+     if (window.__localCount != null && window.__cloudCount != null &&
+        window.__localCount < window.__cloudCount) {
+        const proceed = confirm(`⚠️ Cloud has MORE data (${window.__cloudCount}) than this computer (${window.__localCount}).\n\nBacking up now will OVERWRITE the cloud with LESS data — this can cause DATA LOSS.\n\nOnly continue if you intend to start a fresh database.\n\nPress OK to force backup anyway, or Cancel to use Restore instead.`);
+        if (!proceed) return;
+    }
     const btn = document.getElementById('btn-cloud-sync');
     const originalContent = btn.innerHTML;
     // Show loading spinner
@@ -4004,6 +4014,85 @@ async function restoreFromCloud() {
         btn.classList.remove('animate-pulse');
     }
 }
+
+
+
+
+
+// ============================================
+// SYNC STATUS COUNTER + BACKUP REMINDER ENGINE
+// ============================================
+let lastActivityTime = Date.now();
+['mousemove','keydown','click','touchstart'].forEach(evt =>
+    document.addEventListener(evt, () => lastActivityTime = Date.now())
+);
+
+async function getLocalPatientCount() {
+    const db = await openDB();
+    const tx = db.transaction("patients", "readonly");
+    return await new Promise(res => {
+        const req = tx.objectStore("patients").count();
+        req.onsuccess = () => res(req.result);
+        req.onerror = () => res(null);
+    });
+}
+
+async function getCloudPatientCount() {
+    try {
+        const response = await fetch(CLOUD_CONFIG.workerUrl, {
+            method: 'GET',
+            headers: { 'X-OPD-Auth': CLOUD_CONFIG.authSecret }
+        });
+        if (!response.ok) return null;
+        const gistData = await response.json();
+        const cloudData = JSON.parse(gistData.files["opd_emr_backup.json"].content);
+        return cloudData.length;
+    } catch (e) { return null; }
+}
+
+function getBackupReminderShown() {
+    return localStorage.getItem('backupReminderDate') === new Date().toDateString();
+}
+function setBackupReminderShown() {
+    localStorage.setItem('backupReminderDate', new Date().toDateString());
+}
+
+async function updateSyncStatus() {
+    const display = document.getElementById('syncCounterDisplay');
+    const localCount = await getLocalPatientCount();
+    const cloudCount = await getCloudPatientCount();
+
+    window.__localCount = localCount;
+    window.__cloudCount = cloudCount;
+
+    if (display && localCount !== null && cloudCount !== null) {
+        let color, icon;
+        if (localCount === cloudCount) { color = '#69F0AE'; icon = ''; }
+        else if (cloudCount > localCount) { color = '#FFD600'; icon = '⚠️ '; }
+        else { color = '#FF5252'; icon = '⚠️ '; }
+        display.style.color = color;
+        display.innerHTML = `${icon}☁️ ${cloudCount} | 💻 ${localCount}`;
+    }
+
+    const now = new Date();
+    const h = now.getHours(), m = now.getMinutes();
+    const inWindow = (h === 17 && m >= 30 && m <= 45);
+    const idleMs = Date.now() - lastActivityTime;
+
+    if (inWindow && idleMs >= 120000 && !getBackupReminderShown() &&
+        localCount !== null && cloudCount !== null && localCount > cloudCount) {
+        setBackupReminderShown();
+        const banner = document.createElement('div');
+        banner.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;background:#f59e0b;color:#000;padding:12px;text-align:center;font-weight:700;";
+        banner.innerHTML = `⚠️ You have ${localCount} local entries vs ${cloudCount} on cloud. Please backup now! <button onclick="syncToCloud();this.parentElement.remove();" style="margin-left:12px;background:#000;color:#fff;padding:4px 10px;border-radius:6px;">Backup Now</button> <button onclick="this.parentElement.remove();" style="margin-left:6px;background:#fff;color:#000;padding:4px 10px;border-radius:6px;">Dismiss</button>`;
+        document.body.appendChild(banner);
+    }
+}
+updateSyncStatus();
+setInterval(updateSyncStatus, 60000);
+    
+
+    
 
 function autoSyncFollowUpDays() {
     const fuDaysInput = document.getElementById('fuDays');
