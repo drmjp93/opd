@@ -3984,7 +3984,6 @@ async function restoreFromCloud() {
     btn.classList.add('animate-pulse');
 
     try {
-        // 1. Fetch encrypted Gist data from Cloudflare Worker
         const response = await fetch(CLOUD_CONFIG.workerUrl, {
             method: 'GET',
             headers: { 'X-OPD-Auth': CLOUD_CONFIG.authSecret }
@@ -3993,12 +3992,24 @@ async function restoreFromCloud() {
         if (!response.ok) throw new Error(`Server returned ${response.status}`);
         
         const gistData = await response.json();
+        const fileObj = gistData.files && gistData.files["opd_emr_backup.json"];
         
-        // 2. Parse GitHub's specific response structure
-        const cloudDataString = gistData.files["opd_emr_backup.json"].content;
+        if (!fileObj) throw new Error("Backup file 'opd_emr_backup.json' not found in Gist");
+
+        let cloudDataString = fileObj.content;
+
+        // Handle large backups that were truncated by GitHub
+        if (fileObj.truncated && fileObj.raw_url) {
+            const rawRes = await fetch(fileObj.raw_url);
+            cloudDataString = await rawRes.text();
+        }
+
         const cloudData = JSON.parse(cloudDataString);
 
-        // 3. Overwrite Local IndexedDB securely
+        if (!Array.isArray(cloudData)) {
+            throw new Error("Backup data is not a valid patient array");
+        }
+
         const db = await openDB();
         const tx = db.transaction("patients", "readwrite");
         const store = tx.objectStore("patients");
@@ -4013,15 +4024,12 @@ async function restoreFromCloud() {
         alert(`✅ Successfully restored ${cloudData.length} patient records! The page will now reload to apply changes.`);
         window.location.reload(); 
     } catch (e) {
-        alert("Restore Failed. Are you sure you ran a backup first?");
+        alert("Restore Failed: " + (e.message || "Ensure cloud backup exists."));
         console.error("Restore Error:", e);
     } finally {
         btn.classList.remove('animate-pulse');
     }
 }
-
-
-
 
 
 // ============================================
@@ -4049,10 +4057,25 @@ async function getCloudPatientCount() {
             headers: { 'X-OPD-Auth': CLOUD_CONFIG.authSecret }
         });
         if (!response.ok) return null;
+        
         const gistData = await response.json();
-        const cloudData = JSON.parse(gistData.files["opd_emr_backup.json"].content);
-        return cloudData.length;
-    } catch (e) { return null; }
+        const fileObj = gistData.files && gistData.files["opd_emr_backup.json"];
+        if (!fileObj) return null;
+
+        let cloudDataString = fileObj.content;
+
+        // If data exceeds 1MB, pull from raw_url directly
+        if (fileObj.truncated && fileObj.raw_url) {
+            const rawRes = await fetch(fileObj.raw_url);
+            cloudDataString = await rawRes.text();
+        }
+
+        const cloudData = JSON.parse(cloudDataString);
+        return Array.isArray(cloudData) ? cloudData.length : null;
+    } catch (e) {
+        console.error("Cloud count error:", e);
+        return null;
+    }
 }
 
 function getBackupReminderShown() {
