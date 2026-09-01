@@ -2682,7 +2682,9 @@ function updatePtSummary() {
     // Grab KCOs directly from the checked boxes
     const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]:checked'));
     const kcoTexts = kcoCheckboxes.map(cb => cb.nextElementSibling.textContent).join(', ');
-
+    const customKcoTxt = (document.getElementById('customKCO')?.value || '').trim();
+    const kcoAll = [kcoTexts, customKcoTxt].filter(Boolean).join(', ');
+    
     // Grab Complaints and format them into a single line
     const complaints = document.getElementById('complaints') ? document.getElementById('complaints').value.trim() : '';
 
@@ -2701,8 +2703,8 @@ function updatePtSummary() {
 
         // Toggle KCO visibility
         const kcoEl = document.getElementById('sumKCO');
-        if (kcoTexts) {
-            kcoEl.innerText = `KCO: ${kcoTexts}`;
+        if (kcoAll) {
+            kcoEl.innerText = `KCO: ${kcoAll}`;
             kcoEl.classList.remove('hidden');
         } else {
             kcoEl.classList.add('hidden');
