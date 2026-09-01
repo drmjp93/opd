@@ -4509,7 +4509,7 @@ async function openFollowupDashboard() {
                 // --- Extract KCO string for this patient ---
                 let kcoStr = '';
                 if (last.details.kco) {
-                    kcoStr = last.details.kco.map((c, i) => c ? kcoMasterLabels[i] : null).filter(Boolean).join(', ');
+                    kcoStr = last.details.kco.map((c, i) => c ? kcoMasterLabels[i] : null).filter(Boolean).concat(last.details.customKCO ? [last.details.customKCO] : []).join(', ');
                 }
                 
                 // --- 🔥 THE FIX: ONLY ADD IF THEY HAVE A CHRONIC DISEASE (KCO) ---
