@@ -3442,6 +3442,7 @@ function loadVisitFromArchive(idx) {
     if (latestVisit.kco) {
         const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
         kcoCheckboxes.forEach((cb, i) => { if(latestVisit.kco[i] !== undefined) cb.checked = latestVisit.kco[i]; });
+        if (document.getElementById('customKCO')) document.getElementById('customKCO').value = latestVisit.customKCO || '';
     }
     
     if (latestVisit.rxItems) { rxItems = JSON.parse(JSON.stringify(latestVisit.rxItems)); renderRx(); }
@@ -3826,6 +3827,7 @@ async function loadSpecificVisit(patientName, visitIndex) {
         if (latestVisit.kco) {
             const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
             kcoCheckboxes.forEach((cb, i) => { if(latestVisit.kco[i] !== undefined) cb.checked = latestVisit.kco[i]; });
+        if (document.getElementById('customKCO')) document.getElementById('customKCO').value = latestVisit.customKCO || '';
         }
         
         if (latestVisit.rxItems) { rxItems = JSON.parse(JSON.stringify(latestVisit.rxItems)); renderRx(); }
