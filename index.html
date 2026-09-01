@@ -3262,7 +3262,7 @@ async function searchArchive() {
                     // Build a single searchable blob per visit
                     const age = (d.age || "").toString();
                     const sex = (d.sex || "").toString();
-                    const kcoStr = Array.isArray(d.kco) ? d.kco.map((c,idx)=>c?kcoLabels[idx]:null).filter(Boolean).join(" ") : "";
+                    const kcoStr = (Array.isArray(d.kco) ? d.kco.map((c,idx)=>c?kcoLabels[idx]:null).filter(Boolean).join(" ") : "") + (d.customKCO ? " " + d.customKCO : "");
                     const complaintsStr = d.complaints || "";
                     const medsStr = (d.rxItems||[]).map(r => `${r.brand||''} ${r.molecule||''}`).join(" ");
                     const invObj = d.investigations || {};
@@ -3321,7 +3321,7 @@ function renderSearchResults(matchedVisits, kcoLabels, resultsDiv, isRecent = fa
 
             let kcoStr = '';
             if (match.details.kco && Array.isArray(match.details.kco)) {
-                kcoStr = match.details.kco.map((isChecked, i) => isChecked ? kcoLabels[i] : null).filter(Boolean).join(', ');
+                kcoStr = match.details.kco.map((isChecked, i) => isChecked ? kcoLabels[i] : null).filter(Boolean).concat(match.details.customKCO ? [match.details.customKCO] : []).join(', ');
             }
             const kcoBadge = kcoStr ? `<span class="text-[10px] bg-rose-50 text-rose-700 font-bold px-2.5 py-1 rounded-md border border-rose-100 uppercase tracking-widest truncate max-w-[40vw]">KCO: ${kcoStr}</span>` : '';
 
@@ -3609,7 +3609,7 @@ async function openHistoryModal(patientName) {
             // Extract KCO for this specific visit
             let kcoStr = '';
             if (d.kco && Array.isArray(d.kco)) {
-                kcoStr = d.kco.map((isChecked, idx) => isChecked ? kcoLabels[idx] : null).filter(Boolean).join(', ');
+                kcoStr = d.kco.map((isChecked, idx) => isChecked ? kcoLabels[idx] : null).filter(Boolean).concat(d.customKCO ? [d.customKCO] : []).join(', ');
             }
             const kcoHtml = kcoStr ? `<div class="text-[9px] font-bold text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200 inline-block self-start mt-1 shadow-sm">KCO: ${kcoStr}</div>` : '';
 
@@ -4508,7 +4508,7 @@ async function openFollowupDashboard() {
                 
                 // --- Extract KCO string for this patient ---
                 let kcoStr = '';
-                if (last.details.kco) {
+               if (last.details.kco) { 
                     kcoStr = last.details.kco.map((c, i) => c ? kcoMasterLabels[i] : null).filter(Boolean).concat(last.details.customKCO ? [last.details.customKCO] : []).join(', ');
                 }
                 
@@ -4592,7 +4592,7 @@ function renderPatientsTable() {
 
         let kcoStr = '';
         if (latest.kco) {
-            kcoStr = latest.kco.map((c, i) => c ? kcoMasterLabels[i] : '').join(' ').toLowerCase();
+            kcoStr = latest.kco.map((c, i) => c ? kcoMasterLabels[i] : '').filter(Boolean).concat(latest.customKCO ? [latest.customKCO] : []).join(' ').toLowerCase();
         }
 
         const age = (latest.age || '').toString().toLowerCase();
@@ -4650,7 +4650,7 @@ function renderPatientsTable() {
         else if (daysAgo <= 7) dateBadge = `<span class="px-2 py-1 rounded bg-blue-50 text-blue-600 border border-blue-200 font-bold">${vDateLabel}</span>`;
 
         let kcoStr = '';
-        if (latestVisit.kco) kcoStr = latestVisit.kco.map((c, i) => c ? kcoMasterLabels[i] : null).filter(Boolean).join(', ');
+        if (latestVisit.kco) kcoStr = latestVisit.kco.map((c, i) => c ? kcoMasterLabels[i] : null).filter(Boolean).concat(latestVisit.customKCO ? [latestVisit.customKCO] : []).join(', ');
         const kcoBadge = kcoStr ? `<span class="px-2 py-0.5 bg-rose-50 border border-rose-100 text-rose-600 rounded text-[9px] font-bold tracking-wider">${kcoStr}</span>` : '--';
 
         const moaDisplay = getSmartMOA(latestVisit.moa, p.visits[p.visits.length - 1].date);
