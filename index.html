@@ -3034,6 +3034,7 @@ async function saveToArchive(autoClear = true) {
         cns: document.getElementById('ptCNS') ? document.getElementById('ptCNS').value : '',
         complaints: document.getElementById('complaints') ? document.getElementById('complaints').value : '', // <--- ADD THIS LINE
         kco: kcoData,
+        customKCO: document.getElementById('customKCO') ? document.getElementById('customKCO').value : '',
         rxItems: JSON.parse(JSON.stringify(rxItems)),
         tapers: JSON.parse(JSON.stringify(tapers)), // <--- ADDED THIS LINE
         generalAdvice: document.getElementById('generalAdvice') ? document.getElementById('generalAdvice').value : '',
@@ -3887,9 +3888,10 @@ async function editSpecificVisit(patientName, visitIndex) {
         setVal('complaints', data.complaints);
 
         if (data.kco) {
-            const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
-            kcoCheckboxes.forEach((cb, i) => { if(data.kco[i] !== undefined) cb.checked = data.kco[i]; });
+    const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
+    kcoCheckboxes.forEach((cb, i) => { if(data.kco[i] !== undefined) cb.checked = data.kco[i]; });
         }
+        if (document.getElementById('customKCO')) document.getElementById('customKCO').value = data.customKCO || '';
         
         if (data.rxItems) { rxItems = JSON.parse(JSON.stringify(data.rxItems)); renderRx(); }
         if (data.tapers) { tapers = JSON.parse(JSON.stringify(data.tapers)); renderActiveTapers(); } else { tapers = []; renderActiveTapers(); }
