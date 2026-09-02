@@ -1529,6 +1529,7 @@ function parseQuickEntry(str) {
         const tLow = t.toLowerCase();
         
         if (tLow === 'm' || tLow === 'f') { data.sex = tLow.toUpperCase(); }
+        else if (tLow === 'pnb') { data.bp = 'PNB'; data.hr = 'PNB'; }
         else if (/^\d{2,3}\/\d{2,3}$/.test(t)) { data.bp = t; }
         else if (tLow.startsWith('rs-'))  { const v=t.substring(3).replace(/-/g,' '); data.rs=(v==='n')?'B/L AE+, Clear':v; }
         else if (tLow.startsWith('cvs-')) { const v=t.substring(4).replace(/-/g,' '); data.cvs=(v==='n')?'S1S2+, No Murmur':v; }
@@ -1971,7 +1972,8 @@ async function prepareAndPrint() {
 
     const bpCheck = (document.getElementById('bpInput') || {}).value?.trim();
     const hrCheck = (document.getElementById('ptPulse') || {}).value?.trim();
-    if (!bpCheck || !hrCheck) {
+    const isPNB2 = bpCheck?.toUpperCase()==='PNB' || hrCheck?.toUpperCase()==='PNB';
+    if ((!bpCheck || !hrCheck) && !isPNB2) {
         alert('⚠ BP and HR must be entered before printing.');
         return;
     }
@@ -2092,8 +2094,8 @@ async function prepareAndPrint() {
     const pa=document.getElementById('ptPA').value, cns=document.getElementById('ptCNS').value;
 
     let vArr=[], sArr=[];
-    if(bp) vArr.push(`<b>BP</b> ${bp} mmHg`);
-    if(pulse) vArr.push(`<b>HR</b> ${pulse} bpm`);
+    if(bp) vArr.push(bp.toUpperCase()==='PNB' ? `<b>BP/HR</b> PNB` : `<b>BP</b> ${bp} mmHg`);
+    if(pulse && pulse.toUpperCase()!=='PNB') vArr.push(`<b>HR</b> ${pulse} bpm`);
     if(temp) vArr.push(`<b>Temp</b> ${temp}`);
     if(spo2) vArr.push(`<b>SpO₂</b> ${spo2}`);
     if(rs)  sArr.push(`<b>R/S</b> ${rs}`);
@@ -2449,8 +2451,8 @@ async function prepareAndPrint() {
             ${[
               [
                 temp  ? `<b>T</b>&nbsp;${temp}` : '',
-                pulse ? `<b>P</b>&nbsp;${pulse}&nbsp;bpm` : '',
-                bp    ? `<b>BP</b>&nbsp;${bp}&nbsp;mmHg` : '',
+                pulse ? (pulse.toUpperCase()==='PNB' ? '' : `<b>P</b>&nbsp;${pulse}&nbsp;bpm`) : '',
+                bp    ? (bp.toUpperCase()==='PNB' ? `<b>BP/P</b>&nbsp;PNB` : `<b>BP</b>&nbsp;${bp}&nbsp;mmHg`) : '',
                 spo2  ? `<b>SpO\u2082</b>&nbsp;${spo2}` : ''
               ].filter(Boolean).join('<span style="margin:0 7px;color:#888;">|</span>'),
               [
@@ -3006,7 +3008,8 @@ async function saveToArchive(autoClear = true) {
 
     const bpCheck = (document.getElementById('bpInput') || {}).value?.trim();
     const hrCheck = (document.getElementById('ptPulse') || {}).value?.trim();
-    if (!bpCheck || !hrCheck) {
+    const isPNB1 = bpCheck?.toUpperCase()==='PNB' || hrCheck?.toUpperCase()==='PNB';
+    if ((!bpCheck || !hrCheck) && !isPNB1) {
         alert('⚠ BP and HR must be entered before saving.');
         return;
     }
