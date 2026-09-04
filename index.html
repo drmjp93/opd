@@ -2126,8 +2126,15 @@ async function prepareAndPrint() {
     if(pulse && pulse.toUpperCase()!=='PNB') vArr.push(`<b>HR</b> ${pulse} bpm`);
     if(temp) vArr.push(`<b>Temp</b> ${temp}`);
     if(spo2) vArr.push(`<b>SpO₂</b> ${spo2}`);
-    if(ht && wt) vArr.push(`<b>Ht/Wt</b> ${ht}/${wt}kg`);
-    if(bmi && bmi !== '—') vArr.push(`<b>BMI</b> ${bmi}`);
+    if (ht && wt) {
+        vArr.push(`<b>Ht/Wt</b> ${ht}/${wt}kg`);
+    } else if (wt) {
+        vArr.push(`<b>Wt</b> ${wt}kg`);
+    } else if (ht) {
+        vArr.push(`<b>Ht</b> ${ht}`);
+    }
+    
+    if (bmi && bmi !== '—') vArr.push(`<b>BMI</b> ${bmi}`);
     if(rs)  sArr.push(`<b>R/S</b> ${rs}`);
     if(cvs) sArr.push(`<b>CVS</b> ${cvs}`);
     if(pa)  sArr.push(`<b>P/A</b> ${pa}`);
@@ -2484,8 +2491,8 @@ async function prepareAndPrint() {
                 pulse ? (pulse.toUpperCase()==='PNB' ? '' : `<b>P</b>&nbsp;${pulse}&nbsp;bpm`) : '',
                 bp    ? (bp.toUpperCase()==='PNB' ? `<b>BP/P</b>&nbsp;PNB` : `<b>BP</b>&nbsp;${bp}&nbsp;mmHg`) : '',
                 spo2  ? `<b>SpO\u2082</b>&nbsp;${spo2}` : '',
-                (ht && wt) ? `<b>Ht/Wt</b>&nbsp;${ht}/${wt}kg` : '',
-                bmi && bmi !== '—' ? `<b>BMI</b>&nbsp;${bmi}` : ''      
+                (ht && wt) ? `<b>Ht/Wt</b>&nbsp;${ht}/${wt}kg` : (wt ? `<b>Wt</b>&nbsp;${wt}kg` : (ht ? `<b>Ht</b>&nbsp;${ht}` : '')),
+                bmi && bmi !== '—' ? `<b>BMI</b>&nbsp;${bmi}` : ''    
               ].filter(Boolean).join('<span style="margin:0 7px;color:#888;">|</span>'),
               [
                 rs  ? `<b>R/S</b>&nbsp;${rs}` : '',
@@ -3497,6 +3504,9 @@ function loadVisitFromArchive(idx) {
     if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
     if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = getSmartAge(latestVisit.age, latestVisit.date);
     if (document.getElementById('ptMOA')) document.getElementById('ptMOA').value = latestVisit.moa ? getSmartMOA(latestVisit.moa, latestVisit.date) : '';
+    if (latestVisit.height && document.getElementById('ptHeight')) document.getElementById('ptHeight').value = latestVisit.height;
+    if (latestVisit.weight && document.getElementById('ptWeight')) document.getElementById('ptWeight').value = latestVisit.weight;
+    updateBMI(); // Forces the UI card to recalculate and appear
     //if (latestVisit.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = latestVisit.bp;
     //if (latestVisit.pulse && document.getElementById('ptPulse')) document.getElementById('ptPulse').value = latestVisit.pulse;
     //if (latestVisit.temp && document.getElementById('ptTemp')) document.getElementById('ptTemp').value = latestVisit.temp;
