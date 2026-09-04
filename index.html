@@ -354,6 +354,29 @@
     <div id="labReportsBody" class="px-3 py-2 border-t border-blue-100">
     <div class="flex flex-nowrap items-center gap-2 overflow-x-auto hide-scroll">
 
+        <!-- Ht -->
+<div class="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 min-w-[52px] hover:border-teal-300 hover:bg-teal-50/40 focus-within:border-teal-400 transition-all">
+    <span class="text-[8px] font-black text-teal-600 uppercase tracking-widest leading-none mb-1">Ht</span>
+    <input type="text" id="ptHeight" class="bg-transparent border-none outline-none w-full text-[12px] font-bold text-slate-800 text-center placeholder:text-slate-300" placeholder="170/5.8">
+    <span class="text-[7px] text-slate-400 font-medium leading-none mt-0.5">cm/ft</span>
+</div>
+
+<!-- Wt -->
+<div class="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 min-w-[52px] hover:border-teal-300 hover:bg-teal-50/40 focus-within:border-teal-400 transition-all">
+    <span class="text-[8px] font-black text-teal-600 uppercase tracking-widest leading-none mb-1">Wt</span>
+    <input type="number" id="ptWeight" class="bg-transparent border-none outline-none w-full text-[12px] font-bold text-slate-800 text-center placeholder:text-slate-300" placeholder="—">
+    <span class="text-[7px] text-slate-400 font-medium leading-none mt-0.5">kg</span>
+</div>
+
+<!-- BMI (auto) -->
+<div id="bmiCard" class="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 min-w-[52px] hidden">
+    <span class="text-[8px] font-black text-teal-700 uppercase tracking-widest leading-none mb-1">BMI</span>
+    <span id="bmiValue" class="text-[12px] font-bold text-slate-800 text-center">—</span>
+    <span class="text-[7px] text-slate-400 font-medium leading-none mt-0.5">kg/m²</span>
+</div>
+
+<div class="w-px h-8 bg-slate-200 shrink-0"></div>
+
         <!-- Hb -->
         <div class="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 min-w-[52px] hover:border-red-300 hover:bg-red-50/40 focus-within:border-red-400 transition-all">
             <span class="text-[8px] font-black text-red-500 uppercase tracking-widest leading-none mb-1">Hb</span>
@@ -1844,6 +1867,8 @@ function saveWorkspace() {
         ptPulse:document.getElementById('ptPulse').value,
         ptTemp: document.getElementById('ptTemp').value,
         ptSpo2: document.getElementById('ptSpo2').value,
+        ptHeight: document.getElementById('ptHeight').value,
+        ptWeight: document.getElementById('ptWeight').value,    
         ptRS:   document.getElementById('ptRS').value,
         ptCVS:  document.getElementById('ptCVS').value,
         ptPA:   document.getElementById('ptPA').value,
@@ -1879,6 +1904,7 @@ function loadWorkspace() {
         try {
             const d = JSON.parse(saved);
             const s = (id, v) => { if (v!==undefined&&document.getElementById(id)) document.getElementById(id).value=v; };
+            s('ptHeight',d.ptHeight); s('ptWeight',d.ptWeight);
             s('ptName',d.ptName); s('date',d.date); s('ptAge',d.ptAge); s('ptSex',d.ptSex);
             s('bpInput',d.bpInput); s('ptPulse',d.ptPulse); s('ptTemp',d.ptTemp); s('ptSpo2',d.ptSpo2);
             s('ptRS',d.ptRS); s('ptCVS',d.ptCVS); s('ptPA',d.ptPA); s('ptCNS',d.ptCNS);
@@ -1891,6 +1917,7 @@ function loadWorkspace() {
                 s('lab-hba1c', i.hba1c); s('lab-tsh', i.tsh); s('lab-urine', i.urine);
                 s('lab-others', i.others);
                 updateEGFR();
+                updateBMI();
             }
             if (d.rxItems) rxItems = d.rxItems;
             if (d.tapers)  tapers  = d.tapers;
@@ -2091,6 +2118,7 @@ async function prepareAndPrint() {
     const bp=document.getElementById('bpInput').value, pulse=document.getElementById('ptPulse').value;
     const temp=document.getElementById('ptTemp').value, spo2=document.getElementById('ptSpo2').value;
     const rs=document.getElementById('ptRS').value, cvs=document.getElementById('ptCVS').value;
+    const ht = document.getElementById('ptHeight').value, wt = document.getElementById('ptWeight').value, bmi = document.getElementById('bmiValue').textContent;
     const pa=document.getElementById('ptPA').value, cns=document.getElementById('ptCNS').value;
 
     let vArr=[], sArr=[];
@@ -2098,6 +2126,8 @@ async function prepareAndPrint() {
     if(pulse && pulse.toUpperCase()!=='PNB') vArr.push(`<b>HR</b> ${pulse} bpm`);
     if(temp) vArr.push(`<b>Temp</b> ${temp}`);
     if(spo2) vArr.push(`<b>SpO₂</b> ${spo2}`);
+    if(ht && wt) vArr.push(`<b>Ht/Wt</b> ${ht}/${wt}kg`);
+    if(bmi && bmi !== '—') vArr.push(`<b>BMI</b> ${bmi}`);
     if(rs)  sArr.push(`<b>R/S</b> ${rs}`);
     if(cvs) sArr.push(`<b>CVS</b> ${cvs}`);
     if(pa)  sArr.push(`<b>P/A</b> ${pa}`);
@@ -2438,11 +2468,11 @@ async function prepareAndPrint() {
 
       <hr class="slip-divider">
 
-      ${complaints || kcoList || rs || cvs || pa || cns || bp || pulse || temp || spo2 ? `<div class="slip-notes">
+      ${complaints || kcoList || rs || cvs || pa || cns || bp || pulse || temp || spo2 || ht || wt || bmi ? `<div class="slip-notes">
         ${complaints ? `<div class="note-row"><span style="font-weight:900;font-size:10pt;min-width:40px;flex-shrink:0;color:#000;">C/O :</span><span style="font-size:10pt;">${complaints.replace(/\n/g,' | ')}</span></div>` : ''}
         ${kcoList ? `<div class="note-row"><span style="font-weight:900;font-size:10pt;min-width:40px;flex-shrink:0;color:#000;text-transform:uppercase;">KCO :</span><span style="font-weight:900;font-size:10pt;text-transform:uppercase;">${kcoList}</span></div>` : ''}
 
-        ${(bp || pulse || temp || spo2 || rs || cvs || pa || cns) ? `
+        ${(bp || pulse || temp || spo2 || rs || cvs || pa || cns || ht || wt || bmi) ? `
         <div style="border-top:1px solid #000;margin:4px 0 3px 0;"></div>
 
         <div class="note-row" style="align-items:baseline;">
@@ -2453,7 +2483,9 @@ async function prepareAndPrint() {
                 temp  ? `<b>T</b>&nbsp;${temp}` : '',
                 pulse ? (pulse.toUpperCase()==='PNB' ? '' : `<b>P</b>&nbsp;${pulse}&nbsp;bpm`) : '',
                 bp    ? (bp.toUpperCase()==='PNB' ? `<b>BP/P</b>&nbsp;PNB` : `<b>BP</b>&nbsp;${bp}&nbsp;mmHg`) : '',
-                spo2  ? `<b>SpO\u2082</b>&nbsp;${spo2}` : ''
+                spo2  ? `<b>SpO\u2082</b>&nbsp;${spo2}` : '',
+                (ht && wt) ? `<b>Ht/Wt</b>&nbsp;${ht}/${wt}kg` : '',
+                bmi && bmi !== '—' ? `<b>BMI</b>&nbsp;${bmi}` : ''      
               ].filter(Boolean).join('<span style="margin:0 7px;color:#888;">|</span>'),
               [
                 rs  ? `<b>R/S</b>&nbsp;${rs}` : '',
@@ -2645,6 +2677,34 @@ function updateEGFR() {
 document.getElementById('lab-creat').addEventListener('input', updateEGFR);
 document.getElementById('ptAge').addEventListener('input', updateEGFR);
 document.getElementById('ptSex').addEventListener('change', updateEGFR);
+
+function updateBMI() {
+    const raw = document.getElementById('ptHeight').value.trim();
+    const wt = parseFloat(document.getElementById('ptWeight').value);
+    const card = document.getElementById('bmiCard');
+    const out = document.getElementById('bmiValue');
+    if (!raw || !wt || wt <= 0) { out.textContent = '—'; card.classList.add('hidden'); return; }
+    let cm;
+    const ftIn = raw.match(/^(\d+)\s*'\s*(\d{1,2})/);
+    if (ftIn) {
+        cm = (parseInt(ftIn[1]) * 30.48) + (parseInt(ftIn[2]) * 2.54);
+    } else {
+        const num = parseFloat(raw);
+        if (!num || num <= 0) { out.textContent = '—'; card.classList.add('hidden'); return; }
+        if (num <= 9) {
+            const feet = Math.floor(num);
+            const inches = Math.round((num - feet) * 10);
+            cm = (feet * 30.48) + (inches * 2.54);
+        } else cm = num;
+    }
+    const m = cm / 100;
+    const bmi = wt / (m * m);
+    out.textContent = bmi.toFixed(1);
+    out.className = 'text-[12px] font-bold text-center ' + (bmi < 18.5 || bmi >= 30 ? 'text-rose-600' : bmi >= 25 ? 'text-amber-600' : 'text-emerald-600');
+    card.classList.remove('hidden');
+}
+document.getElementById('ptHeight').addEventListener('input', updateBMI);
+document.getElementById('ptWeight').addEventListener('input', updateBMI);
 
 
 // ========================================================
@@ -3033,6 +3093,8 @@ async function saveToArchive(autoClear = true) {
         pulse: document.getElementById('ptPulse') ? document.getElementById('ptPulse').value : '',
         temp: document.getElementById('ptTemp') ? document.getElementById('ptTemp').value : '',
         spo2: document.getElementById('ptSpo2') ? document.getElementById('ptSpo2').value : '',
+        height: document.getElementById('ptHeight') ? document.getElementById('ptHeight').value : '',
+        weight: document.getElementById('ptWeight') ? document.getElementById('ptWeight').value : '',
         rs: document.getElementById('ptRS') ? document.getElementById('ptRS').value : '',
         cvs: document.getElementById('ptCVS') ? document.getElementById('ptCVS').value : '',
         pa: document.getElementById('ptPA') ? document.getElementById('ptPA').value : '',
@@ -3893,6 +3955,8 @@ async function editSpecificVisit(patientName, visitIndex) {
         setVal('ptPA', data.pa);
         setVal('ptCNS', data.cns);
         setVal('complaints', data.complaints);
+        setVal('ptHeight', data.height);
+        setVal('ptWeight', data.weight);
 
         if (data.kco) {
     const kcoCheckboxes = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]'));
@@ -3915,6 +3979,7 @@ async function editSpecificVisit(patientName, visitIndex) {
             if (el) el.value = (data.investigations && data.investigations[key]) ? data.investigations[key] : '';
         });
         updateEGFR();
+        updateBMI();
 
         // Cleanup UI instantly without alerts
         closeHistoryModal();
