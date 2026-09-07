@@ -5022,7 +5022,8 @@ function applyHeaderToggleStyle() {
     
     const now = new Date();
     document.getElementById("calDay").innerText = days[now.getDay()];
-    document.getElementById("calDate").innerText = now.getDate();
+    const mon = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+document.getElementById("calDate").innerText = String(now.getDate()).padStart(2,'0') + "-" + mon[now.getMonth()] + "-" + String(now.getFullYear()).slice(-2);
   }
   updateCal();
   applyHeaderToggleStyle();
