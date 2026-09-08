@@ -253,6 +253,15 @@
                 <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 13l3 3m0 0l3-3m-3 3V10"/></svg>
                 <span class="text-[8px] font-black text-purple-700 uppercase mt-0.5 tracking-tighter">Restore</span>
             </button>
+
+            <div class="flex items-center bg-green-50/50 p-1 rounded-xl border border-green-200 shadow-sm">
+            <button onclick="saveToCloudClipboard()" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-green-100 rounded-lg transition-colors group" title="Push to Fitness">
+                <span class="text-[8px] font-black text-green-700 uppercase mt-0.5 tracking-tighter">Push</span>
+            </button>
+            <button onclick="loadFromCloudClipboard()" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-green-100 rounded-lg transition-colors border-l border-green-200/50" title="Fetch from Fitness">
+                <span class="text-[8px] font-black text-green-700 uppercase mt-0.5 tracking-tighter">Fetch</span>
+            </button>
+        </div>
         </div>
         </div>
 
