@@ -23,6 +23,29 @@
 
 
     <style>
+
+        :root{ --border:#e2e8f0; --text:#1e293b; }
+
+        details.tool{ background:#fff; border:1px solid var(--border); border-radius:12px; margin-bottom:10px; overflow:hidden; }
+        details.tool summary{ padding:12px 16px; cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; }
+        details.tool summary::-webkit-details-marker{ display:none; }
+        .tool-title{ font-weight:700; font-size:0.85rem; color:var(--text); }
+        .tool-sub{ font-size:0.7rem; color:#64748b; margin-top:2px; }
+        .tool-body{ padding:0 16px 16px; border-top:1px solid var(--border); }
+        .step{ margin-top:12px; }
+        .step-title{ font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:6px; }
+        .options{ display:flex; gap:6px; flex-wrap:wrap; }
+        .options button{ padding:6px 10px; font-size:0.7rem; }
+        .options{ display:flex; gap:8px; flex-wrap:wrap; }
+        .options button{ padding:6px 12px; border:1px solid var(--border); border-radius:8px; background:#f8fafc; color:var(--text); font-size:0.75rem; font-weight:600; cursor:pointer; }
+        .options button.selected{ background:#0f172a; color:#fff; border-color:#0f172a; }
+        .result{ padding:12px; border-radius:10px; font-size:0.85rem; }
+        .result.success{ background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
+        .result.warn{ background:#fef2f2; color:#991b1b; border:1px solid #fecaca; }
+        .monitor{ margin-top:14px; padding:10px 12px; background:#f8fafc; border:1px solid var(--border); border-radius:10px; font-size:0.75rem; color:#475569; line-height:1.5; }
+        .hidden{ display:none !important; }
+
+                    
         body { background-color: #f8fafc; overflow-y: auto; overflow-x: hidden; }
         .glass-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border: 1px solid rgba(226,232,240,0.8); border-radius: 16px; box-shadow: 0 4px 20px -2px rgba(0,0,0,0.03); }
         .premium-input { width: 100%; background: #f1f5f9; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; font-size: 0.85rem; font-weight: 500; color: #1e293b; transition: all 0.2s ease; }
@@ -469,7 +492,7 @@
         <!-- TSH -->
         <div class="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 min-w-[52px] hover:border-teal-300 hover:bg-teal-50/40 focus-within:border-teal-400 transition-all">
             <span class="text-[8px] font-black text-teal-600 uppercase tracking-widest leading-none mb-1">TSH</span>
-            <input type="text" id="lab-tsh" class="bg-transparent border-none outline-none w-full text-[12px] font-bold text-slate-800 text-center placeholder:text-slate-300" placeholder="—">
+            <input type="text" id="lab-tsh" class="bg-transparent border-none outline-none w-full text-[12px] font-bold text-slate-800 text-center placeholder:text-slate-300" placeholder="—" oninput="toggleThyroidTools()">
             <span class="text-[7px] text-slate-400 font-medium leading-none mt-0.5">mIU/L</span>
         </div>
 
@@ -532,6 +555,145 @@
                 </div>
             </div>
         </details>
+        
+        <div id="thyroidTools" class="hidden lg:col-span-3 space-y-2">
+          <!-- ================= THYROXINE DOSE CALCULATOR ================= -->
+
+  
+<details class="tool" data-system="endocrine">
+<summary>
+  <div>
+    <div class="tool-title">Thyroxine Dose Calculator</div>
+    <div class="tool-sub">Convert weekly variable dosing → daily dose</div>
+  </div>
+  <div>▾</div>
+</summary>
+
+<div class="tool-body">
+
+<div class="step">
+  <div class="step-title">Current prescription</div>
+
+  <div style="
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px
+  ">
+    <input id="thyroxine-strength" type="number" step="12.5"
+      placeholder="Tablet strength (mcg)"
+            style="padding:12px;border-radius:10px;border:1px solid var(--border);
+             background:#f8fafc;color:var(--text)"
+      oninput="calcThyroxine()">
+
+    <input id="thyroxine-weekly" type="number" step="1"
+      placeholder="Total tablets per week"
+            style="padding:12px;border-radius:10px;border:1px solid var(--border);
+             background:#f8fafc;color:var(--text)"
+      oninput="calcThyroxine()">
+  </div>
+</div>
+
+<div id="thyroxine-result" class="hidden" style="margin-top: 14px;"></div>
+
+</div>
+</details>
+
+<script>
+function calcThyroxine(){
+  const strInput = document.getElementById('thyroxine-strength').value;
+  const weeklyInput = document.getElementById('thyroxine-weekly').value;
+  const res = document.getElementById('thyroxine-result');
+
+  // Silently hide the result if either field is empty while typing
+  if(strInput === '' || weeklyInput === ''){
+    res.classList.add('hidden');
+    return;
+  }
+
+  const strength = parseFloat(strInput);
+  const weeklyTabs = parseFloat(weeklyInput);
+
+  if(strength <= 0 || weeklyTabs <= 0){
+    res.className = 'result warn';
+    res.textContent = 'Please enter valid positive numbers.';
+    res.classList.remove('hidden');
+    return;
+  }
+
+  const weeklyDose = strength * weeklyTabs; // mcg/week
+  const dailyExact = weeklyDose / 7;
+
+  // Round to nearest 12.5 mcg (practical tablet division)
+  const dailyRounded = Math.round(dailyExact / 12.5) * 12.5;
+
+  res.className = 'result success';
+  res.innerHTML = `
+    Weekly dose = <b>${weeklyDose.toFixed(1)} mcg</b><br>
+    Exact daily equivalent = ${dailyExact.toFixed(1)} mcg/day<br><br>
+    <strong>Suggested daily dose ≈ ${dailyRounded} mcg</strong>
+
+    <div style="margin-top:8px;font-size:0.8rem;color:#9ca3af">
+      Rounded to nearest 12.5 mcg for practical dosing.<br>
+      Adjust further based on TSH (6–8 weeks).
+    </div>
+  `;
+  res.classList.remove('hidden');
+}
+</script>
+  
+  <!-- ================= THYROXINE DOSE CALCULATOR - TWO ================= -->
+
+  <details class="tool" data-system="endocrine">
+  <summary>
+    <div>
+      <div class="tool-title">Thyroxine Calculator</div>
+      <div class="tool-sub">Weight-based dosing (Adult & Pregnancy)</div>
+    </div>
+    <div>▾</div>
+  </summary>
+
+  <div class="tool-body">
+
+        <div class="step" style="display:grid;grid-template-columns:1.2fr 1.2fr 0.8fr;gap:12px;align-items:start;">
+      <div>
+        <div class="step-title">Patient Status</div>
+        <div class="options">
+          <button class="selected" onclick="setLevoStatus('adult', this)">Adult (Non-pregnant)</button>
+          <button onclick="setLevoStatus('pregnant', this)">Pregnant</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="step-title">Severity</div>
+        <div class="options">
+          <button class="selected" onclick="setLevoSeverity('overt', this)">Overt Hypothyroidism</button>
+          <button onclick="setLevoSeverity('subclinical', this)">Subclinical</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="step-title">Weight (kg)</div>
+        <input id="levo-weight" type="number" step="0.1" placeholder="Enter weight in kg"
+          style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);
+                 background:#f8fafc;color:var(--text)"
+          oninput="calcLevothyroxine()">
+      </div>
+    </div>
+
+    <div id="levo-result" class="result hidden" style="margin-top: 14px;"></div>
+
+    <div class="monitor">
+      <b>Guideline Notes (ATA/Endocrine Society):</b><br>
+      • <b>Elderly / Cardiac disease:</b> Start low (12.5 - 25 mcg/day) regardless of weight.<br>
+      • <b>Subclinical (Non-pregnant):</b> Often treated with fixed low doses (25 - 50 mcg/day). Weight-based calculation shown here uses conservative ~1.0 mcg/kg.<br>
+      • <b>Monitoring:</b> Recheck TSH in 4–6 weeks (every 4 weeks in pregnancy) and titrate by 12.5 - 25 mcg.<br>
+      • Take on an empty stomach 30–60 mins before breakfast.
+    </div>
+
+  </div>
+</details>
+        </div>
+
 
          <!-- Clinical Note -->
       
@@ -5044,7 +5206,97 @@ document.getElementById("calDate").innerText = String(now.getDate()).padStart(2,
   setInterval(updateCal, 60000);
 </script>
         
+<script>
+function toggleThyroidTools(){
+  const tsh = document.getElementById('lab-tsh').value.trim();
+  document.getElementById('thyroidTools').classList.toggle('hidden', tsh === '');
+  if(tsh !== '') calcLevothyroxine();
+}
+</script>
+ 
 
-        
+<script>
+let levoStatus = 'adult';
+let levoSeverity = 'overt';
+
+function setLevoStatus(val, btn) {
+  levoStatus = val;
+  select(btn); 
+  calcLevothyroxine(); // Recalculate instantly if weight is already entered
+}
+
+function setLevoSeverity(val, btn) {
+  levoSeverity = val;
+  select(btn);
+  calcLevothyroxine(); // Recalculate instantly if weight is already entered
+}
+
+function calcLevothyroxine() {
+  const levoWtEl = document.getElementById('levo-weight');
+  if (levoWtEl.value === '' && document.getElementById('ptWeight').value) {
+    levoWtEl.value = document.getElementById('ptWeight').value;
+  }
+  const wtInput = levoWtEl.value;
+  const res = document.getElementById('levo-result');
+
+  // Hide the result box if the user clears the input field
+  if (wtInput === '') {
+    res.classList.add('hidden');
+    return;
+  }
+
+  const wt = parseFloat(wtInput);
+
+  if (!wt || wt <= 0) {
+    res.className = 'result warn';
+    res.textContent = 'Please enter a valid weight.';
+    res.classList.remove('hidden');
+    return;
+  }
+
+  let dosePerKg = 0;
+  let exactDose = 0;
+  let message = "";
+
+  if (levoStatus === 'adult') {
+    if (levoSeverity === 'overt') {
+      dosePerKg = 1.6;
+      message = "Based on standard adult replacement (1.6 mcg/kg/day).";
+    } else {
+      dosePerKg = 1.0; 
+      message = "Based on ~1.0 mcg/kg/day (Note: Max 25-50 mcg/day flat dose is often preferred for adult subclinical).";
+    }
+  } else if (levoStatus === 'pregnant') {
+    if (levoSeverity === 'overt') {
+      dosePerKg = 1.6; 
+      message = "Based on pregnancy overt (TSH &ge; 10) starting dose (1.6 mcg/kg/day).";
+    } else {
+      dosePerKg = 1.2; 
+      message = "Based on pregnancy subclinical (TSH &lt; 10) starting dose (1.2 mcg/kg/day).";
+    }
+  }
+
+  exactDose = wt * dosePerKg;
+  const roundedDose = Math.round(exactDose / 12.5) * 12.5;
+
+  res.className = 'result success';
+  res.innerHTML = `
+    Calculated Exact Dose: <b>${exactDose.toFixed(1)} mcg/day</b><br>
+    Practical Starting Dose: <strong style="font-size:1.1em">${roundedDose} mcg/day</strong>
+    <div style="margin-top:8px;font-size:0.85rem;opacity:0.9">
+      ${message}
+    </div>
+  `;
+  res.classList.remove('hidden');
+}
+
+function select(btn){
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+
+</script>
+
 </body>
 </html>
