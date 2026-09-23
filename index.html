@@ -4356,6 +4356,9 @@ async function getCloudPatientCount() {
         const cloudData = JSON.parse(cloudDataString);
         if (Array.isArray(cloudData)) { window.__cloudMeta = null; return cloudData.length; }
         if (cloudData && Array.isArray(cloudData.patients)) { window.__cloudMeta = cloudData.meta || null; return cloudData.patients.length; }
+                return null;
+    } catch (e) {
+        console.error("Cloud count error:", e);
         return null;
     }
 }
