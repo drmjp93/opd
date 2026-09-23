@@ -3549,6 +3549,7 @@ async function searchArchive() {
             req.onsuccess = () => {
             if (myToken !== archiveSearchToken) return;
             const allPatients = req.result;
+            let allVisits = [];    
             
             // Gather the most recent visit from EVERY patient
             allPatients.forEach(p => {
