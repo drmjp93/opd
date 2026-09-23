@@ -4385,7 +4385,7 @@ function formatLastSync() {
     const iso = localStorage.getItem('lastSyncTime');
     if (!iso) return 'Never';
     const dt = new Date(iso);
-    return dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) + ' ' + dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    return dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) + ' ' + dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',hour12:true});
 }
 async function updateSyncStatus() {
     const display = document.getElementById('syncCounterDisplay');
