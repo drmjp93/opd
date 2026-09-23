@@ -4411,7 +4411,7 @@ async function updateSyncStatus() {
         if (metaEl) {
         if (window.__cloudMeta && window.__cloudMeta.lastSyncTime) {
             const dt = new Date(window.__cloudMeta.lastSyncTime);
-            metaEl.textContent = `${window.__cloudMeta.device || 'Unknown'} • ${dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} ${dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}`;
+            metaEl.textContent = `${window.__cloudMeta.device || 'Unknown'} • ${dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'})} ${dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit', hour12:true})}`;
         } else {
             metaEl.textContent = 'No cloud sync yet';
         }
