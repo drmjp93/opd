@@ -2012,6 +2012,9 @@ document.getElementById('fuSmartInput').addEventListener('input', function () {
     let chipsHtml = tests.map(t=>`<span class="px-2.5 py-1 bg-purple-100 text-purple-700 rounded-md text-[10px] font-bold uppercase border border-purple-200 shadow-sm">${t}</span>`).join('');
     if (durationLabel) chipsHtml += `<span class="px-2.5 py-1 bg-amber-100 text-amber-800 rounded-md text-[10px] font-bold uppercase border border-amber-300 shadow-sm">⏱ ${durationLabel}</span>`;
     
+    const oldDateChip = chipsHtml; // keep
+    const fuDateLabel = getFollowUpDateLabel(document.getElementById('fuDays').value);
+    if (fuDateLabel) chipsHtml += `<span class="fu-date-chip px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-md text-[10px] font-bold uppercase border border-emerald-300 shadow-sm"> F/U ${fuDateLabel}</span>`;
     document.getElementById('fuSmartChips').innerHTML = chipsHtml;
     
     // 3. Draw the hidden checkboxes for the Print Engine to find
@@ -4426,8 +4429,28 @@ function autoSyncFollowUpDays() {
     // 3. Update the hidden Follow-Up value
     if (maxDays > 0) {
         fuDaysInput.value = maxDays;
+                const chipBox = document.getElementById('fuSmartChips');
+        if (chipBox) {
+            const lbl = getFollowUpDateLabel(maxDays);
+            const old = chipBox.querySelector('.fu-date-chip');
+            if (old) old.remove();
+            if (lbl) chipBox.insertAdjacentHTML('beforeend', `<span class="fu-date-chip px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-md text-[10px] font-bold uppercase border border-emerald-300 shadow-sm"> FOLLOW UP DATE : ${lbl}</span>`);
+        }
     }
 }
+
+function getFollowUpDateLabel(days) {
+    const d = parseInt(days, 10);
+    if (!d || d <= 0) return '';
+    const dt = new Date();
+    dt.setDate(dt.getDate() + d);
+    if (dt.getDay() === 0) dt.setDate(dt.getDate() + 1); // skip Sunday -> Monday
+    const dayName = dt.toLocaleDateString('en-GB', { weekday: 'short' });
+    const dateStr = dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    return `${dayName}, ${dateStr}`;
+}
+
+
 
 // Attach a listener so if you manually change the left-side "Days" box, it updates instantly
 document.getElementById('globalDays').addEventListener('input', function () {
