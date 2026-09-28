@@ -3439,7 +3439,7 @@ async function saveToArchive(autoClear = true) {
             currentData.rxCodeHistory = [];
 
             finalRecord.visits.push({ date: timestamp, searchDate: searchDateStr, details: currentData });
-            if (finalRecord.visits.length > 50) finalRecord.visits.shift();
+            if (finalRecord.visits.length > 5000) finalRecord.visits.shift();
         }
         finalRecord.lastUpdate = timestamp;
     } else {
@@ -4887,7 +4887,56 @@ let dbSortAsc = false;
 let currentChart = null;
 
 const kcoMasterLabels = ['DM', 'HTN', 'Hypothyroid', 'IHD', 'Hyperthyroid', 'S/P CABG', 'S/P PTCA', 'Asthma', 'COPD', 'CKD', 'Epilepsy', 'Psychiatric', 'RA', 'PIH', 'GDM'];
-
+function getVisitDate(v){
+  if (v.searchDate) return v.searchDate;
+  const t = getSortableTime((v.date||'').split(',')[0]);
+  return t ? new Date(t).toLocaleDateString('en-CA') : '';
+}
+function openStatsModal(){
+  const sc = document.getElementById('statsCond');
+  if (!sc.options.length) sc.innerHTML = '<option value="">All patients</option>' + kcoMasterLabels.map(l=>`<option>${l}</option>`).join('');
+  document.getElementById('statsModal').classList.remove('hidden');
+  setStatsRange('all');
+}
+function setStatsRange(r){
+  const n=new Date(), y=n.getFullYear(), m=n.getMonth(), f=d=>d.toLocaleDateString('en-CA');
+  let a='', b='';
+  if (r==='tm'){a=f(new Date(y,m,1)); b=f(new Date(y,m+1,0));}
+  if (r==='lm'){a=f(new Date(y,m-1,1)); b=f(new Date(y,m,0));}
+  if (r==='ty'){a=f(new Date(y,0,1)); b=f(new Date(y,11,31));}
+  document.getElementById('statsFrom').value=a;
+  document.getElementById('statsTo').value=b;
+  renderStats();
+}
+function renderStats(){
+  const g=document.getElementById('statsGroup').value,
+        cond=document.getElementById('statsCond').value,
+        from=document.getElementById('statsFrom').value,
+        to=document.getElementById('statsTo').value,
+        ci=cond===''?-1:kcoMasterLabels.indexOf(cond);
+  const grp={}, sum={}, pts=new Set(), days=new Set(); let total=0;
+  kcoMasterLabels.forEach(l=>sum[l]={v:0,p:new Set()});
+  dbMasterData.forEach(p=>p.visits.forEach(v=>{
+    const d=getVisitDate(v); if(!d) return;
+    if((from&&d<from)||(to&&d>to)) return;
+    const k=(v.details&&v.details.kco)||[];
+    kcoMasterLabels.forEach((l,i)=>{ if(k[i]){sum[l].v++; sum[l].p.add(p.name);} });
+    if(ci>=0 && !k[ci]) return;
+    total++; pts.add(p.name); days.add(d);
+    const key=g==='year'?d.slice(0,4):g==='month'?d.slice(0,7):d;
+    const o=grp[key]=grp[key]||{v:0,p:new Set()}; o.v++; o.p.add(p.name);
+  }));
+  const th='class="text-left text-[10px] font-black text-slate-500 uppercase p-2 border-b"', td='class="p-2 border-b text-sm"';
+  const card=(a,b)=>`<div class="bg-slate-50 border rounded-xl p-3 text-center"><div class="text-2xl font-black text-indigo-700">${b}</div><div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">${a}</div></div>`;
+  const perRows=Object.keys(grp).sort().reverse().map(k=>`<tr><td ${td}>${k}</td><td ${td}>${grp[k].v}</td><td ${td}>${grp[k].p.size}</td></tr>`).join('');
+  const condRows=kcoMasterLabels.filter(l=>sum[l].v).map(l=>`<tr><td ${td}>${l}</td><td ${td}>${sum[l].v}</td><td ${td}>${sum[l].p.size}</td></tr>`).join('');
+  document.getElementById('statsBody').innerHTML=`
+    <div class="grid grid-cols-4 gap-3 mb-5">${card('Visits',total)}${card('Unique Patients',pts.size)}${card('Active Days',days.size)}${card('Avg Visits / Day',days.size?(total/days.size).toFixed(1):0)}</div>
+    <div class="grid grid-cols-2 gap-6">
+      <div><h3 class="font-black text-xs uppercase mb-2">${cond||'All'} — by ${g}</h3><table class="w-full"><tr><th ${th}>${g}</th><th ${th}>Visits</th><th ${th}>Patients</th></tr>${perRows}</table></div>
+      <div><h3 class="font-black text-xs uppercase mb-2">By condition (selected period)</h3><table class="w-full"><tr><th ${th}>Condition</th><th ${th}>Visits</th><th ${th}>Patients</th></tr>${condRows}</table></div>
+    </div>`;
+}
 async function openFollowupDashboard() {
     const db = await openDB();
     const tx = db.transaction("patients", "readonly");
@@ -5285,7 +5334,7 @@ function applyHeaderToggleStyle() {
             </div>
             
             <input type="text" id="dbSearchInput" oninput="renderPatientsTable()" placeholder="Filter by Name, KCO, or Meds..." class="premium-input max-w-md shadow-sm !py-2">
-            
+            <button onclick="openStatsModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-black uppercase tracking-widest shrink-0">📊 Stats</button>
             <button onclick="document.getElementById('patientsTableModal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-100 hover:text-rose-600 text-slate-400 transition-colors shrink-0">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
@@ -5311,6 +5360,26 @@ function applyHeaderToggleStyle() {
             </table>
         </div>
     </div>
+</div>
+
+<div id="statsModal" class="fixed inset-0 z-[99999] bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
+    <div class="px-6 py-4 border-b bg-slate-50 flex flex-wrap items-center gap-3">
+      <h2 class="text-xl font-black text-slate-800 mr-auto">📊 Practice Statistics</h2>
+      <button onclick="setStatsRange('tm')" class="text-[10px] font-bold px-2 py-1 border rounded">This Month</button>
+      <button onclick="setStatsRange('lm')" class="text-[10px] font-bold px-2 py-1 border rounded">Last Month</button>
+      <button onclick="setStatsRange('ty')" class="text-[10px] font-bold px-2 py-1 border rounded">This Year</button>
+      <button onclick="setStatsRange('all')" class="text-[10px] font-bold px-2 py-1 border rounded">All Time</button>
+      <input type="date" id="statsFrom" onchange="renderStats()" class="premium-input !py-1 !text-xs w-36">
+      <input type="date" id="statsTo" onchange="renderStats()" class="premium-input !py-1 !text-xs w-36">
+      <select id="statsCond" onchange="renderStats()" class="premium-input !py-1 !text-xs w-36"></select>
+      <select id="statsGroup" onchange="renderStats()" class="premium-input !py-1 !text-xs w-28">
+        <option value="day">Per Day</option><option value="month" selected>Per Month</option><option value="year">Per Year</option>
+      </select>
+      <button onclick="document.getElementById('statsModal').classList.add('hidden')" class="text-slate-400 hover:text-rose-600 text-xl font-bold">✕</button>
+    </div>
+    <div id="statsBody" class="p-6 overflow-y-auto"></div>
+  </div>
 </div>
 
 <div id="trendModal" class="fixed inset-0 z-[99999] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
