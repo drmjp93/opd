@@ -4892,9 +4892,15 @@ function getVisitDate(v){
   const t = getSortableTime((v.date||'').split(',')[0]);
   return t ? new Date(t).toLocaleDateString('en-CA') : '';
 }
+function getCustomKcos(v){
+  return ((v.details&&v.details.customKCO)||'').split(/[,;\n]+/).map(s=>s.trim().toUpperCase()).filter(Boolean);
+}
 function openStatsModal(){
-  const sc = document.getElementById('statsCond');
-  if (!sc.options.length) sc.innerHTML = '<option value="">All patients</option>' + kcoMasterLabels.map(l=>`<option>${l}</option>`).join('');
+const sc = document.getElementById('statsCond');
+const cs=new Set(); dbMasterData.forEach(p=>p.visits.forEach(v=>getCustomKcos(v).forEach(t=>cs.add(t))));
+const cur=sc.value;
+sc.innerHTML='<option value="">All patients</option>'+kcoMasterLabels.map(l=>`<option>${l}</option>`).join('')+(cs.size?'<optgroup label="Custom KCO">'+[...cs].sort().map(t=>`<option>${t}</option>`).join('')+'</optgroup>':'');
+sc.value=cur;
   document.getElementById('statsModal').classList.remove('hidden');
   setStatsRange('all');
 }
@@ -4920,8 +4926,11 @@ function renderStats(){
     const d=getVisitDate(v); if(!d) return;
     if((from&&d<from)||(to&&d>to)) return;
     const k=(v.details&&v.details.kco)||[];
-    kcoMasterLabels.forEach((l,i)=>{ if(k[i]){sum[l].v++; sum[l].p.add(p.name);} });
-    if(ci>=0 && !k[ci]) return;
+    const has=new Set();
+    kcoMasterLabels.forEach((l,i)=>{ if(k[i]) has.add(l); });
+    getCustomKcos(v).forEach(t=>has.add(kcoMasterLabels.find(l=>l.toUpperCase()===t)||t));
+    has.forEach(l=>{ sum[l]=sum[l]||{v:0,p:new Set()}; sum[l].v++; sum[l].p.add(p.name); });
+    if(cond && !has.has(cond)) return;
     total++; pts.add(p.name); days.add(d);
     const key=g==='year'?d.slice(0,4):g==='month'?d.slice(0,7):d;
     const o=grp[key]=grp[key]||{v:0,p:new Set()}; o.v++; o.p.add(p.name);
@@ -4929,7 +4938,7 @@ function renderStats(){
   const th='class="text-left text-[10px] font-black text-slate-500 uppercase p-2 border-b"', td='class="p-2 border-b text-sm"';
   const card=(a,b)=>`<div class="bg-slate-50 border rounded-xl p-3 text-center"><div class="text-2xl font-black text-indigo-700">${b}</div><div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">${a}</div></div>`;
   const perRows=Object.keys(grp).sort().reverse().map(k=>`<tr><td ${td}>${k}</td><td ${td}>${grp[k].v}</td><td ${td}>${grp[k].p.size}</td></tr>`).join('');
-  const condRows=kcoMasterLabels.filter(l=>sum[l].v).map(l=>`<tr><td ${td}>${l}</td><td ${td}>${sum[l].v}</td><td ${td}>${sum[l].p.size}</td></tr>`).join('');
+  const condRows=Object.keys(sum).filter(l=>sum[l].v).map(l=>`<tr><td ${td}>${l}</td><td ${td}>${sum[l].v}</td><td ${td}>${sum[l].p.size}</td></tr>`).join('');
   document.getElementById('statsBody').innerHTML=`
     <div class="grid grid-cols-4 gap-3 mb-5">${card('Visits',total)}${card('Unique Patients',pts.size)}${card('Active Days',days.size)}${card('Avg Visits / Day',days.size?(total/days.size).toFixed(1):0)}</div>
     <div class="grid grid-cols-2 gap-6">
