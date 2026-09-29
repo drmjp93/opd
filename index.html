@@ -3776,7 +3776,7 @@ function loadVisitFromArchive(idx) {
     const latestVisit = window.tempMatchedVisits[idx].details;
 
     document.getElementById('date').value = new Date().toISOString().slice(0, 10);    if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
-    if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
+    if (document.getElementById('ptName')) document.getElementById('ptName').value = window.tempMatchedVisits[idx].name;
     if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = getSmartAge(latestVisit.age, latestVisit.date);
     if (document.getElementById('ptMOA')) document.getElementById('ptMOA').value = latestVisit.moa ? getSmartMOA(latestVisit.moa, latestVisit.date) : '';
     if (latestVisit.height && document.getElementById('ptHeight')) document.getElementById('ptHeight').value = latestVisit.height;
@@ -4095,7 +4095,7 @@ async function renamePatientFromHistory() {
                 alert("A patient with that name already exists.");
                 return;
             }
-            p.name = newName;
+            p.name = newName; (p.visits || []).forEach(v => { if (v.details) v.details.name = newName; });
             store.delete(oldName);
             store.put(p);
             tx.oncomplete = () => {
@@ -4170,7 +4170,7 @@ async function loadSpecificVisit(patientName, visitIndex) {
         document.getElementById('date').value = new Date().toISOString().slice(0, 10);        
         
         if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
-        if (latestVisit.name && document.getElementById('ptName')) document.getElementById('ptName').value = latestVisit.name;
+        if (document.getElementById('ptName')) document.getElementById('ptName').value = p.name;
         if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = getSmartAge(latestVisit.age, latestVisit.date);
         if (document.getElementById('ptMOA')) document.getElementById('ptMOA').value = latestVisit.moa ? getSmartMOA(latestVisit.moa, latestVisit.date) : '';
         currentOverdueLabel = calcOverdueLabel(latestVisit.fuDays, latestVisit.date);
@@ -4230,7 +4230,7 @@ async function editSpecificVisit(patientName, visitIndex) {
         
         // Load Everything
         setVal('ptSex', data.sex);
-        setVal('ptName', data.name);
+        setVal('ptName', p.name);
         setVal('ptAge', data.age);
         setVal('bpInput', data.bp);
         setVal('ptPulse', data.pulse);
