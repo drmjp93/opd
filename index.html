@@ -5031,28 +5031,35 @@ async function renderAttendance(from,to){
   const th='class="text-left text-[10px] font-black text-slate-500 uppercase p-2 border-b"', td='class="p-2 border-b text-sm"';
   const hm=ms=>{const m=Math.round(ms/60000);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
   const tm=ms=>new Date(ms).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-  let tot=0;
+    let tot=0; window._attBlocks={};
   const rows=Object.keys(db).filter(d=>(!from||d>=from)&&(!to||d<=to)).sort().reverse().map(d=>{
-    const ss=Object.entries(db[d]).sort((a,b)=>a[1].s-b[1].s);
-    let ms=0, cur=null;
-    ss.forEach(([id,x])=>{ if(cur&&x.s<=cur.e){cur.e=Math.max(cur.e,x.e);} else {if(cur)ms+=cur.e-cur.s; cur={s:x.s,e:x.e};} });
-    if(cur) ms+=cur.e-cur.s;
+    const ss=Object.entries(db[d]).map(([id,x])=>({id,s:x.s,e:x.e})).sort((a,b)=>a.s-b.s);
+    const blocks=[];
+    ss.forEach(x=>{ const b=blocks[blocks.length-1]; if(b&&x.s<=b.e+300000){ b.e=Math.max(b.e,x.e); b.items.push(x); } else blocks.push({s:x.s,e:x.e,items:[x]}); });
+    window._attBlocks[d]=blocks;
+    const ms=blocks.reduce((a,b)=>a+(b.e-b.s),0);
     tot+=ms;
-    const list=ss.map(([id,x])=>`${tm(x.s)} – ${tm(x.e)} <button title="Edit end time" onclick="editSess('${d}','${id}')">✎</button> <button title="Delete" onclick="delSess('${d}','${id}')">✕</button>`).join(' &nbsp;|&nbsp; ');
+    const list=blocks.map((b,i)=>`${tm(b.s)} – ${tm(b.e)} <button title="Edit end time" onclick="editSess('${d}',${i})">✎</button> <button title="Delete" onclick="delSess('${d}',${i})">✕</button>`).join(' &nbsp;|&nbsp; ');
     return `<tr><td ${td}>${d}</td><td ${td}>${list}</td><td ${td}><b>${hm(ms)}</b></td></tr>`;
   }).join('');
   box.innerHTML=`<h3 class="font-black text-xs uppercase mb-2">🕒 OPD Attendance — Total ${hm(tot)}</h3>`+
     (rows?`<table class="w-full"><tr><th ${th}>Date</th><th ${th}>Sessions (in – out)</th><th ${th}>OPD time</th></tr>${rows}</table>`:'<div class="text-xs text-slate-400">No sessions in this period</div>');
 }
-async function editSess(d,id){
+async function editSess(d,i){
+  const b=window._attBlocks[d][i];
   const t=prompt('New end time (HH:MM, 24h):'); if(!/^\d{1,2}:\d{2}$/.test(t||'')) return;
-  const [h,m]=t.split(':'); const e=new Date(d+'T00:00:00'); e.setHours(+h,+m);
-  await fetch(OPDAPI+'/session-edit',{method:'POST',headers:apiH(),body:JSON.stringify({date:d,sid:id,action:'end',end:e.getTime()})});
+  const [h,m]=t.split(':'); const e=new Date(d+'T00:00:00'); e.setHours(+h,+m); const ne=e.getTime();
+  const last=b.items.reduce((a,x)=>x.e>a.e?x:a,b.items[0]);
+  for(const x of b.items){
+    const body = x.s>=ne ? {action:'delete'} : {action:'end',end:(x.id===last.id?ne:Math.min(x.e,ne))};
+    await fetch(OPDAPI+'/session-edit',{method:'POST',headers:apiH(),body:JSON.stringify({date:d,sid:x.id,...body})});
+  }
   renderStats();
 }
-async function delSess(d,id){
-  if(!confirm('Delete this session?')) return;
-  await fetch(OPDAPI+'/session-edit',{method:'POST',headers:apiH(),body:JSON.stringify({date:d,sid:id,action:'delete'})});
+async function delSess(d,i){
+  if(!confirm('Delete this sitting?')) return;
+  for(const x of window._attBlocks[d][i].items)
+    await fetch(OPDAPI+'/session-edit',{method:'POST',headers:apiH(),body:JSON.stringify({date:d,sid:x.id,action:'delete'})});
   renderStats();
 }
 
