@@ -948,6 +948,8 @@ function calcThyroxine(){
 
 
 <style>
+    .stats-pill{font-size:11px;font-weight:800;padding:5px 14px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;color:#475569}
+    .stats-pill.active{background:#4f46e5;border-color:#4f46e5;color:#fff}
     /* This forcefully hides the bar when you click Print */
    @media print {
     #clinic-floating-footer { display: none !important; }
@@ -1888,7 +1890,7 @@ function executeQuickFill() {
 
             const allLabels = Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]')).map(c=>c.nextElementSibling.textContent.toLowerCase().trim());
             const unmatched = data.kco.filter(k => !allLabels.some(lbl => lbl===k || lbl.startsWith(k) || lbl.includes(` ${k}`) || lbl.includes(`${k} `) || lbl.includes(`/${k}`)));
-            if (unmatched.length) document.getElementById('customKCO').value = unmatched.join(', ').toUpperCase();
+            if (unmatched.length) document.getElementById('customKCO').value = unmatched.map(normalizeKcoEntry).join(', ');
 
 
     qCard.classList.remove('border-l-indigo-500');
@@ -4668,7 +4670,24 @@ window.onload = function() {
 (function() {
   const SOURCE      = 'opd';
   const PING_URL    = 'https://opd-api.drmjp93.workers.dev/ping';
-  const MAINT_KEY   = 'statsMaintenanceMode_opd';
+    const CLINIC_KEY = 'opdClinicPC';
+  const isClinic = () => localStorage.getItem(CLINIC_KEY) === 'true';
+  let sid = null, sStart = 0, hb = null;
+  function sendBeat() {
+    if (!sid) return;
+    fetch('https://opd-api.drmjp93.workers.dev/session', {
+      method: 'POST', keepalive: true,
+      headers: { 'Content-Type': 'text/plain', 'X-Secret-Key': 'DrMJP_Secure_2026' },
+      body: JSON.stringify({ sid, date: new Date(sStart).toLocaleDateString('en-CA'), start: sStart, end: Date.now(), device: localStorage.getItem('deviceLabel') || '' })
+    }).catch(() => {});
+  }
+  function startSession() {
+    if (sid) return;
+    sid = Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+    sStart = Date.now(); sendBeat(); hb = setInterval(sendBeat, 300000);
+  }
+  function endSession() { if (!sid) return; sendBeat(); clearInterval(hb); sid = null; }
+  window.addEventListener('pagehide', sendBeat);
 
   // ── KCO → Stats category map ──
   // Key = substring to match in KCO label (lowercase)
@@ -4700,31 +4719,29 @@ window.onload = function() {
     return [...matched];
   }
 
+    function paintPill(btn) {
+    const on = isClinic();
+    btn.innerHTML = on ? '🏥 CLINIC PC' : '🛠 DEV MODE';
+    btn.style.background = on ? '#10b981' : '#ef4444';
+  }
   function buildMaintBtn() {
     if (document.getElementById('statsMaintBtn')) return;
-    const isMaint = localStorage.getItem(MAINT_KEY) === 'true';
     const btn = document.createElement('button');
     btn.id = 'statsMaintBtn';
-    btn.title = 'Toggle Stats Maintenance Mode';
-    btn.innerHTML = isMaint ? '🔧 MAINT' : '📊 LIVE';
-    btn.style.cssText = `
-      position:fixed; bottom:36px; right:16px; z-index:99999;
-      padding:4px 10px; border-radius:6px; border:none; cursor:pointer;
-      font-size:10px; font-weight:900; letter-spacing:.5px;
-      background:${isMaint ? '#ef4444' : '#10b981'}; color:#fff;
-      box-shadow:0 2px 8px rgba(0,0,0,.25); transition:background .2s;
-    `;
+    btn.title = 'CLINIC PC = logs OPD time + stats. DEV MODE = logs nothing';
+    btn.style.cssText = `position:fixed; bottom:36px; right:16px; z-index:99999; padding:4px 10px; border-radius:6px; border:none; cursor:pointer; font-size:10px; font-weight:900; letter-spacing:.5px; color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.25); transition:background .2s;`;
+    paintPill(btn);
     btn.onclick = () => {
-      const current = localStorage.getItem(MAINT_KEY) === 'true';
-      localStorage.setItem(MAINT_KEY, (!current).toString());
-      btn.innerHTML = !current ? '🔧 MAINT' : '📊 LIVE';
-      btn.style.background = !current ? '#ef4444' : '#10b981';
+      localStorage.setItem(CLINIC_KEY, (!isClinic()).toString());
+      paintPill(btn);
+      isClinic() ? startSession() : endSession();
     };
     document.body.appendChild(btn);
+    if (isClinic()) startSession();
   }
 
   function pingStats() {
-    if (localStorage.getItem(MAINT_KEY) === 'true') return;
+        if (!isClinic()) return;
     const today = new Date().toLocaleDateString('en-CA');
     const subcats = getCheckedKCOs();
     fetch(PING_URL, {
@@ -4893,25 +4910,128 @@ function getVisitDate(v){
   return t ? new Date(t).toLocaleDateString('en-CA') : '';
 }
 function getCustomKcos(v){
-  return ((v.details&&v.details.customKCO)||'').split(/[,;\n]+/).map(s=>s.trim().toUpperCase()).filter(Boolean);
+    return ((v.details&&v.details.customKCO)||'').split(/[,;\n]+/).map(s=>canonKco(s)).filter(Boolean);
 }
+const OPDAPI='https://opd-api.drmjp93.workers.dev', OPDKEY='DrMJP_Secure_2026';
+const apiH=()=>({'Content-Type':'text/plain','X-Secret-Key':OPDKEY});
+let kcoAliases=JSON.parse(localStorage.getItem('kcoAliases')||'{}');
+function canonKco(t){ t=String(t).trim().toUpperCase(); return kcoAliases[t]||t; }
+async function loadAliases(){
+  try{ const r=await fetch(OPDAPI+'/aliases',{headers:apiH()}); if(!r.ok) return false;
+    const s=JSON.stringify(await r.json()); const ch=s!==JSON.stringify(kcoAliases);
+    kcoAliases=JSON.parse(s); localStorage.setItem('kcoAliases',s); return ch; }catch(e){ return false; }
+}
+async function saveAliases(){
+  localStorage.setItem('kcoAliases',JSON.stringify(kcoAliases));
+  try{ await fetch(OPDAPI+'/aliases',{method:'POST',headers:apiH(),body:JSON.stringify(kcoAliases)}); }catch(e){}
+}
+loadAliases();
+function lev(a,b){const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t;}}return d[b.length];}
+function similarKco(a,b){const L=Math.min(a.length,b.length);return L>=4&&lev(a,b)<=(L>=8?2:1);}
+function seedKcoKnown(){
+  const k=new Set(JSON.parse(localStorage.getItem('kcoKnown')||'[]'));
+  dbMasterData.forEach(p=>p.visits.forEach(v=>getCustomKcos(v).forEach(t=>k.add(t))));
+  localStorage.setItem('kcoKnown',JSON.stringify([...k]));
+}
+// used while typing entries: maps to alias / reuses a similar existing spelling
+function normalizeKcoEntry(t){
+  t=canonKco(t);
+  const known=JSON.parse(localStorage.getItem('kcoKnown')||'[]');
+  const hit=known.find(k=>k===t)||known.find(k=>similarKco(k,t));
+  if(hit) return canonKco(hit);
+  known.push(t); localStorage.setItem('kcoKnown',JSON.stringify(known));
+  return t;
+}
+function rawCustomTerms(){
+  const m={};
+  dbMasterData.forEach(p=>p.visits.forEach(v=>((v.details&&v.details.customKCO)||'').split(/[,;\n]+/).map(s=>s.trim().toUpperCase()).filter(Boolean).forEach(t=>m[t]=(m[t]||0)+1)));
+  return m;
+}
+let _aliasTerms=[], _aliasNames=[];
+function openAliasPanel(){
+  const raw=rawCustomTerms();
+  _aliasTerms=Object.keys(raw).sort();
+  _aliasNames=[...new Set([...kcoMasterLabels.map(l=>l.toUpperCase()),..._aliasTerms.map(canonKco)])].sort();
+  const th='class="text-left text-[10px] font-black text-slate-500 uppercase p-2 border-b"', td='class="p-2 border-b text-sm"';
+  const rows=_aliasTerms.map((t,i)=>{
+    const cur=kcoAliases[t];
+    const sug=cur?'':_aliasNames.findIndex(n=>n!==t&&similarKco(n,t));
+    const act=cur
+      ? `→ <b>${cur}</b> <button class="text-rose-600 text-xs font-bold ml-2" onclick="unmergeKco(${i})">undo</button>`
+      : `${sug>=0?`<button class="text-indigo-600 text-xs font-bold mr-2" onclick="mergeKco(${i},${sug})">Merge → ${_aliasNames[sug]}</button>`:''}<select class="text-xs border rounded p-1" onchange="if(this.value!=='')mergeKco(${i},+this.value)"><option value="">Merge into…</option>${_aliasNames.map((n,j)=>n===t?'':`<option value="${j}">${n}</option>`).join('')}</select>`;
+    return `<tr><td ${td}>${t}</td><td ${td}>${raw[t]}</td><td ${td}>${act}</td></tr>`;
+  }).join('');
+  document.getElementById('statsBody').innerHTML=`<div class="flex justify-between mb-3"><h3 class="font-black text-xs uppercase">Merge duplicate terms</h3><button onclick="renderStats()" class="text-xs font-bold text-indigo-600">← Back to stats</button></div><table class="w-full"><tr><th ${th}>Typed term</th><th ${th}>Visits</th><th ${th}>Action</th></tr>${rows||`<tr><td ${td} colspan="3">No custom terms yet</td></tr>`}</table>`;
+}
+function mergeKco(i,j){
+  const v=_aliasTerms[i], t=canonKco(_aliasNames[j]); if(v===t) return;
+  Object.keys(kcoAliases).forEach(k=>{ if(kcoAliases[k]===v) kcoAliases[k]=t; });
+  kcoAliases[v]=t; saveAliases(); openAliasPanel();
+}
+function unmergeKco(i){ delete kcoAliases[_aliasTerms[i]]; saveAliases(); openAliasPanel(); }
+
+async function renderAttendance(from,to){
+  const tok=window._attTok=(window._attTok||0)+1;
+  const box=document.createElement('div'); box.className='mt-6';
+  box.innerHTML='<h3 class="font-black text-xs uppercase mb-2">🕒 OPD Attendance</h3><div class="text-xs text-slate-400">Loading…</div>';
+  document.getElementById('statsBody').appendChild(box);
+  let db={};
+  try{ const r=await fetch(OPDAPI+'/sessions',{headers:{'X-Secret-Key':OPDKEY}}); db=await r.json(); }
+  catch(e){ box.lastChild.textContent='Offline — could not load attendance'; return; }
+  if(tok!==window._attTok) return;
+  const th='class="text-left text-[10px] font-black text-slate-500 uppercase p-2 border-b"', td='class="p-2 border-b text-sm"';
+  const hm=ms=>{const m=Math.round(ms/60000);return Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';};
+  const tm=ms=>new Date(ms).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  let tot=0;
+  const rows=Object.keys(db).filter(d=>(!from||d>=from)&&(!to||d<=to)).sort().reverse().map(d=>{
+    const ss=Object.entries(db[d]).sort((a,b)=>a[1].s-b[1].s);
+    let ms=0, cur=null;
+    ss.forEach(([id,x])=>{ if(cur&&x.s<=cur.e){cur.e=Math.max(cur.e,x.e);} else {if(cur)ms+=cur.e-cur.s; cur={s:x.s,e:x.e};} });
+    if(cur) ms+=cur.e-cur.s;
+    tot+=ms;
+    const list=ss.map(([id,x])=>`${tm(x.s)} – ${tm(x.e)} <button title="Edit end time" onclick="editSess('${d}','${id}')">✎</button> <button title="Delete" onclick="delSess('${d}','${id}')">✕</button>`).join(' &nbsp;|&nbsp; ');
+    return `<tr><td ${td}>${d}</td><td ${td}>${list}</td><td ${td}><b>${hm(ms)}</b></td></tr>`;
+  }).join('');
+  box.innerHTML=`<h3 class="font-black text-xs uppercase mb-2">🕒 OPD Attendance — Total ${hm(tot)}</h3>`+
+    (rows?`<table class="w-full"><tr><th ${th}>Date</th><th ${th}>Sessions (in – out)</th><th ${th}>OPD time</th></tr>${rows}</table>`:'<div class="text-xs text-slate-400">No sessions in this period</div>');
+}
+async function editSess(d,id){
+  const t=prompt('New end time (HH:MM, 24h):'); if(!/^\d{1,2}:\d{2}$/.test(t||'')) return;
+  const [h,m]=t.split(':'); const e=new Date(d+'T00:00:00'); e.setHours(+h,+m);
+  await fetch(OPDAPI+'/session-edit',{method:'POST',headers:apiH(),body:JSON.stringify({date:d,sid:id,action:'end',end:e.getTime()})});
+  renderStats();
+}
+async function delSess(d,id){
+  if(!confirm('Delete this session?')) return;
+  await fetch(OPDAPI+'/session-edit',{method:'POST',headers:apiH(),body:JSON.stringify({date:d,sid:id,action:'delete'})});
+  renderStats();
+}
+
 function openStatsModal(){
-const sc = document.getElementById('statsCond');
-const cs=new Set(); dbMasterData.forEach(p=>p.visits.forEach(v=>getCustomKcos(v).forEach(t=>cs.add(t))));
-const cur=sc.value;
-sc.innerHTML='<option value="">All patients</option>'+kcoMasterLabels.map(l=>`<option>${l}</option>`).join('')+(cs.size?'<optgroup label="Custom KCO">'+[...cs].sort().map(t=>`<option>${t}</option>`).join('')+'</optgroup>':'');
-sc.value=cur;
+  const sc=document.getElementById('statsCond');
+  const cs=new Set(); dbMasterData.forEach(p=>p.visits.forEach(v=>getCustomKcos(v).forEach(t=>{ if(!kcoMasterLabels.some(l=>l.toUpperCase()===t)) cs.add(t); })));
+  const cur=sc.value;
+  sc.innerHTML='<option value="">All patients</option>'+kcoMasterLabels.map(l=>`<option>${l}</option>`).join('')+(cs.size?'<optgroup label="Custom KCO">'+[...cs].sort().map(t=>`<option>${t}</option>`).join('')+'</optgroup>':'');
+  sc.value=cur;
+  seedKcoKnown();
   document.getElementById('statsModal').classList.remove('hidden');
-  setStatsRange('all');
+  setStatsRange('td');
+  loadAliases().then(ch=>{ if(ch) renderStats(); });
 }
+
 function setStatsRange(r){
   const n=new Date(), y=n.getFullYear(), m=n.getMonth(), f=d=>d.toLocaleDateString('en-CA');
   let a='', b='';
+  if (r==='td'){a=b=f(n);}
+  if (r==='tw'){const s=new Date(y,m,n.getDate()-((n.getDay()+6)%7)); a=f(s); b=f(new Date(s.getFullYear(),s.getMonth(),s.getDate()+6));}
   if (r==='tm'){a=f(new Date(y,m,1)); b=f(new Date(y,m+1,0));}
-  if (r==='lm'){a=f(new Date(y,m-1,1)); b=f(new Date(y,m,0));}
-  if (r==='ty'){a=f(new Date(y,0,1)); b=f(new Date(y,11,31));}
   document.getElementById('statsFrom').value=a;
   document.getElementById('statsTo').value=b;
+  document.querySelectorAll('#statsPills [data-r]').forEach(x=>x.classList.toggle('active',x.dataset.r===r));
+  renderStats();
+}
+function statsManual(){
+  document.querySelectorAll('#statsPills [data-r]').forEach(x=>x.classList.remove('active'));
   renderStats();
 }
 function renderStats(){
@@ -4945,6 +5065,7 @@ function renderStats(){
       <div><h3 class="font-black text-xs uppercase mb-2">${cond||'All'} — by ${g}</h3><table class="w-full"><tr><th ${th}>${g}</th><th ${th}>Visits</th><th ${th}>Patients</th></tr>${perRows}</table></div>
       <div><h3 class="font-black text-xs uppercase mb-2">By condition (selected period)</h3><table class="w-full"><tr><th ${th}>Condition</th><th ${th}>Visits</th><th ${th}>Patients</th></tr>${condRows}</table></div>
     </div>`;
+      renderAttendance(from,to);
 }
 async function openFollowupDashboard() {
     const db = await openDB();
@@ -5373,19 +5494,28 @@ function applyHeaderToggleStyle() {
 
 <div id="statsModal" class="fixed inset-0 z-[99999] bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden">
-    <div class="px-6 py-4 border-b bg-slate-50 flex flex-wrap items-center gap-3">
-      <h2 class="text-xl font-black text-slate-800 mr-auto">📊 Practice Statistics</h2>
-      <button onclick="setStatsRange('tm')" class="text-[10px] font-bold px-2 py-1 border rounded">This Month</button>
-      <button onclick="setStatsRange('lm')" class="text-[10px] font-bold px-2 py-1 border rounded">Last Month</button>
-      <button onclick="setStatsRange('ty')" class="text-[10px] font-bold px-2 py-1 border rounded">This Year</button>
-      <button onclick="setStatsRange('all')" class="text-[10px] font-bold px-2 py-1 border rounded">All Time</button>
-      <input type="date" id="statsFrom" onchange="renderStats()" class="premium-input !py-1 !text-xs w-36">
-      <input type="date" id="statsTo" onchange="renderStats()" class="premium-input !py-1 !text-xs w-36">
-      <select id="statsCond" onchange="renderStats()" class="premium-input !py-1 !text-xs w-36"></select>
-      <select id="statsGroup" onchange="renderStats()" class="premium-input !py-1 !text-xs w-28">
-        <option value="day">Per Day</option><option value="month" selected>Per Month</option><option value="year">Per Year</option>
-      </select>
-      <button onclick="document.getElementById('statsModal').classList.add('hidden')" class="text-slate-400 hover:text-rose-600 text-xl font-bold">✕</button>
+    <div class="px-6 pt-4 pb-3 border-b bg-slate-50">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-black text-slate-800">📊 Practice Statistics</h2>
+        <button onclick="document.getElementById('statsModal').classList.add('hidden')" class="text-slate-400 hover:text-rose-600 text-xl font-bold">✕</button>
+      </div>
+      <div id="statsPills" class="flex flex-wrap items-center gap-2 mb-3">
+        <button data-r="td" onclick="setStatsRange('td')" class="stats-pill">Today</button>
+        <button data-r="tw" onclick="setStatsRange('tw')" class="stats-pill">This Week</button>
+        <button data-r="tm" onclick="setStatsRange('tm')" class="stats-pill">This Month</button>
+        <button data-r="all" onclick="setStatsRange('all')" class="stats-pill">All Time</button>
+        <button onclick="openAliasPanel()" class="stats-pill ml-auto">🔗 Merge terms</button>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-[10px] font-bold text-slate-500 uppercase">From</span>
+        <input type="date" id="statsFrom" onchange="statsManual()" class="premium-input !py-1 !text-xs w-36">
+        <span class="text-[10px] font-bold text-slate-500 uppercase">To</span>
+        <input type="date" id="statsTo" onchange="statsManual()" class="premium-input !py-1 !text-xs w-36">
+        <select id="statsCond" onchange="renderStats()" class="premium-input !py-1 !text-xs w-36"></select>
+        <select id="statsGroup" onchange="renderStats()" class="premium-input !py-1 !text-xs w-28">
+          <option value="day">Per Day</option><option value="month" selected>Per Month</option><option value="year">Per Year</option>
+        </select>
+      </div>
     </div>
     <div id="statsBody" class="p-6 overflow-y-auto"></div>
   </div>
