@@ -1906,7 +1906,56 @@ function executeQuickFill() {
     updatePtSummary();
     saveWorkspace();
 }
+// ── KCO autocomplete in quick entry ──
+const kcoSug = document.createElement('div');
+kcoSug.className = 'fixed hidden z-[9999] bg-white border border-slate-200 rounded-lg shadow-lg max-h-64 overflow-y-auto';
+document.body.appendChild(kcoSug);
+let kcoSugList = [], kcoSugIdx = -1, kcoSugRange = null;
 
+function kcoCandidates() {
+    const set = new Set(Array.from(document.querySelectorAll('#kcoSection input[type="checkbox"]')).map(c => c.nextElementSibling.textContent.trim().toUpperCase()));
+    try { JSON.parse(localStorage.getItem('kcoKnown') || '[]').forEach(t => set.add(canonKco(t))); } catch (e) {}
+    return [...set].filter(t => t && !/\s/.test(t));
+}
+function kcoSugHide() { kcoSug.classList.add('hidden'); kcoSugList = []; }
+function kcoSugRender() {
+    if (!kcoSugList.length) { kcoSugHide(); return; }
+    kcoSug.innerHTML = kcoSugList.map((t, i) => `<div data-i="${i}" class="px-4 py-2 cursor-pointer text-sm font-bold ${i === kcoSugIdx ? 'bg-gray-700 text-white' : 'text-slate-800 hover:bg-gray-700 hover:text-white'}">${t}</div>`).join('');
+    const r = qInput.getBoundingClientRect();
+    kcoSug.style.left = r.left + 'px'; kcoSug.style.top = (r.bottom + 4) + 'px'; kcoSug.style.width = r.width + 'px';
+    kcoSug.classList.remove('hidden');
+    kcoSug.querySelectorAll('[data-i]').forEach(el => el.addEventListener('mousedown', e => { e.preventDefault(); kcoSugPick(+el.dataset.i); }));
+}
+function kcoSugPick(i) {
+    const t = kcoSugList[i].toLowerCase(), v = qInput.value;
+    qInput.value = v.slice(0, kcoSugRange[0]) + t + v.slice(kcoSugRange[1]);
+    const p = kcoSugRange[0] + t.length; qInput.setSelectionRange(p, p);
+    kcoSugHide(); qInput.dispatchEvent(new Event('input'));
+}
+function kcoSugUpdate() {
+    const pos = qInput.selectionStart, before = qInput.value.slice(0, pos);
+    const m = before.match(/(?:^|\s)kco-([^\s]*)$/i);
+    if (!m) { kcoSugHide(); return; }
+    const frag = m[1].split(',').pop().toUpperCase();
+    if (!frag) { kcoSugHide(); return; }
+    const all = kcoCandidates();
+    kcoSugList = [...all.filter(t => t.startsWith(frag)), ...all.filter(t => !t.startsWith(frag) && (t.includes(frag) || similarKco(t, frag)))].filter(t => t !== frag).slice(0, 8);
+    kcoSugRange = [pos - frag.length, pos];
+    kcoSugIdx = -1;
+    kcoSugRender();
+}
+qInput.addEventListener('focus', () => { try { seedKcoKnown(); } catch (e) {} });
+qInput.addEventListener('input', kcoSugUpdate);
+qInput.addEventListener('keydown', e => {
+    if (kcoSug.classList.contains('hidden') || !kcoSugList.length) return;
+    const n = kcoSugList.length;
+    if (e.key === 'ArrowDown') { e.preventDefault(); e.stopImmediatePropagation(); kcoSugIdx = (kcoSugIdx + 1) % n; kcoSugRender(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); e.stopImmediatePropagation(); kcoSugIdx = kcoSugIdx <= 0 ? n - 1 : kcoSugIdx - 1; kcoSugRender(); }
+    else if (e.key === 'Tab') { e.preventDefault(); e.stopImmediatePropagation(); kcoSugPick(kcoSugIdx < 0 ? 0 : kcoSugIdx); }
+    else if (e.key === 'Enter' && kcoSugIdx >= 0) { e.preventDefault(); e.stopImmediatePropagation(); kcoSugPick(kcoSugIdx); }
+    else if (e.key === 'Escape') { e.stopImmediatePropagation(); kcoSugHide(); }
+}, true);
+document.addEventListener('click', e => { if (e.target !== qInput) kcoSugHide(); });
 qInput.addEventListener('input', () => {
     renderQuickChips(parseQuickEntry(qInput.value));
     const val = qInput.value;
