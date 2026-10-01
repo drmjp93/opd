@@ -4721,9 +4721,16 @@ window.onload = function() {
   const PING_URL    = 'https://opd-api.drmjp93.workers.dev/ping';
     const CLINIC_KEY = 'opdClinicPC';
   const isClinic = () => localStorage.getItem(CLINIC_KEY) === 'true';
-  let sid = null, sStart = 0, hb = null;
+  let sid = null, sStart = 0, hb = null, lastBeat = 0;
   function sendBeat() {
     if (!sid) return;
+    const now = Date.now();
+if (lastBeat && now - lastBeat > 600000) { // gap >10 min = Mac was shut down or asleep
+  sid = now + '-' + Math.random().toString(36).slice(2, 6);
+  sStart = now;
+}
+lastBeat = now;
+
     fetch('https://opd-api.drmjp93.workers.dev/session', {
       method: 'POST', keepalive: true,
       headers: { 'Content-Type': 'text/plain', 'X-Secret-Key': 'DrMJP_Secure_2026' },
@@ -4733,9 +4740,9 @@ window.onload = function() {
   function startSession() {
     if (sid) return;
     sid = Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-    sStart = Date.now(); sendBeat(); hb = setInterval(sendBeat, 300000);
+    sStart = Date.now(); lastBeat = 0; sendBeat(); hb = setInterval(sendBeat, 60000);
   }
-  function endSession() { if (!sid) return; sendBeat(); clearInterval(hb); sid = null; }
+  function endSession() { if (!sid) return; sendBeat(); clearInterval(hb); sid = null; lastBeat = 0; }
   window.addEventListener('pagehide', sendBeat);
 
   // ── KCO → Stats category map ──
