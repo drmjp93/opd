@@ -238,6 +238,7 @@
             <div id="searchResults" class="fixed top-[70px] left-1/2 -translate-x-1/2 w-[96vw] max-w-[1500px] bg-white border-2 border-slate-200 shadow-2xl rounded-xl hidden max-h-[60vh] overflow-y-auto z-[9999] divide-y divide-slate-100"></div>
         </div>
         <div class="ml-3 shrink-0 flex items-center bg-slate-800 p-1 rounded-xl shadow-sm">
+            <button type="button" onclick="openScan()" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-slate-700 rounded-lg transition-colors text-white" title="Scan patient (Esc)"><span class="text-sm">▮▯▮</span><span class="text-[8px] font-black uppercase mt-0.5 tracking-tighter">Scan</span></button>
     <button type="button" onclick="saveToArchive()" id="btn-archive" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-slate-700 rounded-lg transition-colors text-white" title="Save to Local EMR">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zM17 21v-8H7v8M7 3v5h8"/></svg>
         <span class="text-[8px] font-black uppercase mt-0.5 tracking-tighter">Save</span>
@@ -537,7 +538,7 @@
                     <div><label class="input-label">Sex</label><select id="ptSex" class="premium-input !px-2"><option>M</option><option>F</option></select></div>
                 </div>
                 <div class="grid grid-cols-[1fr_80px_100px] gap-2">
-                    <div><label class="input-label">Patient Name</label><input type="text" id="ptName" placeholder="Full Name" class="premium-input font-bold" oninput="this.value=this.value.toUpperCase()"></div>
+                    <div><label class="input-label">Patient Name</label><input type="text" id="ptName" placeholder="Full Name" class="premium-input font-bold" oninput="this.value=this.value.toUpperCase()"><div id="ptPidTag" class="text-[9px] font-bold text-slate-400 mt-0.5"></div></div>
                     <div><label class="input-label">Age</label><input type="number" id="ptAge" placeholder="Yrs" class="premium-input text-center"></div>
                     <div><label class="input-label">MOA</label><input type="text" id="ptMOA" placeholder="e.g. 2M" class="premium-input text-center" oninput="this.value=this.value.toUpperCase()"></div>
                 </div>
@@ -2256,7 +2257,7 @@ function clearWorkspace(skipConfirm = false) {
     // If skipConfirm is true, it won't show the popup warning!
     if (!skipConfirm && !confirm("Clear all patient data and prescriptions?")) return;
     
-    rxItems = []; tapers = []; currentTaperSteps = [];
+    rxItems = []; setPidTag(''); tapers = []; currentTaperSteps = [];
     document.querySelectorAll('input[type="text"],input[type="number"],textarea').forEach(i=>i.value='');
     updateEGFR();
     
@@ -2286,7 +2287,7 @@ function clearWorkspace(skipConfirm = false) {
 // PRINT (ULTRA-COMPACT + PURE BLACK & WHITE)
 // ══════════════════════════════════════════
 async function prepareAndPrint() {
-    
+    window.lastPid = '';
     // --- NEW SAFETY CATCH: Auto-submit any pending text before printing ---
     if (document.getElementById('quickEntryInput') && document.getElementById('quickEntryInput').value.trim() !== '') {
         executeQuickFill();
@@ -2781,7 +2782,7 @@ async function prepareAndPrint() {
             <span>${ptAge ? ptAge + ' Yrs' : '\u2014'} / ${ptSex}${ptMOA ? ' &nbsp;·&nbsp; <b style="font-weight:900;">' + ptMOA + '</b>' : ''}</span>
         </div>
     </div>
-
+       
     <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
         <div style="font-weight: 900; font-size: 12pt; border-bottom: 2px solid #000; padding-bottom: 1px;">${date}</div>
         <div style="margin-top: 3px; font-size: 9pt; font-weight: 900; background: #000; color: #fff; padding: 1px 6px; border-radius: 3px; text-transform: uppercase;">
@@ -2797,7 +2798,7 @@ async function prepareAndPrint() {
         ${kcoList ? `<div class="note-row"><span style="font-weight:900;font-size:10pt;min-width:40px;flex-shrink:0;color:#000;text-transform:uppercase;">KCO :</span><span style="font-weight:900;font-size:10pt;text-transform:uppercase;">${kcoList}</span></div>` : ''}
 
         ${(bp || pulse || temp || spo2 || rs || cvs || pa || cns || ht || wt || bmi) ? `
-        <div style="border-top:1px solid #000;margin:4px 0 3px 0;"></div>
+        ${(complaints || kcoList) ? '<div style="border-top:1px solid #000;margin:4px 0 3px 0;"></div>' : ''}
 
         <div class="note-row" style="align-items:baseline;">
           <span style="font-weight:900;font-size:10pt;min-width:40px;flex-shrink:0;color:#000;">O/E :</span>
@@ -2934,8 +2935,9 @@ async function prepareAndPrint() {
 
       </div>
 
-     <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 15px; padding-top: 8px;">
-        <div style="font-size: 7pt; font-weight: 700; color: rgba(128,128,128,0.7); text-align: left;">RX: ${window.lastRxCode || ''}</div>
+        <div style="margin-top: 10px; width: 46mm; text-align: center;"><div style="font-size:7pt;font-weight:700;color:rgba(128,128,128,0.9);">RX: ${window.lastRxCode || ''}</div>${window.lastPid ? pidBarcodeSVG(window.lastPid) + '<div style="font-size:7pt;font-weight:700;letter-spacing:1px;">ID ' + window.lastPid + '</div>' : ''}</div>
+         <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 3px; padding-top: 0;">
+        <div></div>
         <div class="slip-credit" style="color: rgba(128, 128, 128, 0.6); margin: 0; padding: 0;">Prescription software developed by Dr. Mit Panchani</div>
       </div>
 
@@ -3504,6 +3506,14 @@ async function saveToArchive(autoClear = true) {
         finalRecord = { name: ptName, lastUpdate: timestamp, visits: [{ date: timestamp, searchDate: searchDateStr, details: currentData }] };
     }
 
+        if (!finalRecord.pid) {
+        const all = await new Promise(r => { const q = store.getAll(); q.onsuccess = () => r(q.result); q.onerror = () => r([]); });
+        const used = new Set(all.map(x => x.pid));
+        let n; do { n = String(100000 + Math.floor(Math.random()*900000)); n += pidCheck(n); } while (used.has(n));
+        finalRecord.pid = n;
+    }
+    window.lastPid = finalRecord.pid; setPidTag(finalRecord.pid);
+
     window.lastRxCode = currentData.rxCode;
     store.put(finalRecord);
 
@@ -3828,6 +3838,7 @@ function loadVisitFromArchive(idx) {
 
     document.getElementById('date').value = new Date().toISOString().slice(0, 10);    if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
     if (document.getElementById('ptName')) document.getElementById('ptName').value = window.tempMatchedVisits[idx].name;
+    refreshPidTag();
     if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = getSmartAge(latestVisit.age, latestVisit.date);
     if (document.getElementById('ptMOA')) document.getElementById('ptMOA').value = latestVisit.moa ? getSmartMOA(latestVisit.moa, latestVisit.date) : '';
     if (latestVisit.height && document.getElementById('ptHeight')) document.getElementById('ptHeight').value = latestVisit.height;
@@ -3992,7 +4003,7 @@ async function openHistoryModal(patientName) {
         const latest = p.visits[p.visits.length - 1].details;
         const ageStr = latest.age ? `${latest.age}y` : '';
         const sexStr = latest.sex ? latest.sex : '';
-        document.getElementById('historyModalSub').innerText = [ageStr, sexStr].filter(Boolean).join(' / ');
+        document.getElementById('historyModalSub').innerText = [ageStr, sexStr, p.pid ? 'ID ' + p.pid : ''].filter(Boolean).join(' / ');
 
         const timeline = document.getElementById('historyModalTimeline');
         
@@ -4222,6 +4233,7 @@ async function loadSpecificVisit(patientName, visitIndex) {
         
         if (latestVisit.sex && document.getElementById('ptSex')) document.getElementById('ptSex').value = latestVisit.sex;
         if (document.getElementById('ptName')) document.getElementById('ptName').value = p.name;
+        refreshPidTag();
         if (latestVisit.age && document.getElementById('ptAge')) document.getElementById('ptAge').value = getSmartAge(latestVisit.age, latestVisit.date);
         if (document.getElementById('ptMOA')) document.getElementById('ptMOA').value = latestVisit.moa ? getSmartMOA(latestVisit.moa, latestVisit.date) : '';
         currentOverdueLabel = calcOverdueLabel(latestVisit.fuDays, latestVisit.date);
@@ -5704,6 +5716,67 @@ function select(btn){
 }
 
 
+</script>
+
+<div id="scanOverlay" class="fixed inset-0 z-[100000] hidden flex items-center justify-center bg-slate-900/70 backdrop-blur-md">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md text-center">
+    <div class="text-xs font-black uppercase tracking-widest text-slate-500 mb-3">Scan patient barcode</div>
+    <input id="scanInput" type="text" autocomplete="off" class="premium-input text-center text-2xl font-black tracking-widest">
+    <div id="scanMsg" class="text-sm font-bold text-rose-600 h-5 mt-2"></div>
+    <div class="flex gap-2 mt-4">
+      <button onclick="closeScan();document.getElementById('archiveSearch').focus()" class="flex-1 bg-slate-100 hover:bg-slate-200 rounded-lg py-2 text-xs font-black uppercase">Search by name</button>
+      <button onclick="closeScan();document.getElementById('ptName').focus()" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg py-2 text-xs font-black uppercase">New patient</button>
+    </div>
+    <div class="text-[10px] text-slate-400 mt-3">Esc to close</div>
+  </div>
+</div>
+<script>
+const C128="212222 222122 222221 121223 121322 131222 122213 122312 132212 221213 221312 231212 112232 122132 122231 113222 123122 123221 223211 221132 221231 213212 223112 312131 311222 321122 321221 312212 322112 322211 212123 212321 232121 111323 131123 131321 112313 132113 132311 211313 231113 231311 112133 112331 132131 113123 113321 133121 313121 211331 231131 213113 213311 213131 311123 311321 331121 312113 312311 332111 314111 221411 431111 111224 111422 121124 121421 141122 141221 112214 112412 122114 122411 142112 142211 241211 221114 413111 241112 134111 111242 121142 121241 114212 124112 124211 411212 421112 421211 212141 214121 412121 111143 111341 131141 114113 114311 411113 411311 113141 114131 311141 411131 211412 211214 211232 2331112".split(' ');
+const pidCheck = s => String(parseInt(s,10) % 97).padStart(2,'0');
+const pidValid = p => /^\d{8}$/.test(p) && pidCheck(p.slice(0,6)) === p.slice(6);
+function pidBarcodeSVG(pid){
+  const v=[105]; for(let i=0;i<8;i+=2) v.push(+pid.substr(i,2));
+  v.push((105+v[1]+v[2]*2+v[3]*3+v[4]*4)%103); v.push(106);
+  let x=0,r='';
+  v.forEach(c=>{const w=C128[c];for(let i=0;i<w.length;i++){const n=+w[i];if(i%2===0)r+=`<rect x="${x}" width="${n}" height="1"/>`;x+=n;}});
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 ${x+20} 1" preserveAspectRatio="none" shape-rendering="crispEdges" style="width:46mm;height:8mm;display:block;margin:0 auto"><g fill="#000">${r}</g></svg>`;
+}
+function setPidTag(p){const t=document.getElementById('ptPidTag');if(t)t.textContent=p?'ID '+p:'';}
+async function refreshPidTag(){
+  const n=(document.getElementById('ptName').value||'').trim().toUpperCase();
+  if(!n){setPidTag('');return;}
+  const db=await openDB();
+  const r=db.transaction('patients','readonly').objectStore('patients').get(n);
+  r.onsuccess=()=>setPidTag(r.result&&r.result.pid);
+}
+function formBlank(){const g=i=>((document.getElementById(i)||{}).value||'').trim();return !g('ptName')&&!g('ptAge')&&!g('complaints')&&!rxItems.length;}
+function openScan(){const i=document.getElementById('scanInput');document.getElementById('scanOverlay').classList.remove('hidden');i.value='';document.getElementById('scanMsg').textContent='';setTimeout(()=>i.focus(),50);}
+function closeScan(){document.getElementById('scanOverlay').classList.add('hidden');}
+document.getElementById('scanInput').addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return; e.preventDefault();
+  const v=e.target.value.trim(); e.target.value='';
+  const msg=t=>document.getElementById('scanMsg').textContent=t;
+  if(!pidValid(v)){msg('Invalid code - scan again');return;}
+  openDB().then(db=>{
+    const q=db.transaction('patients','readonly').objectStore('patients').getAll();
+    q.onsuccess=()=>{
+      const p=q.result.find(x=>x.pid===v);
+      if(!p){msg('ID not found - use Search by name');return;}
+      if(!formBlank()&&!confirm('Replace current form?'))return;
+      closeScan(); loadSpecificVisit(p.name,p.visits.length-1);
+    };
+  });
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  const ov=document.getElementById('scanOverlay');
+  if(!ov.classList.contains('hidden')){e.preventDefault();e.stopImmediatePropagation();closeScan();return;}
+  const ls=document.getElementById('lock-screen'); if(ls&&getComputedStyle(ls).display!=='none')return;
+  if([...document.querySelectorAll('[id$="Modal"]')].some(m=>!m.classList.contains('hidden')))return;
+  const sr=document.getElementById('searchResults'); if(sr&&sr.style.display==='block')return;
+  const a=document.activeElement; if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value&&a.value.trim())return;
+  if(formBlank()){e.preventDefault();openScan();}
+},true);
 </script>
 
 </body>
