@@ -2962,7 +2962,7 @@ async function prepareAndPrint() {
         <div class="slip-credit" style="color: rgba(128, 128, 128, 0.6); margin: 0; padding: 0;">Prescription software developed by Dr. Mit Panchani</div>
       </div>
 
-<div style="font-size: 8pt; font-weight: 700; color: rgba(128, 128, 128, 0.9); margin-bottom: 2px; text-align: center">EX-CONSULTANT: CIVIL HOSPITAL, GANDHINAGAR | AMBA HEALTH CENTRE & HOSPITAL (AHCH), ADALAJ, TRIMANDIR SANKUL, GANDHINAGAR</div>
+<div style="font-size: 8pt; font-weight: 700; color: rgba(128, 128, 128, 0.9); margin-bottom: 2px; text-align: center">FORMER CONSULTANT AT CIVIL HOSPITAL, GANDHINAGAR | AMBA HEALTH CENTRE & HOSPITAL (AHCH), ADALAJ, TRIMANDIR SANKUL, GANDHINAGAR</div>
 
       
 
@@ -5281,8 +5281,10 @@ async function openFollowupDashboard() {
     };
 }
 function printDueList() {
-    const rows = document.querySelectorAll('#followupBody tr');
-    if (!rows.length || rows[0].children.length < 5) { alert('No due patients to print.'); return; }
+    const minD = parseInt(document.getElementById('prMin').value) || 0;
+    const maxD = parseInt(document.getElementById('prMax').value) || 999999;
+    const rows = [...document.querySelectorAll('#followupBody tr')].filter(tr => tr.children.length >= 5 && parseInt(tr.children[4].textContent) >= minD && parseInt(tr.children[4].textContent) <= maxD);
+    if (!rows.length) { alert('No due patients in this range.'); return; }
     let h = '<h2>Due Follow-up Call List</h2><p>Date: ' + new Date().toLocaleDateString('en-GB') + ' | Total: ' + rows.length + ' patient(s)</p>';
     h += '<table><thead><tr><th>#</th><th>Name</th><th>Age/Sex/MOA</th><th>KCO</th><th>Last Visit</th><th>Overdue</th><th>Called</th><th>Remarks</th></tr></thead><tbody>';
     rows.forEach((tr, i) => {
@@ -5587,7 +5589,8 @@ function applyHeaderToggleStyle() {
                 <h2 class="text-xl font-black text-slate-800 tracking-tight">Due Follow-ups</h2>
                 <p class="text-xs font-bold text-slate-500 mt-0.5 uppercase tracking-widest" id="followupCount">Loading...</p>
             </div>
-                        <button onclick="printDueList()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-black uppercase tracking-widest shrink-0 ml-auto mr-3">🖨 Print</button>
+            <div class="ml-auto mr-2 flex items-center gap-1 shrink-0"><span class="text-[10px] font-black text-slate-500 uppercase">Overdue days</span><input id="prMin" type="number" min="0" placeholder="from" class="w-16 border border-slate-300 rounded px-2 py-1 text-xs"><span class="text-slate-400">–</span><input id="prMax" type="number" min="0" placeholder="to" class="w-16 border border-slate-300 rounded px-2 py-1 text-xs"></div>           
+            <button onclick="printDueList()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-black uppercase tracking-widest shrink-0 ml-auto mr-3">🖨 Print</button>
             <button onclick="document.getElementById('followupModal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-100 hover:text-rose-600 text-slate-400 transition-colors shrink-0">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
