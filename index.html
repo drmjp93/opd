@@ -2231,6 +2231,7 @@ function loadWorkspace() {
                 updateBMI();
             }
             if (d.rxItems) rxItems = d.rxItems;
+            toggleThyroidTools();
             if (d.tapers)  tapers  = d.tapers;
             if (d.currentTaperSteps) currentTaperSteps = d.currentTaperSteps;
             if (d.checkboxes) {
@@ -2280,10 +2281,10 @@ function clearWorkspace(skipConfirm = false) {
     document.getElementById('fuHiddenBoxes').innerHTML = '';
     initDefaults();
     document.getElementById('globalDays').value = 5;
+    toggleThyroidTools();
     renderTaperBuilder(); renderActiveTapers(); renderRx();
     updatePtSummary(); 
     localStorage.removeItem('clinicalWorkspaceState');
-    
     // --- NEW: Smoothly scroll back to the top of the page ---
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -3443,6 +3444,7 @@ async function saveToArchive(autoClear = true) {
         generalAdvice: document.getElementById('generalAdvice') ? document.getElementById('generalAdvice').value : '',
         fuDays: document.getElementById('fuDays') ? document.getElementById('fuDays').value : '',
         fuSmartInput: document.getElementById('fuSmartInput') ? document.getElementById('fuSmartInput').value : '',
+        globalDays: document.getElementById('globalDays') ? document.getElementById('globalDays').value : '',
         investigations: {
             hb:    (document.getElementById('lab-hb')    || {}).value || '',
             tc:    (document.getElementById('lab-tc')    || {}).value || '',
@@ -3857,7 +3859,7 @@ function loadVisitFromArchive(idx) {
     if (latestVisit.height && document.getElementById('ptHeight')) document.getElementById('ptHeight').value = latestVisit.height;
     if (latestVisit.weight && document.getElementById('ptWeight')) document.getElementById('ptWeight').value = latestVisit.weight;
     updateBMI(); // Forces the UI card to recalculate and appear
-    //if (latestVisit.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = latestVisit.bp;
+    toggleThyroidTools();//if (latestVisit.bp && document.getElementById('bpInput')) document.getElementById('bpInput').value = latestVisit.bp;
     //if (latestVisit.pulse && document.getElementById('ptPulse')) document.getElementById('ptPulse').value = latestVisit.pulse;
     //if (latestVisit.temp && document.getElementById('ptTemp')) document.getElementById('ptTemp').value = latestVisit.temp;
     //if (latestVisit.spo2 && document.getElementById('ptSpo2')) document.getElementById('ptSpo2').value = latestVisit.spo2;
@@ -3872,7 +3874,7 @@ function loadVisitFromArchive(idx) {
         if (document.getElementById('customKCO')) document.getElementById('customKCO').value = latestVisit.customKCO || '';
     }
     
-    if (latestVisit.rxItems) { rxItems = JSON.parse(JSON.stringify(latestVisit.rxItems)); renderRx(); }
+    if (latestVisit.rxItems) { rxItems = JSON.parse(JSON.stringify(latestVisit.rxItems)); renderRx(); } 
     if (latestVisit.tapers) { tapers = JSON.parse(JSON.stringify(latestVisit.tapers)); renderActiveTapers(); } else { tapers = []; renderActiveTapers(); }
     if (latestVisit.generalAdvice !== undefined && document.getElementById('generalAdvice')) document.getElementById('generalAdvice').value = latestVisit.generalAdvice;
     if (latestVisit.fuDays !== undefined && document.getElementById('fuDays')) document.getElementById('fuDays').value = latestVisit.fuDays;
@@ -4263,8 +4265,8 @@ async function loadSpecificVisit(patientName, visitIndex) {
         if (document.getElementById('customKCO')) document.getElementById('customKCO').value = latestVisit.customKCO || '';
         }
         
-        if (latestVisit.rxItems) { rxItems = JSON.parse(JSON.stringify(latestVisit.rxItems)); renderRx(); }
-        if (latestVisit.tapers) { tapers = JSON.parse(JSON.stringify(latestVisit.tapers)); renderActiveTapers(); } else { tapers = []; renderActiveTapers(); }
+        if (latestVisit.rxItems) { rxItems = JSON.parse(JSON.stringify(latestVisit.rxItems)); renderRx(); } toggleThyroidTools(); 
+        if (latestVisit.tapers) { tapers = JSON.parse(JSON.stringify(latestVisit.tapers)); renderActiveTapers(); } else { tapers = []; renderActiveTapers(); } 
         if (latestVisit.generalAdvice !== undefined && document.getElementById('generalAdvice')) document.getElementById('generalAdvice').value = latestVisit.generalAdvice;
         if (latestVisit.fuDays !== undefined && document.getElementById('fuDays')) document.getElementById('fuDays').value = latestVisit.fuDays;
         if (latestVisit.fuSmartInput !== undefined && document.getElementById('fuSmartInput')) {
@@ -4330,7 +4332,7 @@ async function editSpecificVisit(patientName, visitIndex) {
         }
         if (document.getElementById('customKCO')) document.getElementById('customKCO').value = data.customKCO || '';
         
-        if (data.rxItems) { rxItems = JSON.parse(JSON.stringify(data.rxItems)); renderRx(); }
+        if (data.rxItems) { rxItems = JSON.parse(JSON.stringify(data.rxItems)); renderRx(); } { const gd=document.getElementById('globalDays'); if(gd) gd.value = data.globalDays || (rxItems[0] && parseInt(rxItems[0].days)) || 5; }
         if (data.tapers) { tapers = JSON.parse(JSON.stringify(data.tapers)); renderActiveTapers(); } else { tapers = []; renderActiveTapers(); }
         setVal('generalAdvice', data.generalAdvice);
         setVal('fuDays', data.fuDays);
@@ -4346,7 +4348,7 @@ async function editSpecificVisit(patientName, visitIndex) {
         });
         updateEGFR();
         updateBMI();
-
+        toggleThyroidTools();
         // Cleanup UI instantly without alerts
         closeHistoryModal();
         document.getElementById('searchResults').style.display = 'none';
@@ -5098,7 +5100,44 @@ async function delSess(d,i){
     await fetch(OPDAPI+'/session-edit',{method:'POST',headers:apiH(),body:JSON.stringify({date:d,sid:x.id,action:'delete'})});
   renderStats();
 }
-
+function openPharmaStats(){ document.getElementById('pharmaModal').classList.remove('hidden'); setPharmaRange('tm'); }
+function setPharmaRange(r){
+  const n=new Date(),y=n.getFullYear(),m=n.getMonth(),f=d=>d.toLocaleDateString('en-CA');
+  let a='',b='';
+  if(r==='td') a=b=f(n);
+  if(r==='tm'){a=f(new Date(y,m,1));b=f(new Date(y,m+1,0));}
+  if(r==='ty'){a=f(new Date(y,0,1));b=f(new Date(y,11,31));}
+  document.getElementById('phFrom').value=a; document.getElementById('phTo').value=b;
+  renderPharma();
+}
+function renderPharma(){
+  const by=phBy.value, g=phGroup.value, from=phFrom.value, to=phTo.value, q=phQ.value.trim().toUpperCase();
+  const norm=s=>String(s||'—').replace(/\d[\d.,/]*\s*(mg|mcg|µg|g|ml|iu|%)?/gi,'').replace(/\s+/g,' ').trim().toUpperCase()||'—';
+  const map={}, periods=new Set(); let totalRx=0, totalItems=0;
+  dbMasterData.forEach(p=>p.visits.forEach(v=>{
+    const d=getVisitDate(v); if(!d||(from&&d<from)||(to&&d>to)) return;
+    const items=(v.details&&v.details.rxItems)||[]; if(!items.length) return;
+    const per=g==='day'?d:g==='month'?d.slice(0,7):d.slice(0,4);
+    periods.add(per); totalRx++;
+    const seen=new Set();
+    items.forEach(it=>{
+      const K=by==='brand'?String(it.brand||'—').toUpperCase().trim():norm(it.molecule);
+      if(q&&!K.includes(q)) return;
+      totalItems++;
+      const e=map[K]||(map[K]={n:K,rx:0,pts:new Set(),per:{}});
+      e.pts.add(p.name);
+      if(!seen.has(K)){seen.add(K); e.rx++; e.per[per]=(e.per[per]||0)+1;}
+    });
+  }));
+  const pl=[...periods].sort(), rows=Object.values(map).sort((a,b)=>b.rx-a.rx);
+  const th='px-3 py-2 text-[10px] font-black text-slate-500 uppercase text-left border-b';
+  phBody.innerHTML=`<div class="flex gap-3 mb-4 text-xs font-bold">
+    <span class="bg-slate-100 px-3 py-2 rounded-lg">Prescriptions: ${totalRx}</span>
+    <span class="bg-slate-100 px-3 py-2 rounded-lg">Unique ${by}s: ${rows.length}</span>
+    <span class="bg-slate-100 px-3 py-2 rounded-lg">Avg meds/Rx: ${totalRx?(totalItems/totalRx).toFixed(1):0}</span></div>
+  <table class="w-full text-xs"><thead><tr><th class="${th}">#</th><th class="${th}">${by}</th><th class="${th}">Rx</th><th class="${th}">Patients</th><th class="${th}">% of Rx</th>${pl.map(x=>`<th class="${th}">${x}</th>`).join('')}</tr></thead><tbody>`+
+  rows.map((r,i)=>`<tr class="border-b hover:bg-slate-50"><td class="px-3 py-1.5 text-slate-400">${i+1}</td><td class="px-3 py-1.5 font-bold">${r.n}</td><td class="px-3 py-1.5 font-black text-teal-700">${r.rx}</td><td class="px-3 py-1.5">${r.pts.size}</td><td class="px-3 py-1.5">${totalRx?(r.rx*100/totalRx).toFixed(1):0}%</td>${pl.map(x=>`<td class="px-3 py-1.5">${r.per[x]||'·'}</td>`).join('')}</tr>`).join('')+`</tbody></table>`;
+}
 function openStatsModal(){
   const sc=document.getElementById('statsCond');
   const cs=new Set(); dbMasterData.forEach(p=>p.visits.forEach(v=>getCustomKcos(v).forEach(t=>{ if(!kcoMasterLabels.some(l=>l.toUpperCase()===t)) cs.add(t); })));
@@ -5558,6 +5597,7 @@ function applyHeaderToggleStyle() {
             
             <input type="text" id="dbSearchInput" oninput="renderPatientsTable()" placeholder="ID - Name - KCO - Meds" class="premium-input max-w-md shadow-sm !py-2">
             <button onclick="openFollowupDashboard()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-black uppercase tracking-widest shrink-0">⏰ Due</button>
+            <button onclick="openPharmaStats()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg text-xs font-black uppercase tracking-widest shrink-0">💊 Pharmacy</button>
             <button onclick="openStatsModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-black uppercase tracking-widest shrink-0">📊 Stats</button>
             <button onclick="document.getElementById('patientsTableModal').classList.add('hidden')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-rose-100 hover:text-rose-600 text-slate-400 transition-colors shrink-0">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -5615,7 +5655,28 @@ function applyHeaderToggleStyle() {
     <div id="statsBody" class="p-6 overflow-y-auto"></div>
   </div>
 </div>
-
+<div id="pharmaModal" class="fixed inset-0 z-[99999] bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden">
+    <div class="px-6 pt-4 pb-3 border-b bg-slate-50">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-black text-slate-800">💊 Pharmacy Statistics</h2>
+        <button onclick="document.getElementById('pharmaModal').classList.add('hidden')" class="text-slate-400 hover:text-rose-600 text-xl font-bold">✕</button>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="setPharmaRange('td')" class="stats-pill">Today</button>
+        <button onclick="setPharmaRange('tm')" class="stats-pill">This Month</button>
+        <button onclick="setPharmaRange('ty')" class="stats-pill">This Year</button>
+        <button onclick="setPharmaRange('all')" class="stats-pill">All Time</button>
+        <input type="date" id="phFrom" onchange="renderPharma()" class="premium-input !py-1 !text-xs w-36">
+        <input type="date" id="phTo" onchange="renderPharma()" class="premium-input !py-1 !text-xs w-36">
+        <select id="phBy" onchange="renderPharma()" class="premium-input !py-1 !text-xs w-32"><option value="brand">By Brand</option><option value="molecule">By Molecule</option></select>
+        <select id="phGroup" onchange="renderPharma()" class="premium-input !py-1 !text-xs w-28"><option value="day">Per Day</option><option value="month" selected>Per Month</option><option value="year">Per Year</option></select>
+        <input type="text" id="phQ" oninput="renderPharma()" placeholder="Filter drug..." class="premium-input !py-1 !text-xs w-40">
+      </div>
+    </div>
+    <div id="phBody" class="p-6 overflow-auto"></div>
+  </div>
+</div>
 <div id="trendModal" class="fixed inset-0 z-[99999] bg-slate-900/80 backdrop-blur-sm hidden flex items-center justify-center p-4 transition-opacity">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl flex flex-col overflow-hidden border border-slate-200">
         <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
