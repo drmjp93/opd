@@ -273,6 +273,10 @@
                 <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                 <span class="text-[8px] font-black text-emerald-700 uppercase mt-0.5 tracking-tighter">DB</span>
             </button>
+            <button onclick="printRBSChart()" class="flex flex-col items-center justify-center w-12 h-10 hover:bg-emerald-100 rounded-lg transition-colors border-l border-emerald-200/50" title="Print RBS Chart">
+                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M3 6h18M3 18h18M9 6v12M15 6v12"/></svg>
+                <span class="text-[8px] font-black text-emerald-700 uppercase mt-0.5 tracking-tighter">RBS</span>
+            </button>
         </div>
 
         <div class="flex items-center bg-slate-800 p-1 rounded-xl shadow-sm ml-1">
@@ -1018,6 +1022,39 @@ function openDietHandout(btnElement) {
     window.open("https://labs.drmjp93.in/diabetic-diet/index.html?autoprint=true", "_blank");
 
     setTimeout(() => { if (span) span.innerText = originalText; }, 1000);
+}
+
+
+// ==========================================
+// RBS CHART PRINT
+// ==========================================
+function printRBSChart() {
+    const rows = ['FBS / ભૂખ્યા પેટ', 'BL / જમતા પહેલા', 'PPBS / જમીને ૨ કલાક', 'BD / જમતા પહેલા', 'PPBD / જમીને ૨ કલાક', '3AM'];
+    const block = () => `
+        <tr><th></th>${'<th colspan="3">DATE</th>'.repeat(2)}</tr>
+        <tr><th></th>${'<th>RBS</th><th>UNITS</th><th>Given By</th>'.repeat(2)}</tr>
+        ${rows.map(r => `<tr><td class="l">${r}</td>${'<td></td>'.repeat(6)}</tr>`).join('')}`;
+    const pName = (document.getElementById('ptName') || {}).value || '';
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>RBS Chart</title>
+    <style>
+        @page { size: A4 portrait; margin: 12mm; }
+        body { font-family: Arial, sans-serif; margin: 0; }
+        h2 { text-align: center; margin: 0 0 4px; font-size: 16px; }
+        p { margin: 0 0 8px; font-size: 12px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 8px; table-layout: fixed; }
+        th, td { border: 1px solid #000; height: 26px; font-size: 11px; text-align: center; padding: 2px; }
+        td.l { text-align: left; font-weight: bold; width: 22%; }
+        th:first-child { width: 22%; }
+    </style></head><body>
+    <h2>RBS CHARTING</h2>
+    <p>Name: <b>${pName}</b></p>
+    <table>${block()}${block()}${block()}</table>
+    <script>window.onload = () => { window.print(); };<\/script>
+    <\/body></html>`;
+    const w = window.open('', '_blank');
+    if (!w) { alert('Allow popups to print RBS chart'); return; }
+    w.document.write(html);
+    w.document.close();
 }
 
 // ══════════════════════════════════════════
