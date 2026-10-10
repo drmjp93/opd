@@ -1049,7 +1049,7 @@ function printRBSChart() {
     <h2>RBS CHARTING</h2>
     <p>Name: <b>${pName}</b></p>
     <table>${block()}${block()}${block()}</table>
-    <script>window.onload = () => { window.print(); };<\/script>
+    <script>window.onload = () => { window.print(); }; window.onafterprint = () => window.close();<\/script>
     <\/body></html>`;
     const w = window.open('', '_blank');
     if (!w) { alert('Allow popups to print RBS chart'); return; }
